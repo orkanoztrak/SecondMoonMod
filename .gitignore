@@ -2,4 +2,4 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/SecondMoon/.vs/SecondMoon/FileContentIndex/12252567-c220-4a40-bdbb-35ac957c19b6.vsidx
+.vs/

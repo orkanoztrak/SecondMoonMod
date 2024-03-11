@@ -20,7 +20,7 @@ public abstract class Item<T> : Item where T : Item<T>
 
     public Item()
     {
-        if (instance != null) throw new InvalidOperationException("Singleton class \"" + typeof(T).Name + "\" inheriting ItemBase was instantiated twice");
+        if (instance != null) throw new InvalidOperationException("Singleton class \"" + typeof(T).Name + "\" inheriting Item was instantiated twice");
         instance = this as T;
     }
 }

@@ -5,15 +5,13 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using static R2API.RecalculateStatsAPI;
-namespace SecondMoon.Items.Prototype;
-public class CelestineAuger : Item
+namespace SecondMoon.Items.Prototype.CelestineAuger;
+public class CelestineAuger : Item<CelestineAuger>
 {
     public static float CelestineAugerCriticalChance = .5f;
     public static float CelestineAugerCriticalChanceStack = .5f;
     public static float CelestineAugerBaseDamage = .5f;
     public static float CelestineAugerBaseDamageStack = .5f;
-    public static float CelestineAugerCriticalDamage = .5f;
-    public static float CelestineAugerCriticalDamageStack = .5f;
     public static float CelestineAugerInitialCritChance = 5f;
 
     public override string ItemName => "Celestine Auger";
@@ -38,12 +36,12 @@ public class CelestineAuger : Item
 
     public override void Hooks()
     {
-        GetStatCoefficients += InitBuffCritCelestineAuger;
-        On.RoR2.CharacterBody.RecalculateStats += BuffCDCCDmgCelestineAuger;
-        IL.RoR2.BulletAttack.FireSingle += IgnoreCollisionBulletCelestineAuger;
+        GetStatCoefficients += CelestineAugerInitBuffCrit;
+        On.RoR2.CharacterBody.RecalculateStats += CelestineAugerBuffCCDmg;
+        IL.RoR2.BulletAttack.FireSingle += CelestineAugerIgnoreCollisionBullet;
     }
 
-    private void IgnoreCollisionBulletCelestineAuger(ILContext il)
+    private void CelestineAugerIgnoreCollisionBullet(ILContext il)
     {
         var cursor = new ILCursor(il);
         cursor.GotoNext(
@@ -74,7 +72,7 @@ public class CelestineAuger : Item
         Hooks();
     }
 
-    public void InitBuffCritCelestineAuger(RoR2.CharacterBody sender, StatHookEventArgs args)
+    public void CelestineAugerInitBuffCrit(CharacterBody sender, StatHookEventArgs args)
     {
         var stackCount = GetCount(sender);
         if (stackCount > 0)
@@ -83,15 +81,14 @@ public class CelestineAuger : Item
         }
     }
 
-    public void BuffCDCCDmgCelestineAuger(On.RoR2.CharacterBody.orig_RecalculateStats orig, RoR2.CharacterBody self)
+    public void CelestineAugerBuffCCDmg(On.RoR2.CharacterBody.orig_RecalculateStats orig, CharacterBody self)
     {
         orig(self);
         var stackCount = GetCount(self);
         if (stackCount > 0)
         {
-            self.critMultiplier *= 1 + (CelestineAugerCriticalDamage + ((stackCount - 1) * CelestineAugerCriticalDamageStack));
-            self.crit *= 1 + (CelestineAugerCriticalChance + ((stackCount - 1) * CelestineAugerCriticalChanceStack));
-            self.damage *= 1 + (CelestineAugerBaseDamage + ((stackCount - 1) * CelestineAugerBaseDamageStack));
+            self.crit *= 1 + (CelestineAugerCriticalChance + (stackCount - 1) * CelestineAugerCriticalChanceStack);
+            self.damage *= 1 + (CelestineAugerBaseDamage + (stackCount - 1) * CelestineAugerBaseDamageStack);
         }
     }
 }

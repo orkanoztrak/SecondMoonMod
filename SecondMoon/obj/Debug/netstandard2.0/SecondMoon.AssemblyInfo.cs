@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SecondMoon")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9053a02083ad84177a749bc973936fe74b055863")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d56e7622754e82f8cc83e961454bd6256093fc69")]
 [assembly: System.Reflection.AssemblyProductAttribute("SecondMoon")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SecondMoon")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -18,11 +18,14 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="BepInEx.Core" Version="5.4.21" />
+    <PackageReference Include="R2API" Version="5.0.5" />
     <PackageReference Include="R2API.Core" Version="5.0.12" />
     <PackageReference Include="R2API.DamageType" Version="1.0.4" />
     <PackageReference Include="R2API.Dot" Version="1.0.1" />
+    <PackageReference Include="R2API.Elites" Version="1.0.3" />
     <PackageReference Include="R2API.Items" Version="1.0.*" />
     <PackageReference Include="R2API.Language" Version="1.0.*" />
+    <PackageReference Include="R2API.Orb" Version="1.0.1" />
     <PackageReference Include="R2API.RecalculateStats" Version="1.3.0" />
     <PackageReference Include="RiskOfRain2.GameLibs" Version="1.2.4-r.0" />
     <PackageReference Include="UnityEngine.Modules" Version="2019.4.26" />
@@ -79,19 +82,52 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="BuffsAndDebuffs\Buffs\Item\" />
+    <Folder Include="BuffsAndDebuffs\Buffs\Survivor\" />
+    <Folder Include="BuffsAndDebuffs\Debuffs\Dots\Survivor\" />
+    <Folder Include="BuffsAndDebuffs\Debuffs\PureDebuffs\Survivor\" />
+    <Folder Include="Elites\Guardian\" />
+    <Folder Include="Equipment\NewFolder\" />
+    <Folder Include="Events\PrototypeAwakeningChallenge\" />
+    <Folder Include="Interactables\Chests\" />
     <Folder Include="Interactables\Shrines\" />
     <Folder Include="Items\Boss\" />
-    <Folder Include="Items\Lunar\" />
-    <Folder Include="Items\Void\" />
-    <Folder Include="Items\Tier3\" />
-    <Folder Include="Items\Tier2\" />
-    <Folder Include="Items\Tier1\" />
-    <Folder Include="Equipment\" />
+    <Folder Include="Items\Lunar\Moonstone\" />
+    <Folder Include="Items\Lunar\IrradiatedMoonstone\" />
+    <Folder Include="Items\Lunar\NarrowMagnifier\" />
+    <Folder Include="Items\Lunar\VengefulHammer\" />
+    <Folder Include="Items\Lunar\OfferingBowl\" />
+    <Folder Include="Items\NoTier\" />
+    <Folder Include="Items\Prototype\FlailOfMass\" />
+    <Folder Include="Items\Prototype\BloodInfusedCore\" />
+    <Folder Include="Items\Prototype\Hydra\" />
+    <Folder Include="Items\Prototype\TremorKnuckles\" />
+    <Folder Include="Items\Prototype\SoulPoweredMantle\" />
+    <Folder Include="Items\Prototype\TotemOfDesign\" />
+    <Folder Include="Items\Tier1\MissileJammer\" />
+    <Folder Include="Items\Tier1\WhackAMole\" />
+    <Folder Include="Items\Tier2\HexDagger\" />
+    <Folder Include="Items\Tier2\BirthdayBalloon\" />
+    <Folder Include="Items\Tier2\PocketLint\" />
+    <Folder Include="Items\Tier2\PSGS+ProMax\" />
+    <Folder Include="Items\Tier2\GourmetSteak\" />
+    <Folder Include="Items\Tier3\CyberneticHeart\" />
+    <Folder Include="Items\Tier3\Boulderball\" />
+    <Folder Include="Items\Tier3\SilverRevolver\" />
+    <Folder Include="Items\Tier3\UniversalKey\" />
+    <Folder Include="Items\Void\GlassChameleon\" />
+    <Folder Include="Items\Void\Lightbulb\" />
+    <Folder Include="Items\Void\BlissfulVisage\" />
+    <Folder Include="Items\Void\MirrorVeil\" />
+    <Folder Include="Items\Void\GazingSoulstealer\" />
+    <Folder Include="Items\Void\Popperbloom\" />
     <Folder Include="Monsters\" />
-    <Folder Include="Elites\" />
-    <Folder Include="Events\" />
-    <Folder Include="Stages\" />
-    <Folder Include="Survivors\" />
+    <Folder Include="Stages\Lunar\" />
+    <Folder Include="Stages\Badlands\" />
+    <Folder Include="Stages\Providence\" />
+    <Folder Include="Survivors\RogueChimera\" />
+    <Folder Include="Survivors\Warlock\" />
+    <Folder Include="Survivors\Outlaw\" />
   </ItemGroup>
 
 </Project>
