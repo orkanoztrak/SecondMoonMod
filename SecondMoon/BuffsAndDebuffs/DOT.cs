@@ -27,8 +27,8 @@ public abstract class DOT
     public abstract string AssociatedBuffName { get; }
     public BuffDef AssociatedBuff { get; protected set; }
     public DotController.DotIndex DotIndex { get; private set; }
-    public virtual DotAPI.CustomDotBehaviour CustomDotBehaviour { get; } = null;
-    public virtual DotAPI.CustomDotVisual CustomDotVisual { get; } = null;
+    public virtual DotAPI.CustomDotBehaviour CustomDotBehaviour { get; protected set; } = null;
+    public virtual DotAPI.CustomDotVisual CustomDotVisual { get; protected set; } = null;
 
     protected void CreateDOT()
     {

@@ -87,7 +87,10 @@
     <Folder Include="BuffsAndDebuffs\Debuffs\Dots\Survivor\" />
     <Folder Include="BuffsAndDebuffs\Debuffs\PureDebuffs\Survivor\" />
     <Folder Include="Elites\Guardian\" />
-    <Folder Include="Equipment\NewFolder\" />
+    <Folder Include="EntityStates\Survivors\Outlaw\" />
+    <Folder Include="EntityStates\Survivors\RogueChimera\" />
+    <Folder Include="EntityStates\Survivors\Warlock\" />
+    <Folder Include="Equipment\" />
     <Folder Include="Events\PrototypeAwakeningChallenge\" />
     <Folder Include="Interactables\Chests\" />
     <Folder Include="Interactables\Shrines\" />
@@ -98,8 +101,8 @@
     <Folder Include="Items\Lunar\VengefulHammer\" />
     <Folder Include="Items\Lunar\OfferingBowl\" />
     <Folder Include="Items\NoTier\" />
-    <Folder Include="Items\Prototype\FlailOfMass\" />
     <Folder Include="Items\Prototype\BloodInfusedCore\" />
+    <Folder Include="Items\Prototype\FlailOfMass\" />
     <Folder Include="Items\Prototype\Hydra\" />
     <Folder Include="Items\Prototype\TremorKnuckles\" />
     <Folder Include="Items\Prototype\SoulPoweredMantle\" />
@@ -107,9 +110,8 @@
     <Folder Include="Items\Tier1\MissileJammer\" />
     <Folder Include="Items\Tier1\WhackAMole\" />
     <Folder Include="Items\Tier2\HexDagger\" />
-    <Folder Include="Items\Tier2\BirthdayBalloon\" />
     <Folder Include="Items\Tier2\PocketLint\" />
-    <Folder Include="Items\Tier2\PSGS+ProMax\" />
+    <Folder Include="Items\Tier2\PSG+ProMaxS99\" />
     <Folder Include="Items\Tier2\GourmetSteak\" />
     <Folder Include="Items\Tier3\CyberneticHeart\" />
     <Folder Include="Items\Tier3\Boulderball\" />

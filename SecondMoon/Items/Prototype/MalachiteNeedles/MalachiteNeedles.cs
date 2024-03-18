@@ -83,7 +83,7 @@ public class MalachiteNeedles : Item<MalachiteNeedles>
                 ınflictDotInfo.attackerObject = damageInfo.attacker;
                 ınflictDotInfo.dotIndex = Corrosion.instance.DotIndex;
                 ınflictDotInfo.duration = MalachiteNeedlesCorrosionDuration;
-                ınflictDotInfo.damageMultiplier = (damageInfo.damage/attackerBody.damage) * (MalachiteNeedlesCorrosionDmgInit + ((stackCount - 1) * MalachiteNeedlesCorrosionDmgStack));
+                ınflictDotInfo.damageMultiplier = damageInfo.damage / attackerBody.damage * (MalachiteNeedlesCorrosionDmgInit + ((stackCount - 1) * MalachiteNeedlesCorrosionDmgStack));
                 DotController.InflictDot(ref ınflictDotInfo);
             }
         }

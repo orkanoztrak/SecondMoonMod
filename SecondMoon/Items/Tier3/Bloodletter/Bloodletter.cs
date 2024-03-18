@@ -14,15 +14,10 @@ public class Bloodletter : Item<Bloodletter>
 {
     public static float BloodletterProcChance = 10f;
     public static float BloodletterDamage = 2f;
-    public static float BloodletterDamageScalingInit = 1f;
-    public static float BloodletterDamageScalingStack = 1f;
-    public static float BloodletterDamageScalingThreshold = 1f;
-
-    public static float BloodletterGash = 1f;
-    public static float BloodletterGashDuration = 2f;
-    public static float BloodletterGashScalingInit = 0.5f;
-    public static float BloodletterGashScalingStack = 0.5f;
-    public static float BloodletterGashScalingThreshold = 1f;
+    public static float BloodletterDamageScalingInit = 0.5f;
+    public static float BloodletterDamageScalingStack = 0.25f;
+    public static float BloodletterProcChanceScaling = 5f;
+    public static float BloodletterGashDuration = 3f;
 
     public override string ItemName => "Bloodletter";
 
@@ -55,19 +50,29 @@ public class Bloodletter : Item<Bloodletter>
         orig(self, damageInfo, victim);
         if (damageInfo.attacker)
         {
-            var attacker = damageInfo.attacker.GetComponent<CharacterMaster>();
             var attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
+            var attacker = attackerBody.master;
             var victimComponent = victim.GetComponent<HealthComponent>();
-            if (attacker && attackerBody && victimComponent)
+            if (attacker && attackerBody && victimComponent && victim != damageInfo.attacker)
             {
                 var stackCount = GetCount(attacker);
                 if (stackCount > 0)
                 {
-                    if (Util.CheckRoll(BloodletterProcChance * damageInfo.procCoefficient, attacker))
+                    var finalChance = BloodletterProcChance;
+                    if (damageInfo.damage / attackerBody.damage >= 6f)
                     {
+                        finalChance += BloodletterProcChanceScaling;
+                        if (damageInfo.damage / attackerBody.damage >= 10f)
+                        {
+                            finalChance += BloodletterProcChanceScaling;
+                        }
+                    }
+                    if (Util.CheckRoll(finalChance * damageInfo.procCoefficient, attacker))
+                    {
+                        var procDamage = HandleDamageCalc(damageInfo.damage, attackerBody.damage, stackCount);
                         DamageInfo bloodletterProc = new DamageInfo
                         {
-                            damage = BloodletterDamage + (damageInfo.damage / attackerBody.damage / BloodletterDamageScalingThreshold * (BloodletterDamageScalingInit + ((stackCount - 1) * BloodletterDamageScalingStack))),
+                            damage = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, procDamage),
                             damageColorIndex = DamageColorIndex.Item,
                             damageType = DamageType.Generic,
                             attacker = damageInfo.attacker,
@@ -77,14 +82,16 @@ public class Bloodletter : Item<Bloodletter>
                             position = damageInfo.position,
                             procCoefficient = 0
                         };
-
                         InflictDotInfo ınflictDotInfo = default(InflictDotInfo);
                         ınflictDotInfo.victimObject = victim;
                         ınflictDotInfo.attackerObject = damageInfo.attacker;
                         ınflictDotInfo.dotIndex = Gash.instance.DotIndex;
                         ınflictDotInfo.duration = BloodletterGashDuration;
-                        ınflictDotInfo.damageMultiplier = BloodletterGash + (damageInfo.damage / attackerBody.damage / BloodletterGashScalingThreshold * (BloodletterGashScalingInit + ((stackCount - 1) * BloodletterGashScalingStack)));
-
+                        ınflictDotInfo.damageMultiplier = damageInfo.damage / attackerBody.damage * procDamage / 2;
+                        if (bloodletterProc.crit)
+                        {
+                            ınflictDotInfo.damageMultiplier *= attackerBody.critMultiplier;
+                        }
                         EffectManager.SimpleImpactEffect(RoR2.HealthComponent.AssetReferences.executeEffectPrefab, bloodletterProc.position, Vector3.up, transmit: true);
                         victimComponent.TakeDamage(bloodletterProc);
                         DotController.InflictDot(ref ınflictDotInfo);
@@ -99,5 +106,28 @@ public class Bloodletter : Item<Bloodletter>
         CreateLang();
         CreateItem();
         Hooks();
+    }
+
+    public float HandleDamageCalc(float totalDamage, float baseDamage, float stackCount)
+    {
+        var hitPercent = (int)(totalDamage / baseDamage);
+        var scalingIncludingStacks = BloodletterDamageScalingInit + ((stackCount - 1) * BloodletterDamageScalingStack);
+        if (hitPercent <= 1)
+        {
+            return BloodletterDamage;
+        }
+        if (hitPercent < 4)
+        {
+            return BloodletterDamage + ((hitPercent - 1) * scalingIncludingStacks);
+        }
+        if (hitPercent < 8)
+        {
+            return BloodletterDamage + (3 * scalingIncludingStacks);
+        }
+        if (hitPercent >= 8)
+        {
+            return BloodletterDamage + (4 * scalingIncludingStacks);
+        }
+        return 0f;
     }
 }

@@ -18,6 +18,7 @@ namespace SecondMoon
     [BepInDependency(LanguageAPI.PluginGUID)]
     [BepInDependency(DotAPI.PluginGUID)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
+    [BepInDependency(PrefabAPI.PluginGUID)]
 
     // This is the main declaration of our plugin class.
     // BepInEx searches for all classes inheriting from BaseUnityPlugin to initialize on startup.
@@ -67,7 +68,6 @@ namespace SecondMoon
                 item.Init();
                 Logger.LogInfo("Item: " + item.ItemName + " Initialized!");
             }
-
 #pragma warning disable Publicizer001
 #pragma warning restore Publicizer001
         }
