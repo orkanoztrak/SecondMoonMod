@@ -18,16 +18,16 @@ internal class WantedPoster : Item<WantedPoster>
 
     public override string ItemName => "Wanted Poster";
 
-    public override string ItemLangTokenName => "WANTED_POSTER";
+    public override string ItemLangTokenName => "SECONDMOONMOD_WANTED_POSTER";
 
-    public override string ItemPickupDesc => "Test";
+    public override string ItemPickupDesc => $"Deal extra damage to bosses and get bonus gold from killing them.";
 
-    public override string ItemFullDesc => "Test";
+    public override string ItemFullDesc => $"Deal an additional <style=cIsDamage>{WantedPosterBossDamageInit}%</style> damage <style=cStack>(+{WantedPosterBossDamageStack}% per stack)</style> to bosses. They give an additional <style=cIsUtility>{WantedPosterBossGoldInit}%</style> <style=cStack>(+{WantedPosterBossGoldStack}% per stack)</style> <style=cIsUtility>gold</style> upon death.";
 
     public override string ItemLore => "Test";
 
     public override ItemTier ItemTier => ItemTier.Tier1;
-    public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Utility];
+    public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Utility, ItemTag.BrotherBlacklist];
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
         displayRules = new ItemDisplayRuleDict(null);

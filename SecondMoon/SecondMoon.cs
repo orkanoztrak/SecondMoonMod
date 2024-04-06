@@ -1,9 +1,13 @@
 using BepInEx;
+using HarmonyLib;
 using R2API;
 using RoR2;
 using RoR2.ExpansionManagement;
+using RoR2.Items;
 using SecondMoon.BuffsAndDebuffs;
 using SecondMoon.Items;
+using SecondMoon.Equipment;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -11,6 +15,9 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using static Facepunch.Steamworks.Inventory;
 using static Facepunch.Steamworks.Workshop;
+using SecondMoon.AttackTypes.Orbs.Item.Prototype.Hydra;
+
+[assembly: HG.Reflection.SearchableAttribute.OptIn]
 
 namespace SecondMoon
 {
@@ -19,6 +26,8 @@ namespace SecondMoon
     [BepInDependency(DotAPI.PluginGUID)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     [BepInDependency(PrefabAPI.PluginGUID)]
+    [BepInDependency(DamageAPI.PluginGUID)]
+    [BepInDependency(OrbAPI.PluginGUID)]
 
     // This is the main declaration of our plugin class.
     // BepInEx searches for all classes inheriting from BaseUnityPlugin to initialize on startup.
@@ -33,9 +42,13 @@ namespace SecondMoon
         public const string PluginVersion = "1.0.0";
 
         public static HashSet<ItemDef> BlacklistedFromPrinter = new HashSet<ItemDef>();
+        public static List<Items.Item> VoidItemList = new List<Items.Item>();
+        public static ExpansionDef DLC1;
         public void Awake()
         {
             Log.Init(Logger);
+
+            DLC1 = Addressables.LoadAssetAsync<ExpansionDef>("RoR2/DLC1/Common/DLC1.asset").WaitForCompletion();
 
             var BuffTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(Buff)));
             Logger.LogInfo("----------------------BUFFS--------------------");
@@ -67,32 +80,41 @@ namespace SecondMoon
                 Items.Item item = (Items.Item)System.Activator.CreateInstance(itemType);
                 item.Init();
                 Logger.LogInfo("Item: " + item.ItemName + " Initialized!");
+                if (item.ItemToCorrupt)
+                {
+                    VoidItemList.Add(item);
+                }
+            }
+
+            On.RoR2.Items.ContagiousItemManager.Init += Corrupt;
+
+            var EquipmentTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(Equipment.Equipment)));
+
+            Logger.LogInfo("--------------------EQUIPMENT------------------");
+
+            foreach (var equipmentType in EquipmentTypes)
+            {
+                Equipment.Equipment equipment = (Equipment.Equipment)System.Activator.CreateInstance(equipmentType);
+                equipment.Init();
+                Logger.LogInfo("Equipment: " + equipment.EquipmentName + " Initialized!");
             }
 #pragma warning disable Publicizer001
 #pragma warning restore Publicizer001
         }
-        // The Update() method is run on every frame of the game.
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Z))
-            {
-                var transform = PlayerCharacterMasterController.instances[0].master.GetBodyObject().transform;
-                Log.Info($"Player pressed Z. Spawning our custom item at coordinates {transform.position}");
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(RoR2Content.Items.Feather.itemIndex), transform.position, transform.forward * 20f);
-            }
-            if (Input.GetKeyDown(KeyCode.T))
-            {
-                var transform = PlayerCharacterMasterController.instances[0].master.GetBodyObject().transform;
-                Log.Info($"Player pressed Z. Spawning our custom item at coordinates {transform.position}");
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(RoR2Content.Items.Hoof.itemIndex), transform.position, transform.forward * 20f);
-            }
-            if (Input.GetKeyDown(KeyCode.L))
-            {
-                var transform = PlayerCharacterMasterController.instances[0].master.GetBodyObject().transform;
-                Log.Info($"Player pressed Z. Spawning our custom item at coordinates {transform.position}");
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(RoR2Content.Items.Clover.itemIndex), transform.position, transform.forward * 20f);
-            }
 
+        private void Corrupt(On.RoR2.Items.ContagiousItemManager.orig_Init orig)
+        {
+            foreach(Items.Item item in VoidItemList)
+            {
+                ItemDef.Pair transformation = new ItemDef.Pair()
+                {
+                    itemDef1 = item.ItemToCorrupt,
+                    itemDef2 = item.ItemDef
+                };
+                ItemCatalog.itemRelationships[DLC1Content.ItemRelationshipTypes.ContagiousItem] = ItemCatalog.itemRelationships[DLC1Content.ItemRelationshipTypes.ContagiousItem].AddToArray(transformation);
+            }
+            orig();
         }
+
     }
 }

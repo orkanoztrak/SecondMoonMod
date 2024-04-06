@@ -1,15 +1,16 @@
 ﻿using EntityStates;
 using RoR2;
+using SecondMoon.MyEntityStates.Items.Tier2;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace SecondMoon.EntityStates.Items.Tier2;
+namespace SecondMoon.MyEntityStates.Items.Prototype;
 
-public class BirthdayBalloonBase : EntityState
+public class FlailOfMassBase : BaseState
 {
-    private static readonly List<BirthdayBalloonBase> instancesList = new List<BirthdayBalloonBase>();
+    private static readonly List<FlailOfMassBase> instancesList = new List<FlailOfMassBase>();
 
     protected NetworkedBodyAttachment networkedBodyAttachment;
 
@@ -19,33 +20,7 @@ public class BirthdayBalloonBase : EntityState
 
     protected CharacterMotor bodyMotor;
 
-    protected InputBankTest bodyInputBank;
-
-    protected bool jumpButtonDown
-    {
-        get
-        {
-            if ((bool)bodyInputBank)
-            {
-                return bodyInputBank.jump.down;
-            }
-            return false;
-        }
-    }
-
-    protected bool isGrounded
-    {
-        get
-        {
-            if ((bool)bodyMotor)
-            {
-                return bodyMotor.isGrounded;
-            }
-            return false;
-        }
-    }
-
-    public static BirthdayBalloonBase FindForBody(CharacterBody body)
+    public static FlailOfMassBase FindForBody(CharacterBody body)
     {
         for (int i = 0; i < instancesList.Count; i++)
         {
@@ -69,25 +44,12 @@ public class BirthdayBalloonBase : EntityState
             if ((bool)bodyGameObject)
             {
                 bodyMotor = bodyGameObject.GetComponent<CharacterMotor>();
-                bodyInputBank = bodyGameObject.GetComponent<InputBankTest>();
             }
         }
     }
-
     public override void OnExit()
     {
         instancesList.Remove(this);
         base.OnExit();
     }
-
-    protected bool ReturnToIdleIfGroundedAuthority()
-    {
-        if ((bool)bodyMotor && bodyMotor.isGrounded)
-        {
-            outer.SetNextState(new BirthdayBalloonIdle());
-            return true;
-        }
-        return false;
-    }
-
 }

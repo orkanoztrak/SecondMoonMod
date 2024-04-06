@@ -4,6 +4,7 @@ using SecondMoon.BuffsAndDebuffs.Debuffs.Dots.Item.Prototype;
 using SecondMoon.BuffsAndDebuffs.Debuffs.Dots.Item.Tier3;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using UnityEngine;
 using static UnityEngine.ParticleSystem.PlaybackState;
@@ -17,15 +18,21 @@ public class Bloodletter : Item<Bloodletter>
     public static float BloodletterDamageScalingInit = 0.5f;
     public static float BloodletterDamageScalingStack = 0.25f;
     public static float BloodletterProcChanceScaling = 5f;
-    public static float BloodletterGashDuration = 3f;
 
     public override string ItemName => "Bloodletter";
 
-    public override string ItemLangTokenName => "BLOODLETTER";
+    public override string ItemLangTokenName => "SECONDMOONMOD_BLOODLETTER";
 
-    public override string ItemPickupDesc => "Test";
+    public override string ItemPickupDesc => $"Chance on hit to wound the enemy. The stronger the hit, the better this works.";
 
-    public override string ItemFullDesc => "Test";
+    public override string ItemFullDesc => $"Hits have a <style=cIsDamage>{BloodletterProcChance}%</style> chance to deal <style=cIsDamage>{BloodletterDamage * 100}%</style> TOTAL damage and apply <color=#{System.Drawing.Color.Aqua}>Gash</color> for half the damage this item inflicts." +
+        $" <color=#C14040>At certain damage % thresholds, this item's effects become stronger</color>:\r\n\r\n" + 
+        $"• {2 * 100}%: <style=cIsDamage>+{BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{BloodletterDamageScalingStack * 100}% per stack)</style> extra damage.\r\n" +
+        $"• {3 * 100}%: <style=cIsDamage>+{2 * BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{2 * BloodletterDamageScalingStack * 100}% per stack)</style> extra damage.\r\n" +
+        $"• {4 * 100}%: <style=cIsDamage>+{3 * BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{3 * BloodletterDamageScalingStack * 100}% per stack)</style> extra damage.\r\n" +
+        $"• {6 * 100}%: <style=cIsDamage>+{3 * BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{3 * BloodletterDamageScalingStack * 100}% per stack)</style> extra damage. <style=cIsDamage>{BloodletterProcChance + BloodletterProcChanceScaling}%</style> chance for proc.\r\n" +
+        $"• {8 * 100}%: <style=cIsDamage>+{4 * BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{4 * BloodletterDamageScalingStack * 100}% per stack)</style> extra damage. <style=cIsDamage>{BloodletterProcChance + BloodletterProcChanceScaling}%</style> chance for proc.\r\n" +
+        $"• {10 * 100}%: <style=cIsDamage>+{4 * BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{4 * BloodletterDamageScalingStack * 100}% per stack)</style> extra damage. <style=cIsDamage>{BloodletterProcChance + 2 * BloodletterProcChanceScaling}%</style> chance for proc.\r\n";
 
     public override string ItemLore => "Test";
 
@@ -59,10 +66,10 @@ public class Bloodletter : Item<Bloodletter>
                 if (stackCount > 0)
                 {
                     var finalChance = BloodletterProcChance;
-                    if (damageInfo.damage / attackerBody.damage >= 6f)
+                    if (damageInfo.damage / attackerBody.damage >= 6)
                     {
                         finalChance += BloodletterProcChanceScaling;
-                        if (damageInfo.damage / attackerBody.damage >= 10f)
+                        if (damageInfo.damage / attackerBody.damage >= 10)
                         {
                             finalChance += BloodletterProcChanceScaling;
                         }
@@ -86,12 +93,8 @@ public class Bloodletter : Item<Bloodletter>
                         ınflictDotInfo.victimObject = victim;
                         ınflictDotInfo.attackerObject = damageInfo.attacker;
                         ınflictDotInfo.dotIndex = Gash.instance.DotIndex;
-                        ınflictDotInfo.duration = BloodletterGashDuration;
-                        ınflictDotInfo.damageMultiplier = damageInfo.damage / attackerBody.damage * procDamage / 2;
-                        if (bloodletterProc.crit)
-                        {
-                            ınflictDotInfo.damageMultiplier *= attackerBody.critMultiplier;
-                        }
+                        ınflictDotInfo.damageMultiplier = 1;
+                        ınflictDotInfo.totalDamage = bloodletterProc.damage / 2;
                         EffectManager.SimpleImpactEffect(RoR2.HealthComponent.AssetReferences.executeEffectPrefab, bloodletterProc.position, Vector3.up, transmit: true);
                         victimComponent.TakeDamage(bloodletterProc);
                         DotController.InflictDot(ref ınflictDotInfo);

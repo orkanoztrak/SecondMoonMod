@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SecondMoon.EntityStates.Items.Tier2;
+namespace SecondMoon.MyEntityStates.Items.Tier2;
 
 public class BirthdayBalloonIdle : BirthdayBalloonBase
 {
     public override void FixedUpdate()
     {
-        FixedUpdate();
+        base.FixedUpdate();
         if (isAuthority)
         {
             FixedUpdateAuthority();
@@ -16,7 +16,7 @@ public class BirthdayBalloonIdle : BirthdayBalloonBase
     }
 
     private void FixedUpdateAuthority()
-    {
+    { 
         if (bodyMotor && bodyInputBank)
         {
             bool num = jumpButtonDown && bodyMotor.velocity.y < 0f && !bodyMotor.isGrounded;

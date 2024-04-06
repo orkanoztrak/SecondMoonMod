@@ -1,8 +1,10 @@
 ﻿using BepInEx.Configuration;
 using HarmonyLib;
 using MonoMod.Cil;
+using On.RoR2.Items;
 using R2API;
 using RoR2;
+using RoR2.ExpansionManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,13 +36,13 @@ public abstract class Item
     public abstract string ItemFullDesc { get; }
     public abstract string ItemLore { get; }
     public abstract ItemTier ItemTier { get; }
-    public virtual ItemTag[] Category { get; set; } = new ItemTag[] { };
-    //public abstract GameObject ItemModel { get; }
-    //public abstract Sprite ItemIcon { get; }
+    public abstract ItemTag[] Category { get; }
+    public virtual GameObject ItemModel { get; } = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
+    public virtual Sprite ItemIcon { get; } = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
 
     public ItemDef ItemDef;
 
-    public virtual string CorruptsItem { get; set; } = null;
+    public virtual ItemDef ItemToCorrupt { get; } = null;
 
     public virtual UnlockableDef ItemUnlockableDef { get; set; } = null;
 
@@ -51,7 +53,7 @@ public abstract class Item
     public virtual bool PrinterBlacklisted { get; set; } = false;
 
     public virtual bool Unlockable { get; set; } = true;
-
+    public virtual ExpansionDef RequiredExpansion { get; set; } = null;
     protected virtual ItemDisplayRuleDict displayRules { get; set; } = null;
     public abstract void Init();
 
@@ -67,37 +69,27 @@ public abstract class Item
 
     protected void CreateItem()
     {
-        if (AIBlacklisted)
-        {
-            Category.AddItem(ItemTag.AIBlacklist);
-        }
-
+        if (AIBlacklisted) { Category.AddItem(ItemTag.AIBlacklist); }
         ItemDef = ScriptableObject.CreateInstance<ItemDef>();
         ItemDef.name = "ITEM_" + ItemLangTokenName;
         ItemDef.nameToken = "ITEM_" + ItemLangTokenName + "_NAME";
         ItemDef.pickupToken = "ITEM_" + ItemLangTokenName + "_PICKUP";
         ItemDef.descriptionToken = "ITEM_" + ItemLangTokenName + "_DESCRIPTION";
         ItemDef.loreToken = "ITEM_" + ItemLangTokenName + "_LORE";
-        //ItemDef.pickupModelPrefab = ItemModel;
-        //ItemDef.pickupIconSprite = ItemIcon;
+        ItemDef.pickupModelPrefab = ItemModel;
+        ItemDef.pickupIconSprite = ItemIcon;
         ItemDef.hidden = false;
         ItemDef.canRemove = CanRemove;
         ItemDef.deprecatedTier = ItemTier;
         ItemDef.tags = Category;
-        ItemDef.pickupIconSprite = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
-        ItemDef.pickupModelPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
         if (Category.Length > 0) { ItemDef.tags = Category; }
-
-        if (PrinterBlacklisted)
+        if (PrinterBlacklisted) { SecondMoonPlugin.BlacklistedFromPrinter.Add(ItemDef); }
+        if (ItemUnlockableDef) { ItemDef.unlockableDef = ItemUnlockableDef; }
+        if (RequiredExpansion) { ItemDef.requiredExpansion = RequiredExpansion; }
+        if (ItemToCorrupt) 
         {
-            SecondMoonPlugin.BlacklistedFromPrinter.Add(ItemDef);
+            if (!RequiredExpansion) { ItemDef.requiredExpansion = SecondMoonPlugin.DLC1; }
         }
-
-        if (ItemUnlockableDef)
-        {
-            ItemDef.unlockableDef = ItemUnlockableDef;
-        }
-
         ItemAPI.Add(new CustomItem(ItemDef, CreateItemDisplayRules()));
     }
 
@@ -124,6 +116,8 @@ public abstract class Item
             });
         }
     }
+
+
 
     public abstract void Hooks();
 

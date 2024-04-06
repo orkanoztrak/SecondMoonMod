@@ -12,7 +12,7 @@ public class Corrosion : DOT<Corrosion>
 {
     public override float Interval => 0.5f;
 
-    public override float DamageCoefficient => 0.25f;
+    public override float DamageCoefficient => 0.2f;
 
     public override DamageColorIndex DamageColorIndex => DamageColorIndex.Poison;
 

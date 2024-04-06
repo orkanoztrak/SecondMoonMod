@@ -5,9 +5,11 @@ using static RoR2.Items.BaseItemBodyBehavior;
 using UnityEngine;
 using RoR2.Items;
 using RoR2;
-using SecondMoon.EntityStates.Items.Tier2;
+using SecondMoon.MyEntityStates.Items.Tier2;
 using EntityStates;
 using UnityEngine.Networking;
+using R2API.Utils;
+using R2API;
 
 namespace SecondMoon.Items.Tier2.BirthdayBalloon;
 
@@ -23,21 +25,40 @@ public class BirthdayBalloonBodyBehavior : BaseItemBodyBehavior
 
     private void OnEnable()
     {
-        BirthdayBalloonControllerObject = ConstructController();
+        ConstructController();
         BirthdayBalloonControllerObject.GetComponent<NetworkedBodyAttachment>().AttachToGameObjectAndSpawn(body.gameObject);
     }
-
-    private GameObject ConstructController()
+    private void ConstructController()
     {
-        var controller = new GameObject();
-        controller.AddComponent<NetworkIdentity>();
-        controller.AddComponent<NetworkedBodyAttachment>();
-        controller.AddComponent<EntityStateMachine>();
-        controller.GetComponent<EntityStateMachine>().initialStateType = new SerializableEntityStateType(typeof(BirthdayBalloonIdle));
-        controller.GetComponent<EntityStateMachine>().mainStateType = new SerializableEntityStateType(typeof(BirthdayBalloonFloat));
-        controller.AddComponent<RoR2.NetworkStateMachine>();
-        return controller;
+        var controller = CreateBlankPrefab("BirthdayBalloonController", true);
+        controller.GetComponent<NetworkIdentity>().localPlayerAuthority = true;
+
+        NetworkedBodyAttachment networkedBodyAttachment = controller.AddComponent<NetworkedBodyAttachment>();
+        networkedBodyAttachment.shouldParentToAttachedBody = true;
+        networkedBodyAttachment.forceHostAuthority = false;
+
+        EntityStateMachine entityStateMachine = controller.AddComponent<EntityStateMachine>();
+        entityStateMachine.initialStateType = entityStateMachine.mainStateType = new SerializableEntityStateType(typeof(BirthdayBalloonIdle));
+
+        NetworkStateMachine networkStateMachine = controller.AddComponent<NetworkStateMachine>();
+        networkStateMachine.SetFieldValue("stateMachines", new EntityStateMachine[] {
+                entityStateMachine
+            });
+
+        BirthdayBalloonControllerObject = Instantiate(controller);
     }
+
+    public static GameObject CreateBlankPrefab(string name = "GameObject", bool network = false)
+    {
+        GameObject gameObject = PrefabAPI.InstantiateClone(new GameObject(name), name, false);
+        if (network)
+        {
+            gameObject.AddComponent<NetworkIdentity>();
+            PrefabAPI.RegisterNetworkPrefab(gameObject);
+        }
+        return gameObject;
+    }
+
 
     private void OnDisable()
     {

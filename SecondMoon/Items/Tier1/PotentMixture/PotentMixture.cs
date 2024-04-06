@@ -15,11 +15,11 @@ public class PotentMixture : Item<PotentMixture>
 
     public override string ItemName => "Potent Mixture";
 
-    public override string ItemLangTokenName => "POTENT_MIXTURE";
+    public override string ItemLangTokenName => "SECONDMOONMOD_POTENT_MIXTURE";
 
-    public override string ItemPickupDesc => "Test";
+    public override string ItemPickupDesc => $"Your damage over time effects last longer.";
 
-    public override string ItemFullDesc => "Test";
+    public override string ItemFullDesc => $"Your <style=cIsDamage>damage over time</style> effects last <style=cIsDamage>{PotentMixtureExtensionInit * 100}%</style> <style=cStack>(+{PotentMixtureExtensionStack * 100}% per stack)</style> longer. <style=cIsDamage>Collapse</style> instead does <style=cIsDamage>{PotentMixtureExtensionInit * 100}%</style> <style=cStack>(+{PotentMixtureExtensionStack * 100}% per stack)</style> more damage.";
 
     public override string ItemLore => "Test";
 
@@ -42,22 +42,33 @@ public class PotentMixture : Item<PotentMixture>
     {
         var newDuration = duration;
         float? newTotalDamage = totalDamage;
-        var increase = 0f;
+        float increase;
         var attacker = attackerObject.GetComponent<CharacterBody>();
+        var newDamageMultiplier = damageMultiplier;
         if (attacker)
         {
             var stackCount = GetCount(attacker);
             if (stackCount > 0)
             {
-                increase = 1 - (1 / (1 + PotentMixtureExtensionInit + ((stackCount - 1) * PotentMixtureExtensionStack)));
-                newDuration = duration * (1 + increase);
-                if (totalDamage.HasValue)
+                increase = (float)(1 - ((1 - PotentMixtureExtensionInit) * Math.Pow(1 - PotentMixtureExtensionStack, stackCount - 1)));
+                if (!(dotIndex == DotController.DotIndex.Fracture))
                 {
-                    newTotalDamage = totalDamage * (1 + increase);
+                    if (totalDamage.HasValue)
+                    {
+                        newTotalDamage = totalDamage * (1 + increase);
+                    }
+                    else
+                    {
+                        newDuration = duration * (1 + increase);
+                    }
+                }
+                else
+                {
+                    newDamageMultiplier = damageMultiplier * (1 + increase);
                 }
             }
         }
-        orig(self, attackerObject, newDuration, dotIndex, damageMultiplier, maxStacksFromAttacker, newTotalDamage, preUpgradeDotIndex);
+        orig(self, attackerObject, newDuration, dotIndex, newDamageMultiplier, maxStacksFromAttacker, newTotalDamage, preUpgradeDotIndex);
     }
 
     public override void Init()

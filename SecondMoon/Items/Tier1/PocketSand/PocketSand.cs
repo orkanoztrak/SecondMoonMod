@@ -12,7 +12,6 @@ namespace SecondMoon.Items.Tier1.PocketSand;
 
 internal class PocketSand : Item<PocketSand>
 {
-    public BuffDef DebuffPocketSand;
     public static float PocketSandHealthThreshold = 0.9f;
     public static float PocketSandMovementReduction = 0.45f;
     public static float PocketSandAttackSpeedReduction = 0.45f;
@@ -20,7 +19,7 @@ internal class PocketSand : Item<PocketSand>
     public static float PocketSandTimerStack = 2f;
     public override string ItemName => "Pocket Sand";
 
-    public override string ItemLangTokenName => "POCKET_SAND";
+    public override string ItemLangTokenName => "SECONDMOONMOD_POCKET_SAND";
 
     public override string ItemPickupDesc => "Test";
 
@@ -57,14 +56,13 @@ internal class PocketSand : Item<PocketSand>
             if (stackCount > 0)
             {
                 var victim = healthComponent.GetComponent<CharacterBody>();
-                victim.AddTimedBuffAuthority(DebuffPocketSand.buffIndex, PocketSandTimerInit + ((stackCount - 1) * PocketSandTimerStack));
+                victim.AddTimedBuffAuthority(PocketSandDebuff.instance.BuffDef.buffIndex, PocketSandTimerInit + ((stackCount - 1) * PocketSandTimerStack));
             }
         });
     }
 
     public override void Init()
     {
-        DebuffPocketSand = PocketSandDebuff.instance.BuffDef;
         CreateLang();
         CreateItem();
         Hooks();

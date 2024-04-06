@@ -11,9 +11,9 @@ namespace SecondMoon.BuffsAndDebuffs.Debuffs.Dots.Item.Tier3;
 
 public class Gash : DOT<Gash>
 {
-    public override float Interval => 0.3f;
+    public override float Interval => 0.6f;
 
-    public override float DamageCoefficient => 0.1f;
+    public override float DamageCoefficient => 0.2f;
 
     public override DamageColorIndex DamageColorIndex => DamageColorIndex.SuperBleed;
 
