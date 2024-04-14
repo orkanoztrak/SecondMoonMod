@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SecondMoon.AttackTypes.Orbs.Item.Prototype.Hydra;
 
-public class HydraOrb : RoR2.Orbs.GenericDamageOrb, IOrbFixedUpdateBehavior
+public class HydraOrb : GenericDamageOrb, IOrbFixedUpdateBehavior
 {
     private float accumulatedTime;
 

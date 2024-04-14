@@ -14,7 +14,8 @@ namespace SecondMoon.Items.Tier3.Bloodletter;
 public class Bloodletter : Item<Bloodletter>
 {
     public static float BloodletterProcChance = 10f;
-    public static float BloodletterDamage = 2f;
+    public static float BloodletterDamageInit = 2f;
+    public static float BloodletterDamageStack = 1f;
     public static float BloodletterDamageScalingInit = 0.5f;
     public static float BloodletterDamageScalingStack = 0.25f;
     public static float BloodletterProcChanceScaling = 5f;
@@ -25,7 +26,7 @@ public class Bloodletter : Item<Bloodletter>
 
     public override string ItemPickupDesc => $"Chance on hit to wound the enemy. The stronger the hit, the better this works.";
 
-    public override string ItemFullDesc => $"Hits have a <style=cIsDamage>{BloodletterProcChance}%</style> chance to deal <style=cIsDamage>{BloodletterDamage * 100}%</style> TOTAL damage and apply <color=#{System.Drawing.Color.Aqua}>Gash</color> for half the damage this item inflicts." +
+    public override string ItemFullDesc => $"Hits have a <style=cIsDamage>{BloodletterProcChance}%</style> chance to deal <style=cIsDamage>{BloodletterDamageInit * 100}%</style> <style=cStack>(+{BloodletterDamageStack * 100} per stack)</style> TOTAL damage and apply <color=#C14040>Gash</color> for half the damage this item inflicts." +
         $" <color=#C14040>At certain damage % thresholds, this item's effects become stronger</color>:\r\n\r\n" + 
         $"• {2 * 100}%: <style=cIsDamage>+{BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{BloodletterDamageScalingStack * 100}% per stack)</style> extra damage.\r\n" +
         $"• {3 * 100}%: <style=cIsDamage>+{2 * BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{2 * BloodletterDamageScalingStack * 100}% per stack)</style> extra damage.\r\n" +
@@ -115,21 +116,22 @@ public class Bloodletter : Item<Bloodletter>
     {
         var hitPercent = (int)(totalDamage / baseDamage);
         var scalingIncludingStacks = BloodletterDamageScalingInit + ((stackCount - 1) * BloodletterDamageScalingStack);
+        var damageIncludingStacks = BloodletterDamageInit + (stackCount - 1) * BloodletterDamageStack;
         if (hitPercent <= 1)
         {
-            return BloodletterDamage;
+            return damageIncludingStacks;
         }
         if (hitPercent < 4)
         {
-            return BloodletterDamage + ((hitPercent - 1) * scalingIncludingStacks);
+            return damageIncludingStacks + ((hitPercent - 1) * scalingIncludingStacks);
         }
         if (hitPercent < 8)
         {
-            return BloodletterDamage + (3 * scalingIncludingStacks);
+            return damageIncludingStacks + (3 * scalingIncludingStacks);
         }
         if (hitPercent >= 8)
         {
-            return BloodletterDamage + (4 * scalingIncludingStacks);
+            return damageIncludingStacks + (4 * scalingIncludingStacks);
         }
         return 0f;
     }

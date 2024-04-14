@@ -1,18 +1,18 @@
 ﻿using SecondMoon.BuffsAndDebuffs.Buffs.Item.Prototype;
-using SecondMoon.Items.Prototype.FlailOfMass;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using static SecondMoon.Items.Prototype.FlailOfMass.FlailOfMass;
 
 namespace SecondMoon.MyEntityStates.Items.Prototype;
 
 public class FlailOfMassBuildingMomentum : FlailOfMassBase
 {
     private float sprintTimer;
-    private float buildRate = 7f;
+    private readonly float buildRate = 10.15f * FlailOfMassMomentumBuildRate;
     private float decayTimer;
-    private float decayRate = 2f;
+    private readonly float decayRate = 1f * FlailOfMassMomentumDecayRate;
     public override void OnEnter()
     {
         base.OnEnter();
@@ -22,11 +22,12 @@ public class FlailOfMassBuildingMomentum : FlailOfMassBase
 
     public override void FixedUpdate()
     {
+        base.FixedUpdate();
         if (bodyMotor)
         {
             int num = body.GetBuffCount(Momentum.instance.BuffDef.buffIndex);
             bool flag = outer.state.GetType() == typeof(FlailOfMassBuildingMomentum);
-            if (num >= FlailOfMass.FlailOfMassMomentumLimit && flag)
+            if (num >= FlailOfMassMomentumLimit && flag)
             {
                 outer.SetNextState(new FlailOfMassAttackReady());
                 return;

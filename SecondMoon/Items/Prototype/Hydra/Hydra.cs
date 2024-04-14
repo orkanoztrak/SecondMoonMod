@@ -23,7 +23,7 @@ public class Hydra : Item<Hydra>
 
     public override string ItemPickupDesc => "You hit two extra times. Your damage is modified accordingly.";
 
-    public override string ItemFullDesc => $"You hit <color=#7CFDEA>2 extra times</color>. Your damage is <style=cIsDamage>{HydraBaseDamageInit * 100}%</style> <style=cStack>(+{HydraBaseDamageStack * 100}% per stack)</style>.";
+    public override string ItemFullDesc => $"You hit <color=#7CFDEA>2 extra times</color>. Your damage on hit is <style=cIsDamage>{HydraBaseDamageInit * 100}%</style> <style=cStack>(+{HydraBaseDamageStack * 100}% per stack)</style>.";
 
     public override string ItemLore => "Test";
 

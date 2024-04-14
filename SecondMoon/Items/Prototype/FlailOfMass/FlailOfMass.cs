@@ -16,17 +16,22 @@ public class FlailOfMass : Item<FlailOfMass>
 {
     public static List<BuffIndex> FlailOfMassSlowsAndRoots = new List<BuffIndex>();
     public static string[] FlailOfMassSlowAndRootNames = ["bdEntangle", "bdNullified", "bdNullifyStack", "bdLunarSecondaryRoot", "bdSlow50", "bdSlow60", "bdSlow80", "bdClayGoo", "bdSlow30", "bdJailerSlow", "bdJailerTether"];
-    public static int FlailOfMassMomentumLimit = 100;
+    public static int FlailOfMassMomentumLimit = 120;
     public static float FlailOfMassRadius = 25f;
-    public static float FlailOfMassDamageMultiplier = 1000f;
+    public static float FlailOfMassDamageMultiplierInit = 150f;
+    public static float FlailOfMassDamageMultiplierStack = 150f;
     public static float FlailOfMassProcCoefficient = 1f;
+    public static float FlailOfMassMomentumBuildRate = 1f;
+    public static float FlailOfMassMomentumDecayRate = 1f;
     public override string ItemName => "Flail of Mass";
 
     public override string ItemLangTokenName => "SECONDMOON_FLAIL_OF_MASS";
 
     public override string ItemPickupDesc => "Become immune to stuns and slows. Consistent sprinting builds up a massive attack.";
 
-    public override string ItemFullDesc => "Test";
+    public override string ItemFullDesc => $"<color=#7CFDEA>Become immune to stuns and slows</color>. " +
+        $"While sprinting, gain a <color=#7CFDEA>Momentum</color> buff every <style=cIsUtility>{FlailOfMassMomentumBuildRate}s</style> (gain rate increases with <style=cIsUtility>movement speed</style>). Lose a stack of this buff every <style=cIsUtility>{FlailOfMassMomentumDecayRate}s</style> while not sprinting. " +
+        $"At <color=#7CFDEA>{FlailOfMassMomentumLimit}</color> stacks, using your <style=cIsUtility>Primary skill</style> fires an explosive homing projectile that deals <style=cIsDamage>{FlailOfMassDamageMultiplierInit * 100}%</style> <style=cStack>(+{FlailOfMassDamageMultiplierStack * 100}% per stack)</style> damage in a <style=cIsDamage>{FlailOfMassRadius}m</style> radius.";
 
     public override string ItemLore => "Test";
 
@@ -44,17 +49,8 @@ public class FlailOfMass : Item<FlailOfMass>
     {
         RoR2Application.onLoad += FlailOfMassRegisterDebuffsToIgnore;
         On.RoR2.CharacterBody.AddBuff_BuffIndex += FlailOfMassIgnoreSlowingDebuffs;
-        //On.RoR2.CharacterBody.AddTimedBuff_BuffDef_float += FlailOfMassIgnoreSlowingDebuffs;
         IL.RoR2.CharacterBody.RecalculateStats += FlailOfMassIgnoreSlows;
         On.RoR2.CharacterBody.OnInventoryChanged += FlailOfMassAddIgnoreStunBehavior;
-    }
-
-    private void FlailOfMassIgnoreSlowingDebuffs(On.RoR2.CharacterBody.orig_AddTimedBuff_BuffDef_float orig, CharacterBody self, BuffDef buffDef, float duration)
-    {
-        if (!FlailOfMassSlowsAndRoots.Contains(buffDef.buffIndex))
-        {
-            orig(self, buffDef, duration);
-        }
     }
 
     [Server]

@@ -23,7 +23,7 @@ public class Thunderbolt : Item<Thunderbolt>
     public override string ItemPickupDesc => "Increase attack speed. Your attack speed increases also translate to movement speed, cooldown reduction and projectile speed.";
 
     public override string ItemFullDesc => $"Increases <style=cIsDamage>attack speed</style> by <style=cIsDamage>{ThunderboltASInit * 100}%</style> <style=cStack>(+{ThunderboltASStack * 100}% per stack)</style>. " +
-        $"<color=#7CFDEA>Your <style=cIsDamage>attack speed</style> increase percentage also translates into the following</color>:\r\n\r\n" +
+        $"<color=#7CFDEA>Your attack speed increase percentage also translates into the following</color>:\r\n\r\n" +
         $"• Gain <style=cIsUtility>movement speed</style> equal to <color=#7CFDEA>{ThunderboltASToMS * 100}%</color> of it. \r\n" +
         $"• Gain <style=cIsUtility>cooldown reduction</style> equal to <color=#7CFDEA>{((1f - 1f / (1f + (0.25f * 0.5f))) * ThunderboltASToCD) * 400}%</color> of it. \r\n" +
         $"• Gain <style=cIsDamage>projectile speed</style> equal to <color=#7CFDEA>{ThunderboltASToProjectileSpeed * 100}%</color> of it for projectiles without targets.";
