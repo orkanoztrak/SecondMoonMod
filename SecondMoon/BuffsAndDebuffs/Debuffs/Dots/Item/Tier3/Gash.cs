@@ -41,7 +41,7 @@ public class Gash : DOT<Gash>
 
     public override void SetAssociatedBuff()
     {
-        this.AssociatedBuff = GashDebuff.instance.BuffDef;
+        AssociatedBuff = GashDebuff.instance.BuffDef;
     }
 
     public override void CreateCustomDotVisual()

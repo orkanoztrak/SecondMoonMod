@@ -10,9 +10,9 @@ namespace SecondMoon.MyEntityStates.Items.Prototype;
 public class FlailOfMassBuildingMomentum : FlailOfMassBase
 {
     private float sprintTimer;
-    private readonly float buildRate = 10.15f * FlailOfMassMomentumBuildRate;
+    private readonly float buildRate = 10.15f / FlailOfMassMomentumBuildRate;
     private float decayTimer;
-    private readonly float decayRate = 1f * FlailOfMassMomentumDecayRate;
+    private readonly float decayRate = 1f / FlailOfMassMomentumDecayRate;
     public override void OnEnter()
     {
         base.OnEnter();

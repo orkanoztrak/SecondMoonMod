@@ -1,58 +1,61 @@
-﻿using R2API;
+﻿using BepInEx.Configuration;
+using R2API;
 using RoR2;
 using RoR2.Projectile;
+using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 using static R2API.RecalculateStatsAPI;
-using static RoR2.CharacterBody;
 
 namespace SecondMoon.Items.Lunar.IrradiatedMoonstone;
 
-internal class IrradiatedMoonstone : Item<IrradiatedMoonstone>
+public class IrradiatedMoonstone : Item<IrradiatedMoonstone>
 {
-    public static float IrradiatedMoonstoneCooldownReductionInit = 0.15f;
-    public static float IrradiatedMoonstoneCooldownReductionStack = 0.15f;
+    public static ConfigOption<float> IrradiatedMoonstoneCooldownReductionInit;
+    public static ConfigOption<float> IrradiatedMoonstoneCooldownReductionStack;
 
-    public static float IrradiatedMoonstoneMovementInit = 0.15f;
-    public static float IrradiatedMoonstoneMovementStack = 0.15f;
+    public static ConfigOption<float> IrradiatedMoonstoneMovementInit;
+    public static ConfigOption<float> IrradiatedMoonstoneMovementStack;
 
-    public static float IrradiatedMoonstoneSprintInit = 0.15f;
-    public static float IrradiatedMoonstoneSprintStack = 0.15f;
+    public static ConfigOption<float> IrradiatedMoonstoneSprintInit;
+    public static ConfigOption<float> IrradiatedMoonstoneSprintStack;
 
-    public static float IrradiatedMoonstoneAttackSpeedInit = 0.15f;
-    public static float IrradiatedMoonstoneAttackSpeedStack = 0.15f;
+    public static ConfigOption<float> IrradiatedMoonstoneAttackSpeedInit;
+    public static ConfigOption<float> IrradiatedMoonstoneAttackSpeedStack;
 
-    public static float IrradiatedMoonstoneRegenInit = 0.15f;
-    public static float IrradiatedMoonstoneRegenStack = 0.15f;
+    public static ConfigOption<float> IrradiatedMoonstoneRegenInit;
+    public static ConfigOption<float> IrradiatedMoonstoneRegenStack;
 
-    public static float IrradiatedMoonstoneSelfDebuffDurationReductionInit = 0.15f;
-    public static float IrradiatedMoonstoneSelfDebuffDurationReductionStack = 0.15f;
+    public static ConfigOption<float> IrradiatedMoonstoneSelfDebuffDurationReductionInit;
+    public static ConfigOption<float> IrradiatedMoonstoneSelfDebuffDurationReductionStack;
 
-    public static float IrradiatedMoonstoneProjectileSpeedInit = 0.15f;
-    public static float IrradiatedMoonstoneProjectileSpeedStack = 0.15f;
+    public static ConfigOption<float> IrradiatedMoonstoneProjectileSpeedInit;
+    public static ConfigOption<float> IrradiatedMoonstoneProjectileSpeedStack;
 
-    public static float IrradiatedMoonstoneTeleporterChargeRateIncreaseInit = 0.15f;
-    public static float IrradiatedMoonstoneTeleporterChargeRateIncreaseStack = 0.15f;
-    public static int IrradiatedMoonstoneTeleporterChargeRateIncreaseCap = 8;
+    public static ConfigOption<float> IrradiatedMoonstoneTeleporterChargeRateIncreaseInit;
+    public static ConfigOption<float> IrradiatedMoonstoneTeleporterChargeRateIncreaseStack;
+    public static ConfigOption<int> IrradiatedMoonstoneTeleporterChargeRateIncreaseCap;
 
     public static int IrradiatedMoonstonePlayersStackTracker = 0;
     public static int IrradiatedMoonstoneMonsterStackTracker = 0;
 
+
     public override string ItemName => "Irradiated Moonstone";
 
-    public override string ItemLangTokenName => "SECONDMOON_SHINYPEARL_LUNAR";
+    public override string ItemLangTokenName => "SECONDMOONMOD_SHINYPEARL_LUNAR";
 
     public override string ItemPickupDesc => $"You are faster (in almost all aspects)... <color=#FF7F7F>BUT your enemies also benefit from this item.</color>\n";
 
     public override string ItemFullDesc => $"Gain the following boosts:\r\n\r\n" +
-        $"• Gain <style=cIsUtility>{IrradiatedMoonstoneCooldownReductionInit * 100}% <style=cStack>(+{IrradiatedMoonstoneCooldownReductionStack * 100}% per stack)</style> cooldown reduction</style> <color=#FF7F7F>(enemies also benefit)</color>.\r\n" +
+        $"• Gain <style=cIsUtility>{IrradiatedMoonstoneCooldownReductionInit * 100}% <style=cStack>(+{IrradiatedMoonstoneCooldownReductionStack * 100}% per stack)</style> cooldown reduction</style> <color=#FF7F7F>(enemies also benefit).</color>\r\n" +
         $"• Gain <style=cIsUtility>{IrradiatedMoonstoneMovementInit * 100}% <style=cStack>(+{IrradiatedMoonstoneMovementStack * 100}% per stack)</style> movement speed</style>.\r\n" +
         $"• Gain <style=cIsUtility>{IrradiatedMoonstoneSprintInit * 100}% <style=cStack>(+{IrradiatedMoonstoneSprintStack * 100}% per stack)</style> sprint speed</style>.\r\n" +
-        $"• Gain <style=cIsDamage>{IrradiatedMoonstoneAttackSpeedInit * 100}% <style=cStack>(+{IrradiatedMoonstoneAttackSpeedStack * 100}% per stack)</style> attack speed</style> <color=#FF7F7F>(enemies also benefit)</color>.\r\n" +
+        $"• Gain <style=cIsDamage>{IrradiatedMoonstoneAttackSpeedInit * 100}% <style=cStack>(+{IrradiatedMoonstoneAttackSpeedStack * 100}% per stack)</style> attack speed</style> <color=#FF7F7F>(enemies also benefit).</color>\r\n" +
         $"• Gain <style=cIsHealing>{IrradiatedMoonstoneRegenInit * 100}% <style=cStack>(+{IrradiatedMoonstoneRegenStack * 100}% per stack)</style> health regeneration</style>.\r\n" +
         $"• Gain <style=cIsUtility>{IrradiatedMoonstoneSelfDebuffDurationReductionInit * 100}% <style=cStack>(+{IrradiatedMoonstoneSelfDebuffDurationReductionStack * 100}% per stack)</style> debuff duration reduction on self</style>." +
         $" <style=cIsDamage>Collapse</style> instead does <style=cIsDamage>{IrradiatedMoonstoneSelfDebuffDurationReductionInit * 100}%</style> <style=cStack>(+{IrradiatedMoonstoneSelfDebuffDurationReductionStack * 100}% per stack)</style> less damage to you.\r\n" +
@@ -61,7 +64,7 @@ internal class IrradiatedMoonstone : Item<IrradiatedMoonstone>
 
     public override string ItemLore => "Test";
 
-    public override ItemTier ItemTier => ItemTier.Lunar;
+    public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/LunarTierDef.asset").WaitForCompletion();
 
     public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Utility, ItemTag.Healing, ItemTag.WorldUnique, ItemTag.HoldoutZoneRelated];
 
@@ -132,19 +135,22 @@ internal class IrradiatedMoonstone : Item<IrradiatedMoonstone>
         orig(self, buffDef, newDuration);
     }
 
-    private void IrradiatedMoonstoneFasterProjectiles(On.RoR2.Projectile.ProjectileController.orig_Start orig, RoR2.Projectile.ProjectileController self)
+    private void IrradiatedMoonstoneFasterProjectiles(On.RoR2.Projectile.ProjectileController.orig_Start orig, ProjectileController self)
     {
         orig(self);
-        var ownerBody = self.owner.GetComponent<CharacterBody>();
-        if (ownerBody)
+        if (self.owner)
         {
-            var stackCount = GetCount(ownerBody);
-            if (stackCount > 0)
+            var ownerBody = self.owner.GetComponent<CharacterBody>();
+            if (ownerBody)
             {
-                var projectileSimple = self.gameObject.GetComponent<ProjectileSimple>();
-                if (projectileSimple)
+                var stackCount = GetCount(ownerBody);
+                if (stackCount > 0)
                 {
-                    projectileSimple.desiredForwardSpeed *= 1 + (IrradiatedMoonstoneProjectileSpeedInit + ((stackCount - 1) * IrradiatedMoonstoneProjectileSpeedStack));
+                    var projectileSimple = self.gameObject.GetComponent<ProjectileSimple>();
+                    if (projectileSimple)
+                    {
+                        projectileSimple.desiredForwardSpeed *= 1 + (IrradiatedMoonstoneProjectileSpeedInit + ((stackCount - 1) * IrradiatedMoonstoneProjectileSpeedStack));
+                    }
                 }
             }
         }
@@ -194,8 +200,8 @@ internal class IrradiatedMoonstone : Item<IrradiatedMoonstone>
         if (sender.teamComponent)
         {
             float decrease;
-            switch (sender.teamComponent.teamIndex) 
-            { 
+            switch (sender.teamComponent.teamIndex)
+            {
                 case TeamIndex.Player:
                     args.attackSpeedMultAdd += IrradiatedMoonstoneMonsterStackTracker > 0 ? IrradiatedMoonstoneAttackSpeedInit + (IrradiatedMoonstoneMonsterStackTracker - 1) * IrradiatedMoonstoneAttackSpeedStack : 0;
                     decrease = (float)(1 - ((1 - IrradiatedMoonstoneCooldownReductionInit) * Math.Pow(1 - IrradiatedMoonstoneCooldownReductionStack, IrradiatedMoonstoneMonsterStackTracker - 1)));
@@ -210,11 +216,45 @@ internal class IrradiatedMoonstone : Item<IrradiatedMoonstone>
         }
     }
 
-    public override void Init()
+    public override void Init(ConfigFile config)
     {
-        CreateLang();
-        CreateItem();
-        Hooks();
+        base.Init(config);
+        if (IsEnabled)
+        {
+            CreateConfig(config);
+            CreateLang();
+            CreateItem();
+            Hooks();
+        }
+    }
+
+    private void CreateConfig(ConfigFile config)
+    {
+        IrradiatedMoonstoneCooldownReductionInit = config.ActiveBind("Item: " + ItemName, "Cooldown reduction with one " + ItemName, 0.15f, "How much should cooldowns be reduced by with one Irradiated Moonstone? This scales exponentially (0.15 = 15%, refer to Alien Head on the wiki).");
+        IrradiatedMoonstoneCooldownReductionStack = config.ActiveBind("Item: " + ItemName, "Cooldown reduction per stack after one " + ItemName, 0.15f, "How much should cooldowns be reduced by per stack of Irradiated Moonstone after one? This scales exponentially (0.15 = 15%, refer to Alien Head on the wiki).");
+
+        IrradiatedMoonstoneMovementInit = config.ActiveBind("Item: " + ItemName, "Movement speed with one " + ItemName, 0.15f, "How much should movement speed be increased by with one Irradiated Moonstone? (0.15 = 15%)");
+        IrradiatedMoonstoneMovementStack = config.ActiveBind("Item: " + ItemName, "Movement speed per stack after one " + ItemName, 0.15f, "How much should movement speed be increased by per stack of Irradiated Moonstone after one? (0.15 = 15%)");
+
+        IrradiatedMoonstoneSprintInit = config.ActiveBind("Item: " + ItemName, "Sprint speed with one " + ItemName, 0.15f, "How much should sprint speed be increased by with one Irradiated Moonstone? (0.15 = 15%)");
+        IrradiatedMoonstoneSprintStack = config.ActiveBind("Item: " + ItemName, "Sprint speed per stack after one " + ItemName, 0.15f, "How much should sprint speed be increased by per stack of Irradiated Moonstone after one? (0.15 = 15%)");
+
+        IrradiatedMoonstoneAttackSpeedInit = config.ActiveBind("Item: " + ItemName, "Attack speed with one " + ItemName, 0.15f, "How much should attack speed be increased by with one Irradiated Moonstone? (0.15 = 15%)");
+        IrradiatedMoonstoneAttackSpeedStack = config.ActiveBind("Item: " + ItemName, "Attack speed per stack after one " + ItemName, 0.15f, "How much should attack speed be increased by per stack of Irradiated Moonstone after one? (0.15 = 15%)");
+
+        IrradiatedMoonstoneRegenInit = config.ActiveBind("Item: " + ItemName, "Health regeneration with one " + ItemName, 0.15f, "How much should health regeneration be increased by with one Irradiated Moonstone? (0.15 = roughly 15%, refer to Irradiant Pearl on the wiki, this gives 0.15 (+0.03 per level))");
+        IrradiatedMoonstoneRegenStack = config.ActiveBind("Item: " + ItemName, "Health regeneration per stack after one " + ItemName, 0.15f, "How much should health regeneration be increased by per stack of Irradiated Moonstone after one? (0.15 = roughly 15%, refer to Irradiant Pearl on the wiki, this gives 0.15 (+0.03 per level))");
+
+        IrradiatedMoonstoneSelfDebuffDurationReductionInit = config.ActiveBind("Item: " + ItemName, "Reduced debuff duration on holder with one " + ItemName, 0.15f, "How much should the durations of debuffs inflicted on the holder be reduced by with one Irradiated Moonstone? Collapse's damage will be reduced by this value instead. (0.15 = 15%)");
+        IrradiatedMoonstoneSelfDebuffDurationReductionStack = config.ActiveBind("Item: " + ItemName, "Reduced debuff duration on holder per stack after one " + ItemName, 0.15f, "How much should the durations of debuffs inflicted on the holder be reduced by per stack of Irradiated Moonstone after one? Collapse's damage will be reduced by this value instead. (0.15 = 15%)");
+
+        IrradiatedMoonstoneProjectileSpeedInit = config.ActiveBind("Item: " + ItemName, "Projectile speed with one " + ItemName, 0.15f, "How much should untargeted projectile speed be increased by with one Irradiated Moonstone? (0.15 = 15%)");
+        IrradiatedMoonstoneProjectileSpeedStack = config.ActiveBind("Item: " + ItemName, "Projectile speed per stack after one " + ItemName, 0.15f, "How much should untargeted projectile speed be increased by per stack of Irradiated Moonstone after one? (0.15 = 15%)");
+
+        IrradiatedMoonstoneTeleporterChargeRateIncreaseInit = config.ActiveBind("Item: " + ItemName, "Teleporter charge rate with one " + ItemName, 0.15f, "How much should holdout zone charge rate be increased by with one Irradiated Moonstone? (0.15 = 15%)");
+        IrradiatedMoonstoneTeleporterChargeRateIncreaseStack = config.ActiveBind("Item: " + ItemName, "Teleporter charge rate per stack after one " + ItemName, 0.15f, "How much should holdout zone charge rate be increased by per stack of Irradiated Moonstone after one? (0.15 = 15%)");
+
+        IrradiatedMoonstoneTeleporterChargeRateIncreaseCap = config.ActiveBind("Item: " + ItemName, "Teleporter charge rate cap for " + ItemName, 8, "After how many Irradiated Moonstones should holdout zone charge rate not be increased?");
     }
 
     public class IrradiatedMoonstoneTPBoosterController : MonoBehaviour

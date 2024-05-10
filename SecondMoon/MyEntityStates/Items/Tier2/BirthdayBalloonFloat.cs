@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using static SecondMoon.Items.Tier2.BirthdayBalloon.BirthdayBalloon;
 
 namespace SecondMoon.MyEntityStates.Items.Tier2;
 
@@ -53,15 +54,15 @@ public class BirthdayBalloonFloat : BirthdayBalloonBase
             bodyMotor.velocity = velocity;
 
             healTimer += Time.fixedDeltaTime;
-            if (healTimer > 0.5f)
+            if (healTimer > BirthdayBalloonHealInterval)
             {
                 if (networkedBodyAttachment.attachedBody)
                 {
                     var stackCount = BirthdayBalloon.instance.GetCount(networkedBodyAttachment.attachedBody);
                     if (networkedBodyAttachment.attachedBody.healthComponent)
                     {
-                        networkedBodyAttachment.attachedBody.healthComponent.Heal(BirthdayBalloon.BirthdayBalloonHealInit + ((stackCount - 1) * BirthdayBalloon.BirthdayBalloonHealStack), default(ProcChainMask));
-                        healTimer -= 0.5f;
+                        networkedBodyAttachment.attachedBody.healthComponent.Heal(BirthdayBalloon.BirthdayBalloonHealInit + ((stackCount - 1) * BirthdayBalloon.BirthdayBalloonHealStack), default);
+                        healTimer -= BirthdayBalloonHealInterval;
                     }
                 }
             }

@@ -1,18 +1,22 @@
-﻿using R2API;
+﻿using BepInEx.Configuration;
+using R2API;
 using RoR2;
+using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine.AddressableAssets;
 using static R2API.RecalculateStatsAPI;
 
 namespace SecondMoon.Items.Tier2.GourmetSteak;
 
-internal class GourmetSteak : Item<GourmetSteak>
+public class GourmetSteak : Item<GourmetSteak>
 {
-    public static float GourmetSteakHealthInit = 0.08f;
-    public static float GourmetSteakHealthStack = 0.08f;
-    public static float GourmetSteakOSPThresholdIncreaseInit = 0.1f;
-    public static float GourmetSteakOSPThresholdIncreaseStack = 0.1f;
+    public static ConfigOption<float> GourmetSteakHealthInit;
+    public static ConfigOption<float> GourmetSteakHealthStack;
+    public static ConfigOption<float> GourmetSteakOSPThresholdIncreaseInit;
+    public static ConfigOption<float> GourmetSteakOSPThresholdIncreaseStack;
+    public static ConfigOption<int> GourmetSteakOSPThresholdIncreaseLimit;
 
     public override string ItemName => "Gourmet Steak";
 
@@ -25,7 +29,7 @@ internal class GourmetSteak : Item<GourmetSteak>
 
     public override string ItemLore => "Test";
 
-    public override ItemTier ItemTier => ItemTier.Tier2;
+    public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier2Def.asset").WaitForCompletion();
 
     public override ItemTag[] Category => [ItemTag.Healing];
 
@@ -57,14 +61,29 @@ internal class GourmetSteak : Item<GourmetSteak>
         var stackCount = GetCount(self);
         if (stackCount > 0)
         {
-            self.oneShotProtectionFraction *= 1 + (GourmetSteakOSPThresholdIncreaseInit + (stackCount - 1) * GourmetSteakOSPThresholdIncreaseStack);
+            var limitedStacks = stackCount > GourmetSteakOSPThresholdIncreaseLimit ? GourmetSteakOSPThresholdIncreaseLimit : stackCount;
+            self.oneShotProtectionFraction *= 1 + (GourmetSteakOSPThresholdIncreaseInit + (limitedStacks - 1) * GourmetSteakOSPThresholdIncreaseStack);
         }
     }
 
-    public override void Init()
+    public override void Init(ConfigFile config)
     {
-        CreateLang();
-        CreateItem();
-        Hooks();
+        base.Init(config);
+        if (IsEnabled)
+        {
+            CreateConfig(config);
+            CreateLang();
+            CreateItem();
+            Hooks();
+        }
+    }
+
+    private void CreateConfig(ConfigFile config)
+    {
+        GourmetSteakHealthInit = config.ActiveBind("Item: " + ItemName, "Maximum health increase with one " + ItemName, 0.08f, "How much should maximum health be increased by with one Gourmet Steak? (0.08 = 8%)");
+        GourmetSteakHealthStack = config.ActiveBind("Item: " + ItemName, "Maximum health increase per stack after one " + ItemName, 0.08f, "How much should maximum health be increased by per stack of Gourmet Steak after one? (0.08 = 8%)");
+        GourmetSteakOSPThresholdIncreaseInit = config.ActiveBind("Item: " + ItemName, "One-shot protection threshold increase with one " + ItemName, 0.1f, "How much should the one-shot protection threshold be increased by with one Gourmet Steak? (0.1 = 10%)");
+        GourmetSteakOSPThresholdIncreaseStack = config.ActiveBind("Item: " + ItemName, "One-shot protection threshold increase per stack after one " + ItemName, 0.1f, "How much should the one-shot protection threshold be increased by per stack of Gourmet Steak after one? (0.1 = 10%)");
+        GourmetSteakOSPThresholdIncreaseLimit = config.ActiveBind("Item: " + ItemName, "One-shot protection threshold increase limit", 40, "After how many Gourmet Steaks should the one-shot protection threshold stop increasing? Note that for default settings, if you set this too high, you will be unable to take damage after 90 stacks.");
     }
 }

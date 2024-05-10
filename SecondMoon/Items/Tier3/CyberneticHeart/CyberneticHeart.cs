@@ -1,21 +1,24 @@
-﻿using R2API;
+﻿using BepInEx.Configuration;
+using R2API;
 using RoR2;
+using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using static R2API.RecalculateStatsAPI;
 
 namespace SecondMoon.Items.Tier3.CyberneticHeart;
 
 public class CyberneticHeart : Item<CyberneticHeart>
 {
-    public static float CyberneticHeartShieldInit = 0.2f;
-    public static float CyberneticHeartShieldStack = 0.2f;
+    public static ConfigOption<float> CyberneticHeartShieldInit;
+    public static ConfigOption<float> CyberneticHeartShieldStack;
 
     public override string ItemName => "Cybernetic Heart";
 
-    public override string ItemLangTokenName => "SECONDMOON_CYBERNETIC_HEART";
+    public override string ItemLangTokenName => "SECONDMOONMOD_CYBERNETIC_HEART";
 
     public override string ItemPickupDesc => "Gain a recharging shield. Your healing restores shields as well.";
 
@@ -24,7 +27,7 @@ public class CyberneticHeart : Item<CyberneticHeart>
 
     public override string ItemLore => "Test";
 
-    public override ItemTier ItemTier => ItemTier.Tier3;
+    public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
 
     public override ItemTag[] Category => [ItemTag.Healing, ItemTag.Utility];
 
@@ -63,14 +66,26 @@ public class CyberneticHeart : Item<CyberneticHeart>
         var stackCount = GetCount(sender);
         if (stackCount > 0)
         {
-            args.baseShieldAdd += sender.maxHealth * (CyberneticHeartShieldInit + (stackCount - 1) * CyberneticHeartShieldStack);
+            HealthComponent healthComponent = sender.healthComponent;
+            args.baseShieldAdd += healthComponent.fullHealth * (CyberneticHeartShieldInit + (stackCount - 1) * CyberneticHeartShieldStack);
         }
     }
 
-    public override void Init()
+    public override void Init(ConfigFile config)
     {
-        CreateLang();
-        CreateItem();
-        Hooks();
+        base.Init(config);
+        if (IsEnabled)
+        {
+            CreateConfig(config);
+            CreateLang();
+            CreateItem();
+            Hooks();
+        }
+    }
+
+    private void CreateConfig(ConfigFile config)
+    {
+        CyberneticHeartShieldInit = config.ActiveBind("Item: " + ItemName, "Maximum shield increase with one " + ItemName, 0.2f, "Gain shield equal to what % of maximum health with one Cybernetic Heart? (0.2 = 20%)");
+        CyberneticHeartShieldStack = config.ActiveBind("Item: " + ItemName, "Maximum shield increase per stack after one " + ItemName, 0.2f, "Gain shield equal to what % of maximum health per stack of Cybernetic Heart after one? (0.2 = 20%)");
     }
 }

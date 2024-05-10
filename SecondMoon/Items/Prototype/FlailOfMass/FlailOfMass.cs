@@ -1,31 +1,34 @@
-﻿using MonoMod.Cil;
+﻿using BepInEx.Configuration;
+using MonoMod.Cil;
 using R2API;
 using RoR2;
+using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 using static R2API.RecalculateStatsAPI;
-using static SecondMoon.Items.Void.BlissfulVisage.BlissfulVisage.BlissfulVisageSuicideComponent;
 
 namespace SecondMoon.Items.Prototype.FlailOfMass;
 
 public class FlailOfMass : Item<FlailOfMass>
 {
+    public static ConfigOption<int> FlailOfMassMomentumLimit;
+    public static ConfigOption<float> FlailOfMassRadius;
+    public static ConfigOption<float> FlailOfMassDamageMultiplierInit;
+    public static ConfigOption<float> FlailOfMassDamageMultiplierStack;
+    public static ConfigOption<float> FlailOfMassProcCoefficient;
+    public static ConfigOption<float> FlailOfMassMomentumBuildRate;
+    public static ConfigOption<float> FlailOfMassMomentumDecayRate;
+
     public static List<BuffIndex> FlailOfMassSlowsAndRoots = new List<BuffIndex>();
     public static string[] FlailOfMassSlowAndRootNames = ["bdEntangle", "bdNullified", "bdNullifyStack", "bdLunarSecondaryRoot", "bdSlow50", "bdSlow60", "bdSlow80", "bdClayGoo", "bdSlow30", "bdJailerSlow", "bdJailerTether"];
-    public static int FlailOfMassMomentumLimit = 120;
-    public static float FlailOfMassRadius = 25f;
-    public static float FlailOfMassDamageMultiplierInit = 150f;
-    public static float FlailOfMassDamageMultiplierStack = 150f;
-    public static float FlailOfMassProcCoefficient = 1f;
-    public static float FlailOfMassMomentumBuildRate = 1f;
-    public static float FlailOfMassMomentumDecayRate = 1f;
     public override string ItemName => "Flail of Mass";
 
-    public override string ItemLangTokenName => "SECONDMOON_FLAIL_OF_MASS";
+    public override string ItemLangTokenName => "SECONDMOONMOD_FLAIL_OF_MASS";
 
     public override string ItemPickupDesc => "Become immune to stuns and slows. Consistent sprinting builds up a massive attack.";
 
@@ -35,9 +38,9 @@ public class FlailOfMass : Item<FlailOfMass>
 
     public override string ItemLore => "Test";
 
-    public override ItemTier ItemTier => ItemTier.Tier3;
+    public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
 
-    public override ItemTag[] Category => [ItemTag.Utility, ItemTag.Damage];
+    public override ItemTag[] Category => [ItemTag.Utility, ItemTag.Damage, ItemTag.SprintRelated];
 
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
@@ -125,11 +128,27 @@ public class FlailOfMass : Item<FlailOfMass>
         cursor.Emit(Mono.Cecil.Cil.OpCodes.Br, target2.Target);
     }
 
-    public override void Init()
+    public override void Init(ConfigFile config)
     {
-        CreateLang();
-        CreateItem();
-        Hooks();
+        base.Init(config);
+        if (IsEnabled)
+        {
+            CreateConfig(config);
+            CreateLang();
+            CreateItem();
+            Hooks();
+        }
+    }
+
+    private void CreateConfig(ConfigFile config)
+    {
+        FlailOfMassMomentumLimit = config.ActiveBind("Item: " + ItemName, "Momentum stacks necessary to access the attack", 100, "At this number of Momentum stacks, they will not decay until the attack is fired.");
+        FlailOfMassRadius = config.ActiveBind("Item: " + ItemName, "Attack explosion radius", 25f, "The explosion of the attack will have a radius of this many meters.");
+        FlailOfMassDamageMultiplierInit = config.ActiveBind("Item: " + ItemName, "Damage multiplier of the attack with one " + ItemName, 150f, "What % of base damage should the attack do with one Flail of Mass? (150 = 15000%)");
+        FlailOfMassDamageMultiplierStack = config.ActiveBind("Item: " + ItemName, "Damage multiplier of the attack per stack after one " + ItemName, 150f, "What % of base damage should be added to the attack per stack of Flail of Mass after one? (150 = 15000%)");
+        FlailOfMassProcCoefficient = config.ActiveBind("Item: " + ItemName, "Attack proc coefficient", 1f, "The proc coefficient of the attack and the explosion it makes.");
+        FlailOfMassMomentumBuildRate = config.ActiveBind("Item: " + ItemName, "Momentum build rate", 1f, "Momentum is added every (10.15/(totalSpeed * buildRate)) seconds while sprinting, where buildRate is this config value.");
+        FlailOfMassMomentumDecayRate = config.ActiveBind("Item: " + ItemName, "Momentum build rate", 1f, "Momentum is removed every 1/decayRate seconds while not sprinting, where decayRate is this config value.");
     }
 
     public class FlailOfMassIgnoreStunBehavior : CharacterBody.ItemBehavior
@@ -140,7 +159,7 @@ public class FlailOfMass : Item<FlailOfMass>
         bool hs;
         bool s;
 
-        private void OnEnable() 
+        private void OnEnable()
         {
             component = GetComponent<SetStateOnHurt>();
 

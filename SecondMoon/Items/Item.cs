@@ -5,6 +5,7 @@ using On.RoR2.Items;
 using R2API;
 using RoR2;
 using RoR2.ExpansionManagement;
+using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,12 +36,16 @@ public abstract class Item
     public abstract string ItemPickupDesc { get; }
     public abstract string ItemFullDesc { get; }
     public abstract string ItemLore { get; }
-    public abstract ItemTier ItemTier { get; }
+    public abstract ItemTierDef ItemTierDef { get; }
     public abstract ItemTag[] Category { get; }
     public virtual GameObject ItemModel { get; } = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
     public virtual Sprite ItemIcon { get; } = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
 
+    public static ConfigOption<bool> IsEnabled;
+
     public ItemDef ItemDef;
+
+    public bool EnableCheck;
 
     public virtual ItemDef ItemToCorrupt { get; } = null;
 
@@ -48,14 +53,17 @@ public abstract class Item
 
     public virtual bool CanRemove { get; } = true;
 
-    public virtual bool AIBlacklisted { get; set; } = false;
-
     public virtual bool PrinterBlacklisted { get; set; } = false;
 
     public virtual bool Unlockable { get; set; } = true;
     public virtual ExpansionDef RequiredExpansion { get; set; } = null;
     protected virtual ItemDisplayRuleDict displayRules { get; set; } = null;
-    public abstract void Init();
+
+    public virtual void Init(ConfigFile config)
+    {
+        IsEnabled = config.ActiveBind<bool>("Item: " + ItemName, "Should this be enabled?", true, "If false, this item will not appear in the game.");
+        EnableCheck = IsEnabled;
+    }
 
     protected void CreateLang()
     {
@@ -69,7 +77,6 @@ public abstract class Item
 
     protected void CreateItem()
     {
-        if (AIBlacklisted) { Category.AddItem(ItemTag.AIBlacklist); }
         ItemDef = ScriptableObject.CreateInstance<ItemDef>();
         ItemDef.name = "ITEM_" + ItemLangTokenName;
         ItemDef.nameToken = "ITEM_" + ItemLangTokenName + "_NAME";
@@ -80,7 +87,14 @@ public abstract class Item
         ItemDef.pickupIconSprite = ItemIcon;
         ItemDef.hidden = false;
         ItemDef.canRemove = CanRemove;
-        ItemDef.deprecatedTier = ItemTier;
+        if (!ItemTierDef)
+        {
+            ItemDef.deprecatedTier = ItemTier.NoTier;
+        }
+        else
+        {
+            ItemDef._itemTierDef = ItemTierDef;
+        }
         ItemDef.tags = Category;
         if (Category.Length > 0) { ItemDef.tags = Category; }
         if (PrinterBlacklisted) { SecondMoonPlugin.BlacklistedFromPrinter.Add(ItemDef); }

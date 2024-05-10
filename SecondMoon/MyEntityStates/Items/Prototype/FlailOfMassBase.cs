@@ -1,6 +1,5 @@
 ﻿using EntityStates;
 using RoR2;
-using SecondMoon.MyEntityStates.Items.Tier2;
 using System;
 using System.Collections.Generic;
 using System.Text;

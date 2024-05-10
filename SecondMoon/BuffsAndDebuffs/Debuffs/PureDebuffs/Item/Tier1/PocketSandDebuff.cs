@@ -5,14 +5,12 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using static SecondMoon.Items.Tier1.PocketSand.PocketSand;
 
 namespace SecondMoon.BuffsAndDebuffs.Debuffs.PureDebuffs.Item.Tier1;
 
 public class PocketSandDebuff : Buff<PocketSandDebuff>
 {
-    public static float PocketSandHealthThreshold = 0.9f;
-    public static float PocketSandMovementReduction = 0.4f;
-    public static float PocketSandAttackSpeedReduction = 0.4f;
     public override string Name => "PocketSandDebuff";
 
     public override Sprite IconSprite => Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/texBuffSlow50Icon.tif").WaitForCompletion();
@@ -32,8 +30,8 @@ public class PocketSandDebuff : Buff<PocketSandDebuff>
     {
         if (sender.HasBuff(BuffDef))
         {
-            args.moveSpeedReductionMultAdd += PocketSandMovementReduction;
-            args.attackSpeedReductionMultAdd += PocketSandAttackSpeedReduction;
+            args.moveSpeedReductionMultAdd += PocketSandReduction;
+            args.attackSpeedReductionMultAdd += PocketSandReduction;
         }
     }
 

@@ -12,7 +12,7 @@ public class Momentum : Buff<Momentum>
 
     public override Sprite IconSprite => Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/texMovespeedBuffIcon.tif").WaitForCompletion();
 
-    public override Color BuffColor => new Color(124, 253, 234, 1);
+    public override Color BuffColor => new Color32(124, 253, 234, 255);
 
     public override void Hooks()
     {

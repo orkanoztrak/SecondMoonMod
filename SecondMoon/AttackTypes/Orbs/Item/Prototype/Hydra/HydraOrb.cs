@@ -7,10 +7,8 @@ using UnityEngine;
 
 namespace SecondMoon.AttackTypes.Orbs.Item.Prototype.Hydra;
 
-public class HydraOrb : GenericDamageOrb, IOrbFixedUpdateBehavior
+public class HydraOrb : GenericDamageOrb
 {
-    private float accumulatedTime;
-
     public int totalStrikes;
 
     public float secondsPerStrike = 0.5f;
@@ -21,7 +19,6 @@ public class HydraOrb : GenericDamageOrb, IOrbFixedUpdateBehavior
 
     public override void Begin()
     {
-        accumulatedTime = 0f;
         base.duration = (float)(totalStrikes - 1) * secondsPerStrike;
         effectPrefab = LegacyResourcesAPI.Load<GameObject>("Prefabs/Effects/OrbEffects/VoidLightningOrbEffect");
         Strike();
@@ -29,20 +26,6 @@ public class HydraOrb : GenericDamageOrb, IOrbFixedUpdateBehavior
 
     public override void OnArrival()
     {
-    }
-
-    public void FixedUpdate()
-    {
-        accumulatedTime += Time.fixedDeltaTime;
-        while (accumulatedTime > secondsPerStrike)
-        {
-            accumulatedTime -= secondsPerStrike;
-            if ((bool)target)
-            {
-                origin = target.transform.position;
-                Strike();
-            }
-        }
     }
 
     private void Strike()

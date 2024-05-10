@@ -5,25 +5,17 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using static SecondMoon.Equipment.EssenceChanneler.EssenceChanneler;
 
 namespace SecondMoon.BuffsAndDebuffs.Buffs.Equipment;
 
 public class Channeling : Buff<Channeling>
 {
-    public static float ChannelingHealthBoost = 0.3f;
-    public static float ChannelingRegenBoost = 0.3f;
-    public static float ChannelingMovementBoost = 0.3f;
-    public static float ChannelingDamageBoost = 0.3f;
-    public static float ChannelingAttackSpeedBoost = 0.3f;
-    public static float ChannelingCritBoost = 0.3f;
-    public static float ChannelingArmorBoost = 0.3f;
-
     public override string Name => "Channeling";
 
-    public override Sprite IconSprite => Addressables.LoadAssetAsync<Sprite>("RoR2/Base/EliteLunar/texAffixLunarIcon.png").WaitForCompletion();
+    public override Sprite IconSprite => Addressables.LoadAssetAsync<Sprite>("RoR2/Base/EliteLunar/texBuffAffixLunar.tif").WaitForCompletion();
 
-    public override Color BuffColor => new Color(255, 223, 135, 1);
-
+    public override Color BuffColor => new Color32(255, 223, 135, 255);
     public override bool CanStack => false;
 
     public override void Hooks()
@@ -35,14 +27,14 @@ public class Channeling : Buff<Channeling>
     {
         if (sender.HasBuff(BuffDef))
         {
-            args.healthMultAdd += ChannelingHealthBoost;
-            args.baseRegenAdd += ChannelingRegenBoost;
-            args.levelRegenAdd += ChannelingRegenBoost / 5;
-            args.moveSpeedMultAdd += ChannelingMovementBoost;
-            args.damageMultAdd += ChannelingDamageBoost;
-            args.attackSpeedMultAdd += ChannelingAttackSpeedBoost;
-            args.critAdd += ChannelingCritBoost;
-            args.armorAdd += ChannelingArmorBoost;
+            args.healthMultAdd += ChannelingBoost;
+            args.baseRegenAdd += ChannelingBoost;
+            args.levelRegenAdd += ChannelingBoost / 5;
+            args.moveSpeedMultAdd += ChannelingBoost;
+            args.damageMultAdd += ChannelingBoost;
+            args.attackSpeedMultAdd += ChannelingBoost;
+            args.critAdd += ChannelingBoost;
+            args.armorAdd += ChannelingBoost;
         }
     }
 

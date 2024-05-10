@@ -1,7 +1,9 @@
-﻿using R2API;
+﻿using BepInEx.Configuration;
+using R2API;
 using RoR2;
 using RoR2.ExpansionManagement;
 using RoR2.Skills;
+using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +18,10 @@ namespace SecondMoon.Items.Void.BlissfulVisage;
 
 public class BlissfulVisage : Item<BlissfulVisage>
 {
-    public static float BlissfulVisageGhostCooldown = 120f;
-    public static float BlissfulVisageReduceTimerOnKillInit = 0.5f;
-    public static float BlissfulVisageReduceTimerOnKillStack = 0.5f;
-    public static float BlissfulVisageSuicideTimer = 30f;
+    public static ConfigOption<float> BlissfulVisageGhostCooldown;
+    public static ConfigOption<float> BlissfulVisageReduceTimerOnKillInit;
+    public static ConfigOption<float> BlissfulVisageReduceTimerOnKillStack;
+    public static ConfigOption<float> BlissfulVisageSuicideTimer;
 
     public override string ItemName => "Blissful Visage";
 
@@ -31,7 +33,7 @@ public class BlissfulVisage : Item<BlissfulVisage>
 
     public override string ItemLore => "Test";
 
-    public override ItemTier ItemTier => ItemTier.VoidTier3;
+    public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/DLC1/Common/VoidTier3Def.asset").WaitForCompletion();
 
     public override ItemTag[] Category => [ItemTag.Utility, ItemTag.BrotherBlacklist, ItemTag.CannotCopy, ItemTag.OnKillEffect];
 
@@ -48,81 +50,95 @@ public class BlissfulVisage : Item<BlissfulVisage>
 
     }
 
-    public override void Init()
+    public override void Init(ConfigFile config)
     {
-        CreateLang();
-        CreateItem();
-    }
-
-    public class BlissfulVisageSuicideComponent : Item<BlissfulVisageSuicideComponent>
-    {
-        public override string ItemName => "BlissfulVisageSuicideComponent";
-
-        public override string ItemLangTokenName => "SECONDMOONMOD_GHOSTONKILLVOID_SUICIDE";
-
-        public override string ItemPickupDesc => "";
-
-        public override string ItemFullDesc => "";
-
-        public override string ItemLore => "";
-
-        public override ItemTier ItemTier => ItemTier.NoTier;
-
-        public override ItemTag[] Category => [ItemTag.AIBlacklist, ItemTag.BrotherBlacklist, ItemTag.CannotCopy, ItemTag.CannotDuplicate];
-
-        public override ItemDisplayRuleDict CreateItemDisplayRules()
+        base.Init(config);
+        if (IsEnabled)
         {
-            displayRules = new ItemDisplayRuleDict(null);
-            return displayRules;
-        }
-
-        public override void Hooks()
-        {
-            On.RoR2.CharacterBody.OnInventoryChanged += BlissfulVisageAddSuicideItemBehavior;
-        }
-        
-        private void BlissfulVisageAddSuicideItemBehavior(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
-        {
-            if (NetworkServer.active)
-            {
-                self.AddItemBehavior<BlissfulVisageSuicideComponentBehavior>(self.inventory.GetItemCount(instance.ItemDef));
-            }
-            orig(self);
-        }
-
-        public override void Init()
-        {
+            CreateConfig(config);
             CreateLang();
             CreateItem();
-            Hooks();
+        }
+    }
+
+    private void CreateConfig(ConfigFile config)
+    {
+        BlissfulVisageGhostCooldown = config.ActiveBind("Item: " + ItemName, "Cooldown for ghost to respawn", 120f, "How many seconds need to pass before the ghost respwans?");
+        BlissfulVisageReduceTimerOnKillInit = config.ActiveBind("Item: " + ItemName, "Ghost cooldown reduction on kill with one " + ItemName, 0.5f, "How many seconds should the ghost cooldown be reduced by upon getting a kill with one Blissful Visage?");
+        BlissfulVisageReduceTimerOnKillStack = config.ActiveBind("Item: " + ItemName, "Ghost cooldown reduction on kill per stack after one " + ItemName, 0.5f, "How many seconds should the ghost cooldown be reduced by upon getting a kill per stack of Blissful Visage after one?");
+        BlissfulVisageSuicideTimer = config.ActiveBind("Item: " + ItemName, "Ghost lifespan", 30f, "How many seconds should the ghost last?");
+    }
+}
+
+public class BlissfulVisageSuicideComponent : Item<BlissfulVisageSuicideComponent>
+{
+    public override string ItemName => "BlissfulVisageSuicideComponent";
+
+    public override string ItemLangTokenName => "SECONDMOONMOD_GHOSTONKILLVOID_SUICIDE";
+
+    public override string ItemPickupDesc => "";
+
+    public override string ItemFullDesc => "";
+
+    public override string ItemLore => "";
+
+    public override ItemTierDef ItemTierDef => null;
+
+    public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Utility, ItemTag.CannotCopy];
+
+    public override ItemDisplayRuleDict CreateItemDisplayRules()
+    {
+        displayRules = new ItemDisplayRuleDict(null);
+        return displayRules;
+    }
+
+    public override void Hooks()
+    {
+        On.RoR2.CharacterBody.OnInventoryChanged += BlissfulVisageAddSuicideItemBehavior;
+    }
+
+    private void BlissfulVisageAddSuicideItemBehavior(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
+    {
+        if (NetworkServer.active)
+        {
+            self.AddItemBehavior<BlissfulVisageSuicideComponentBehavior>(self.inventory.GetItemCount(instance.ItemDef));
+        }
+        orig(self);
+    }
+
+    public override void Init(ConfigFile config)
+    {
+        EnableCheck = BlissfulVisage.instance.EnableCheck;
+        CreateLang();
+        CreateItem();
+        Hooks();
+    }
+
+    public class BlissfulVisageSuicideComponentBehavior : CharacterBody.ItemBehavior
+    {
+        private float suicideTimer;
+
+        private void Awake()
+        {
+            enabled = false;
+        }
+        private void Start()
+        {
+            suicideTimer = BlissfulVisage.BlissfulVisageSuicideTimer;
         }
 
-
-        public class BlissfulVisageSuicideComponentBehavior : CharacterBody.ItemBehavior
+        private void FixedUpdate()
         {
-            private float suicideTimer;
-
-            private void Awake()
+            suicideTimer -= Time.deltaTime;
+            if (suicideTimer <= 0)
             {
-                base.enabled = false;
-            }
-            private void Start()
-            {
-                suicideTimer = BlissfulVisageSuicideTimer;
-            }
-
-            private void FixedUpdate() 
-            { 
-                suicideTimer -= Time.deltaTime;
-                if (suicideTimer <= 0) 
+                if (body.HasBuff(DLC1Content.Buffs.EliteVoid))
                 {
-                    if (body.HasBuff(DLC1Content.Buffs.EliteVoid))
-                    {
-                        body.RemoveBuff(DLC1Content.Buffs.EliteVoid);
-                    }
-                    body.healthComponent.Suicide();
+                    body.RemoveBuff(DLC1Content.Buffs.EliteVoid);
                 }
+                body.healthComponent.Suicide();
             }
         }
     }
 }
+

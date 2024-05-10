@@ -2,7 +2,6 @@
 using R2API;
 using RoR2;
 using RoR2.Items;
-using SecondMoon.MyEntityStates.Items.Tier2;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -31,7 +30,7 @@ public class FlailOfMassBodyBehavior : BaseItemBodyBehavior
     }
     private void ConstructController()
     {
-        var controller = CreateBlankPrefab("FlailOfMassController", true);
+        var controller = Utils.Utils.CreateBlankPrefab("FlailOfMassController", true);
         controller.GetComponent<NetworkIdentity>().localPlayerAuthority = true;
 
         NetworkedBodyAttachment networkedBodyAttachment = controller.AddComponent<NetworkedBodyAttachment>();
@@ -47,17 +46,6 @@ public class FlailOfMassBodyBehavior : BaseItemBodyBehavior
             });
 
         FlailOfMassControllerObject = Instantiate(controller);
-    }
-
-    public static GameObject CreateBlankPrefab(string name = "GameObject", bool network = false)
-    {
-        GameObject gameObject = PrefabAPI.InstantiateClone(new GameObject(name), name, false);
-        if (network)
-        {
-            gameObject.AddComponent<NetworkIdentity>();
-            PrefabAPI.RegisterNetworkPrefab(gameObject);
-        }
-        return gameObject;
     }
 
 

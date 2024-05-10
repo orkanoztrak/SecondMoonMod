@@ -1,9 +1,12 @@
-﻿using R2API;
+﻿using BepInEx.Configuration;
+using R2API;
 using RoR2;
+using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using static R2API.RecalculateStatsAPI;
 
 
@@ -11,13 +14,13 @@ namespace SecondMoon.Items.Tier3.SilverRevolver;
 
 public class SilverRevolver : Item<SilverRevolver>
 {
-    public static float SilverRevolverCDRInit = 0.5f;
-    public static float SilverRevolverCDRStack = 0.5f;
+    public static ConfigOption<float> SilverRevolverCDRInit;
+    public static ConfigOption<float> SilverRevolverCDRStack;
+    public static ConfigOption<float> SilverRevolverInitialCritChance;
 
-    public static float SilverRevolverInitialCritChance = 10f;
     public override string ItemName => "Silver Revolver";
 
-    public override string ItemLangTokenName => "SECONDMOON_SILVER_REVOLVER";
+    public override string ItemLangTokenName => "SECONDMOONMOD_SILVER_REVOLVER";
 
     public override string ItemPickupDesc => "You always critically strike against Elite monsters, and critical strikes lower cooldowns.";
 
@@ -27,7 +30,7 @@ public class SilverRevolver : Item<SilverRevolver>
 
     public override string ItemLore => "Test";
 
-    public override ItemTier ItemTier => ItemTier.Tier3;
+    public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
 
     public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Utility];
 
@@ -84,7 +87,7 @@ public class SilverRevolver : Item<SilverRevolver>
         {
             if (!self.body.isElite)
             {
-                orig(self,damageInfo);
+                orig(self, damageInfo);
             }
             else
             {
@@ -103,10 +106,22 @@ public class SilverRevolver : Item<SilverRevolver>
         }
     }
 
-    public override void Init()
+    public override void Init(ConfigFile config)
     {
-        CreateLang();
-        CreateItem();
-        Hooks();
+        base.Init(config);
+        if (IsEnabled)
+        {
+            CreateConfig(config);
+            CreateLang();
+            CreateItem();
+            Hooks();
+        }
+    }
+
+    private void CreateConfig(ConfigFile config)
+    {
+        SilverRevolverCDRInit = config.ActiveBind("Item: " + ItemName, "Cooldown reduction with one " + ItemName, 0.5f, "How many seconds should cooldowns be reduced by with one Silver Revolver?");
+        SilverRevolverCDRStack = config.ActiveBind("Item: " + ItemName, "Cooldown reduction per stack after one " + ItemName, 0.5f, "How many seconds should cooldowns be reduced by per stack of Silver Revolver after one ?");
+        SilverRevolverInitialCritChance = config.ActiveBind("Item: " + ItemName, "Critical chance with at least one " + ItemName, 5f, "By what % should critical chance be increased by with at least one Silver Revolver?");
     }
 }

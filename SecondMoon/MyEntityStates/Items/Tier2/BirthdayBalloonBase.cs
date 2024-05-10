@@ -33,18 +33,6 @@ public class BirthdayBalloonBase : BaseState
         }
     }
 
-    protected bool isGrounded
-    {
-        get
-        {
-            if ((bool)bodyMotor)
-            {
-                return bodyMotor.isGrounded;
-            }
-            return false;
-        }
-    }
-
     public static BirthdayBalloonBase FindForBody(CharacterBody body)
     {
         for (int i = 0; i < instancesList.Count; i++)

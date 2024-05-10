@@ -31,6 +31,6 @@ public class Corrosion : DOT<Corrosion>
 
     public override void SetAssociatedBuff()
     {
-        this.AssociatedBuff = CorrosionDebuff.instance.BuffDef;
+        AssociatedBuff = CorrosionDebuff.instance.BuffDef;
     }
 }

@@ -46,7 +46,8 @@ public class FlailOrb : GenericDamageOrb
             crit = isCrit,
             radius = FlailOfMassRadius,
             position = target.transform.position,
-            damageColorIndex = damageColorIndex
+            damageColorIndex = damageColorIndex,
+            attackerFiltering = AttackerFiltering.NeverHitSelf
         }.Fire();
     }
 }

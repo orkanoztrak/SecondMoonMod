@@ -12,7 +12,7 @@ public class GashDebuff : Buff<GashDebuff>
 
     public override Sprite IconSprite => Addressables.LoadAssetAsync<Sprite>("RoR2/Junk/Common/texBuffSuperBleedIcon.png").WaitForCompletion();
 
-    public override Color BuffColor => new Color(90, 0, 0, 255);
+    public override Color BuffColor => new Color32(90, 0, 0, 255);
 
     public override bool IsDebuff => true;
 

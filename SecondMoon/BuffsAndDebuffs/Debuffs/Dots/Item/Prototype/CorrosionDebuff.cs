@@ -11,7 +11,7 @@ public class CorrosionDebuff : Buff<CorrosionDebuff>
 
     public override Sprite IconSprite => Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/texBuffVoidFog.tif").WaitForCompletion();
 
-    public override Color BuffColor => new Color(66, 73, 0, 255);
+    public override Color BuffColor => new Color32(150, 150, 0, 255);
 
     public override bool IsDebuff => true;
 

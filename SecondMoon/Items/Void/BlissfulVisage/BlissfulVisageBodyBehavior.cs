@@ -95,7 +95,7 @@ public class BlissfulVisageBodyBehavior : BaseItemBodyBehavior
         obj.useAmbientLevel = null;
         obj.preSpawnSetupCallback = (Action<CharacterMaster>)Delegate.Combine(obj.preSpawnSetupCallback, new Action<CharacterMaster>(PreSpawnSetupVoid));
         obj.loadout = ownerBody.master.loadout;
-        
+
         CharacterMaster characterMaster2 = obj.Perform();
         if (!characterMaster2)
         {
@@ -114,7 +114,7 @@ public class BlissfulVisageBodyBehavior : BaseItemBodyBehavior
         void PreSpawnSetupVoid(CharacterMaster master)
         {
             master.inventory.GiveItem(RoR2Content.Items.Ghost);
-            master.inventory.GiveItem(BlissfulVisage.BlissfulVisageSuicideComponent.instance.ItemDef);
+            master.inventory.GiveItem(BlissfulVisageSuicideComponent.instance.ItemDef);
             master.inventory.GiveEquipmentString("EliteVoidEquipment");
 
             var driver = master.gameObject.AddComponent<AISkillDriver>();

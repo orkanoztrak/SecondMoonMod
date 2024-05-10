@@ -41,12 +41,15 @@ namespace SecondMoon
         public const string PluginName = "SecondMoon";
         public const string PluginVersion = "1.0.0";
 
+        internal static BepInEx.Configuration.ConfigFile MainConfig;
+
         public static HashSet<ItemDef> BlacklistedFromPrinter = new HashSet<ItemDef>();
         public static List<Items.Item> VoidItemList = new List<Items.Item>();
         public static ExpansionDef DLC1;
         public void Awake()
         {
             Log.Init(Logger);
+            MainConfig = Config;
 
             DLC1 = Addressables.LoadAssetAsync<ExpansionDef>("RoR2/DLC1/Common/DLC1.asset").WaitForCompletion();
 
@@ -78,11 +81,14 @@ namespace SecondMoon
             foreach (var itemType in ItemTypes)
             {
                 Items.Item item = (Items.Item)System.Activator.CreateInstance(itemType);
-                item.Init();
-                Logger.LogInfo("Item: " + item.ItemName + " Initialized!");
-                if (item.ItemToCorrupt)
+                item.Init(Config);
+                if (item.EnableCheck)
                 {
-                    VoidItemList.Add(item);
+                    Logger.LogInfo("Item: " + item.ItemName + " Initialized!");
+                    if (item.ItemToCorrupt)
+                    {
+                        VoidItemList.Add(item);
+                    }
                 }
             }
 

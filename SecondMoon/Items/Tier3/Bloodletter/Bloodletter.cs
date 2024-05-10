@@ -1,24 +1,27 @@
-﻿using R2API;
+﻿using BepInEx.Configuration;
+using R2API;
 using RoR2;
 using SecondMoon.BuffsAndDebuffs.Debuffs.Dots.Item.Prototype;
 using SecondMoon.BuffsAndDebuffs.Debuffs.Dots.Item.Tier3;
+using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using static UnityEngine.ParticleSystem.PlaybackState;
 
 namespace SecondMoon.Items.Tier3.Bloodletter;
 
 public class Bloodletter : Item<Bloodletter>
 {
-    public static float BloodletterProcChance = 10f;
-    public static float BloodletterDamageInit = 2f;
-    public static float BloodletterDamageStack = 1f;
-    public static float BloodletterDamageScalingInit = 0.5f;
-    public static float BloodletterDamageScalingStack = 0.25f;
-    public static float BloodletterProcChanceScaling = 5f;
+    public static ConfigOption<float> BloodletterProcChance;
+    public static ConfigOption<float> BloodletterDamageInit;
+    public static ConfigOption<float> BloodletterDamageStack;
+    public static ConfigOption<float> BloodletterDamageScalingInit;
+    public static ConfigOption<float> BloodletterDamageScalingStack;
+    public static ConfigOption<float> BloodletterProcChanceScaling;
 
     public override string ItemName => "Bloodletter";
 
@@ -27,7 +30,7 @@ public class Bloodletter : Item<Bloodletter>
     public override string ItemPickupDesc => $"Chance on hit to wound the enemy. The stronger the hit, the better this works.";
 
     public override string ItemFullDesc => $"Hits have a <style=cIsDamage>{BloodletterProcChance}%</style> chance to deal <style=cIsDamage>{BloodletterDamageInit * 100}%</style> <style=cStack>(+{BloodletterDamageStack * 100} per stack)</style> TOTAL damage and apply <color=#C14040>Gash</color> for half the damage this item inflicts." +
-        $" <color=#C14040>At certain damage % thresholds, this item's effects become stronger</color>:\r\n\r\n" + 
+        $" <color=#C14040>At certain damage % thresholds, this item's effects become stronger</color>:\r\n\r\n" +
         $"• {2 * 100}%: <style=cIsDamage>+{BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{BloodletterDamageScalingStack * 100}% per stack)</style> extra damage.\r\n" +
         $"• {3 * 100}%: <style=cIsDamage>+{2 * BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{2 * BloodletterDamageScalingStack * 100}% per stack)</style> extra damage.\r\n" +
         $"• {4 * 100}%: <style=cIsDamage>+{3 * BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{3 * BloodletterDamageScalingStack * 100}% per stack)</style> extra damage.\r\n" +
@@ -37,7 +40,7 @@ public class Bloodletter : Item<Bloodletter>
 
     public override string ItemLore => "Test";
 
-    public override ItemTier ItemTier => ItemTier.Tier3;
+    public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
 
     public override ItemTag[] Category => [ItemTag.Damage];
 
@@ -61,12 +64,12 @@ public class Bloodletter : Item<Bloodletter>
             var attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
             var attacker = attackerBody.master;
             var victimComponent = victim.GetComponent<HealthComponent>();
-            if (attacker && attackerBody && victimComponent && victim != damageInfo.attacker)
+            if (attacker && attackerBody && victimComponent)
             {
                 var stackCount = GetCount(attacker);
                 if (stackCount > 0)
                 {
-                    var finalChance = BloodletterProcChance;
+                    float finalChance = BloodletterProcChance;
                     if (damageInfo.damage / attackerBody.damage >= 6)
                     {
                         finalChance += BloodletterProcChanceScaling;
@@ -96,7 +99,7 @@ public class Bloodletter : Item<Bloodletter>
                         ınflictDotInfo.dotIndex = Gash.instance.DotIndex;
                         ınflictDotInfo.damageMultiplier = 1;
                         ınflictDotInfo.totalDamage = bloodletterProc.damage / 2;
-                        EffectManager.SimpleImpactEffect(RoR2.HealthComponent.AssetReferences.executeEffectPrefab, bloodletterProc.position, Vector3.up, transmit: true);
+                        EffectManager.SimpleImpactEffect(HealthComponent.AssetReferences.executeEffectPrefab, bloodletterProc.position, Vector3.up, transmit: true);
                         victimComponent.TakeDamage(bloodletterProc);
                         DotController.InflictDot(ref ınflictDotInfo);
                     }
@@ -105,11 +108,26 @@ public class Bloodletter : Item<Bloodletter>
         }
     }
 
-    public override void Init()
+    public override void Init(ConfigFile config)
     {
-        CreateLang();
-        CreateItem();
-        Hooks();
+        base.Init(config);
+        if (IsEnabled)
+        {
+            CreateConfig(config);
+            CreateLang();
+            CreateItem();
+            Hooks();
+        }
+    }
+
+    private void CreateConfig(ConfigFile config)
+    {
+        BloodletterProcChance = config.ActiveBind("Item: " + ItemName, "Proc chance", 10f, "The % chance of hits proccing this.");
+        BloodletterDamageInit = config.ActiveBind("Item: " + ItemName, "Damage of the proc with one " + ItemName, 2f, "What % of TOTAL damage should the proc do with one Bloodletter? (2 = 200%)");
+        BloodletterDamageStack = config.ActiveBind("Item: " + ItemName, "Damage of the proc per stack after one " + ItemName, 2f, "What % of TOTAL damage should be added to the proc per stack of Bloodletter after one? (1 = 100%)");
+        BloodletterDamageScalingInit = config.ActiveBind("Item: " + ItemName, "Damage scaling of thresholds for stronger hits with one " + ItemName, 0.5f, "How much should the respective damage thresholds boost Bloodletter damage by with one Bloodletter? (0.5 = 50%)");
+        BloodletterDamageScalingStack = config.ActiveBind("Item: " + ItemName, "Damage scaling of thresholds for stronger hits per stack after one " + ItemName, 0.5f, "How much should the respective damage thresholds boost Bloodletter damage by per stack of Bloodletter after one? (0.25 = 25%)");
+        BloodletterProcChanceScaling = config.ActiveBind("Item: " + ItemName, "Proc chance scaling of thresholds for stronger hits", 5f, "What % should proc chance be increased by at respective damage thresholds?");
     }
 
     public float HandleDamageCalc(float totalDamage, float baseDamage, float stackCount)

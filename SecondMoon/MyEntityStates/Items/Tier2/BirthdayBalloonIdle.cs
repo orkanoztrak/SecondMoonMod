@@ -16,7 +16,7 @@ public class BirthdayBalloonIdle : BirthdayBalloonBase
     }
 
     private void FixedUpdateAuthority()
-    { 
+    {
         if (bodyMotor && bodyInputBank)
         {
             bool num = jumpButtonDown && bodyMotor.velocity.y < 0f && !bodyMotor.isGrounded;

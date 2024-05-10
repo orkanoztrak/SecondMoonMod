@@ -3855,20 +3855,20 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\HP\\.nuget\\packages\\": {}
+    "C:\\Users\\Orkan\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\HP\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.csproj",
+      "projectUniqueName": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.csproj",
       "projectName": "SecondMoon",
-      "projectPath": "C:\\Users\\HP\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.csproj",
-      "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\HP\\source\\repos\\SecondMoonMod\\SecondMoon\\obj\\",
+      "projectPath": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.csproj",
+      "packagesPath": "C:\\Users\\Orkan\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\HP\\source\\repos\\SecondMoonMod\\NuGet.Config",
-        "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\NuGet.Config",
+        "C:\\Users\\Orkan\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -3979,7 +3979,7 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204\\RuntimeIdentifierGraph.json"
       }
     }
   }
