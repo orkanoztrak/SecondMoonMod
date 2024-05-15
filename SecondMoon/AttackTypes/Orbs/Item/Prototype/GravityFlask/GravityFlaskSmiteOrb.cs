@@ -13,7 +13,7 @@ public class GravityFlaskSmiteOrb : GenericDamageOrb, IOrbFixedUpdateBehavior
     public override void Begin()
     {
         base.Begin();
-        base.duration = 0.1f;
+        base.duration = 0f;
         if ((bool)target)
         {
             lastKnownTargetPosition = target.transform.position;
@@ -27,7 +27,6 @@ public class GravityFlaskSmiteOrb : GenericDamageOrb, IOrbFixedUpdateBehavior
 
     public override void OnArrival()
     {
-        base.OnArrival();
         EffectManager.SpawnEffect(LegacyResourcesAPI.Load<GameObject>("Prefabs/Effects/ImpactEffects/SimpleLightningStrikeImpact"), new EffectData
         {
             origin = lastKnownTargetPosition
@@ -45,7 +44,7 @@ public class GravityFlaskSmiteOrb : GenericDamageOrb, IOrbFixedUpdateBehavior
             blastAttack.inflictor = null;
             blastAttack.position = lastKnownTargetPosition;
             blastAttack.procChainMask = procChainMask;
-            blastAttack.procCoefficient = procCoefficient;
+            blastAttack.procCoefficient = 0;
             blastAttack.radius = 3f;
             blastAttack.teamIndex = TeamComponent.GetObjectTeam(attacker);
             blastAttack.Fire();

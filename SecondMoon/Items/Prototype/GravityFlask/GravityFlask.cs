@@ -13,8 +13,6 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
-using static R2API.RecalculateStatsAPI;
-using static SecondMoon.Items.Prototype.SoulPoweredMantle.SoulPoweredMantle;
 
 namespace SecondMoon.Items.Prototype.GravityFlask;
 
@@ -52,16 +50,28 @@ public class GravityFlask : Item<GravityFlask>
     public static ConfigOption<float> GravityFlaskCooldownReductionStack;
     public static ConfigOption<float> GravityFlaskBonusBoostInit;
     public static ConfigOption<float> GravityFlaskBonusBoostStack;
-
-    public bool RecursionPrevention;
-
     public override string ItemName => "Gravity Flask";
 
     public override string ItemLangTokenName => "SECONDMOONMOD_GRAVITY_FLASK";
 
-    public override string ItemPickupDesc => "Gather items of different categories to get boosts according to the category.";
+    public override string ItemPickupDesc => "Gather items of different categories to get boosts according to the category. Hover over the item in your inventory to see the currently active boosts.";
 
-    public override string ItemFullDesc => "Test";
+    public override string ItemFullDesc => $"<color=#7CFDEA>For each item category, every certain number of items you have grant you the following boosts, with the {GravityFlaskFinalThreshold}-item bonuses only being applied once:</color>\r\n" +
+        $"<style=cIsDamage>Damage:</style>\r\n" +
+        $"•{GravityFlaskFirstThreshold}: Gain <style=cIsDamage>{GravityFlaskAttackSpeedInit * 100}%</style> <style=cStack>(+{GravityFlaskAttackSpeedStack * 100}% per stack)</style> attack speed.\r\n" +
+        $"•{GravityFlaskSecondThreshold}: Gain <style=cIsDamage>{GravityFlaskDamageInit * 100}%</style> <style=cStack>(+{GravityFlaskDamageStack * 100}% per stack)</style> base damage.\r\n" +
+        $"•{GravityFlaskThirdThreshold}: Gain <style=cIsDamage>{GravityFlaskCritInit}%</style> <style=cStack>(+{GravityFlaskCritStack}% per stack)</style> critical hit chance.\r\n" +
+        $"•{GravityFlaskFinalThreshold}: Hits smite enemies for <style=cIsDamage>{GravityFlaskProcDamageInit * 100}%</style> <style=cStack>(+{GravityFlaskProcDamageStack * 100}% per stack)</style> TOTAL damage, with a proc coefficient of <style=cIsDamage>{GravityFlaskProcCoefficient}</style>.\r\n\r\n" +
+        $"<style=cIsHealing>Healing:</style>\r\n" +
+        $"•{GravityFlaskFirstThreshold}: Gain <style=cIsHealing>{GravityFlaskHealthInit * 100}%</style> <style=cStack>(+{GravityFlaskHealthStack * 100}% per stack)</style> maximum health.\r\n" +
+        $"•{GravityFlaskSecondThreshold}: Heal from <style=cIsDamage>incoming damage</style> for <style=cIsHealing>{GravityFlaskHealInit}</style> <style=cStack>(+{GravityFlaskHealStack}% per stack)</style>.\r\n" +
+        $"•{GravityFlaskThirdThreshold}: <style=cIsHealing>Heal +{GravityFlaskHealBoostInit * 100}%</style> <style=cStack>(+{GravityFlaskHealBoostStack * 100}% per stack)</style> more.\r\n" +
+        $"•{GravityFlaskFinalThreshold}: <style=cIsDamage>Any damage you take</style> is reduced by <style=cIsDamage>{GravityFlaskDamageReductionInit * 100}%</style> <style=cStack>(+{GravityFlaskDamageReductionStack * 100}% per stack)</style>.\r\n\r\n" +
+        $"<style=cIsUtility>Utility:</style>\r\n" +
+        $"•{GravityFlaskFirstThreshold}: Gain <style=cIsUtility>{GravityFlaskMovementInit * 100}%</style> <style=cStack>(+{GravityFlaskMovementStack * 100}% per stack)</style> movement speed.\r\n" +
+        $"•{GravityFlaskSecondThreshold}: Gain <style=cIsUtility>{GravityFlaskGoldInit * 100}%</style> <style=cStack>(+{GravityFlaskGoldStack * 100}% per stack)</style> more gold.\r\n" +
+        $"•{GravityFlaskThirdThreshold}: <style=cIsUtility>Reduce skill cooldowns</style> by <style=cIsUtility>{GravityFlaskCooldownReductionInit * 100}%</style> <style=cStack>(+{GravityFlaskCooldownReductionStack * 100}% per stack)</style>.\r\n" +
+        $"•{GravityFlaskFinalThreshold}: Increase <color=#7CFDEA>non-{GravityFlaskFinalThreshold}-item bonuses</color> granted by this by <color=#7CFDEA>{GravityFlaskBonusBoostInit * 100}%</color> <style=cStack>(+{GravityFlaskBonusBoostStack * 100}% per stack)</style>.";
 
     public override string ItemLore => "Test";
 
@@ -78,11 +88,32 @@ public class GravityFlask : Item<GravityFlask>
     public override void Hooks()
     {
         On.RoR2.CharacterBody.OnInventoryChanged += AddItemBehavior;
-        GetStatCoefficients += GravityFlaskBuffStats;
+        RecalculateStatsAPI.GetStatCoefficients += GravityFlaskBuffStats;
         On.RoR2.HealthComponent.TakeDamage += GravityFlaskSetDamageTaken;
         On.RoR2.HealthComponent.TakeDamage += GravityFlaskHealOnDamaged;
         On.RoR2.HealthComponent.Heal += GravityFlaskIncreaseHeals;
-        //On.RoR2.GlobalEventManager.OnHitEnemy += GravityFlaskSmite;
+        On.RoR2.GlobalEventManager.OnHitEnemy += GravityFlaskSmite;
+        On.RoR2.CharacterMaster.GiveMoney += GravityFlaskMoreGold;
+    }
+
+    private void GravityFlaskMoreGold(On.RoR2.CharacterMaster.orig_GiveMoney orig, CharacterMaster self, uint amount)
+    {
+        uint newAmount = amount;
+        var body = self.GetBody();
+        if (body)
+        {
+            var stackCount = GetCount(self);
+            if (stackCount > 0)
+            {
+                var tracker = body.gameObject.GetComponent<GravityFlaskBehavior>();
+                if (tracker)
+                {
+                    var finalUtilityCoefficient = tracker.GravityFlaskUtilityTracker >= GravityFlaskFinalThreshold ? 1f + (GravityFlaskBonusBoostInit + (stackCount - 1) * GravityFlaskBonusBoostStack) : 1f;
+                    newAmount *= (uint)(1 + ((GravityFlaskGoldInit + ((stackCount - 1) * GravityFlaskGoldStack)) * (tracker.GravityFlaskUtilityTracker / GravityFlaskSecondThreshold) * finalUtilityCoefficient));
+                }
+            }
+        }
+        orig(self, newAmount);
     }
 
     private void GravityFlaskHealOnDamaged(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
@@ -110,8 +141,7 @@ public class GravityFlask : Item<GravityFlask>
 
     private void GravityFlaskSmite(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
-        orig(self, damageInfo, victim);
-        if (damageInfo.attacker && !RecursionPrevention && damageInfo.procCoefficient > 0)
+        if (damageInfo.attacker && damageInfo.procCoefficient > 0)
         {
             var attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
             var attacker = attackerBody.master;
@@ -134,32 +164,39 @@ public class GravityFlask : Item<GravityFlask>
                                 damageValue = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, smiteDamage),
                                 isCrit = damageInfo.crit,
                                 procChainMask = damageInfo.procChainMask,
-                                procCoefficient = GravityFlaskProcCoefficient,
                             };
                             HurtBox target = victimBody.mainHurtBox;
-                            try
+                            if (target)
                             {
-                                RecursionPrevention = true;
-                                if (target)
+                                if ((bool)victimBody.hurtBoxGroup)
                                 {
-                                    if ((bool)victimBody.hurtBoxGroup)
-                                    {
-                                        target = victimBody.hurtBoxGroup.hurtBoxes[UnityEngine.Random.Range(0, victimBody.hurtBoxGroup.hurtBoxes.Length)];
-                                    }
-                                    smiteOrb.target = target;
-                                    OrbManager.instance.AddOrb(smiteOrb);
+                                    target = victimBody.hurtBoxGroup.hurtBoxes[UnityEngine.Random.Range(0, victimBody.hurtBoxGroup.hurtBoxes.Length)];
                                 }
-                            }
-
-                            finally
-                            {
-                                RecursionPrevention = false;
+                                smiteOrb.target = target;
+                                OrbManager.instance.AddOrb(smiteOrb);
+                                DamageInfo newDamageInfo = new()
+                                {
+                                    damage = smiteOrb.damageValue,
+                                    crit = smiteOrb.isCrit,
+                                    inflictor = damageInfo.inflictor,
+                                    attacker = smiteOrb.attacker,
+                                    position = damageInfo.position,
+                                    force = damageInfo.force,
+                                    rejected = damageInfo.rejected,
+                                    procChainMask = damageInfo.procChainMask,
+                                    procCoefficient = GravityFlaskProcCoefficient,
+                                    damageType = smiteOrb.damageType,
+                                    damageColorIndex = smiteOrb.damageColorIndex
+                                };
+                                orig(self, newDamageInfo, victim);
+                                GlobalEventManager.instance.OnHitAll(newDamageInfo, victim);
                             }
                         }
                     }
                 }
             }
         }
+        orig(self, damageInfo, victim);
     }
 
     private float GravityFlaskIncreaseHeals(On.RoR2.HealthComponent.orig_Heal orig, HealthComponent self, float amount, ProcChainMask procChainMask, bool nonRegen)
@@ -202,7 +239,7 @@ public class GravityFlask : Item<GravityFlask>
         orig(self, newDamageInfo);
     }
 
-    private void GravityFlaskBuffStats(CharacterBody sender, StatHookEventArgs args)
+    private void GravityFlaskBuffStats(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
     {
         var stackCount = GetCount(sender);
         if (stackCount > 0)
@@ -247,6 +284,7 @@ public class GravityFlask : Item<GravityFlask>
         if (IsEnabled)
         {
             CreateConfig(config);
+            OrbAPI.AddOrb(typeof(GravityFlaskSmiteOrb));
             CreateLang();
             CreateItem();
             Hooks();
@@ -276,8 +314,8 @@ public class GravityFlask : Item<GravityFlask>
         GravityFlaskHealStack = config.ActiveBind("Item " + ItemName, "Heal on getting damaged per stack after one " + ItemName, 3f, "How much should the holder be healed by upon taking damage per stack of Gravity Flask after one?");
         GravityFlaskHealBoostInit = config.ActiveBind("Item: " + ItemName, "Heal increase with one " + ItemName, 0.5f, "How much should healing be increased by with one Gravity Flask? (0.5 = 50%)");
         GravityFlaskHealBoostStack = config.ActiveBind("Item: " + ItemName, "Heal increase per stack after one " + ItemName, 0.5f, "How much should healing be increased by per stack of Gravity Flask after one? (0.5 = 50%)");
-        GravityFlaskDamageReductionInit = config.ActiveBind("Item: " + ItemName, "Multiplicative incoming damage reduction with one " + ItemName, 0.5f, "What should incoming damage be multiplied by with one Gravity Flask? This scales exponentially (0.5 = 50%, refer to Shaped Glass on the wiki).");
-        GravityFlaskDamageReductionStack = config.ActiveBind("Item: " + ItemName, "Multiplicative incoming damage reduction per stack after one " + ItemName, 0.5f, "What should incoming damage be multiplied by per stack of Gravity Flask after one? This scales exponentially (0.5 = 50%, refer to Shaped Glass on the wiki).");
+        GravityFlaskDamageReductionInit = config.ActiveBind("Item: " + ItemName, "Multiplicative incoming damage reduction with one " + ItemName, 0.5f, "What should incoming damage be multiplicatively reduced to with one Gravity Flask? This scales exponentially (0.5 = 50%, refer to Shaped Glass on the wiki).");
+        GravityFlaskDamageReductionStack = config.ActiveBind("Item: " + ItemName, "Multiplicative incoming damage reduction per stack after one " + ItemName, 0.5f, "What should incoming damage be multiplicatively reduced to per stack of Gravity Flask after one? This scales exponentially (0.5 = 50%, refer to Shaped Glass on the wiki).");
 
         GravityFlaskMovementInit = config.ActiveBind("Item: " + ItemName, "Movement speed with one " + ItemName, 0.015f, "How much should movement speed be increased by with one Gravity Flask? (0.015 = 1.5%)");
         GravityFlaskMovementStack = config.ActiveBind("Item: " + ItemName, "Movement speed per stack after one " + ItemName, 0.015f, "How much should movement speed be increased by per stack of Gravity Flask after one? (0.015 = 1.5%)");

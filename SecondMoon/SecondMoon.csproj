@@ -18,14 +18,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="BepInEx.Core" Version="5.4.21" />
-    <PackageReference Include="R2API" Version="5.0.5" />
-    <PackageReference Include="R2API.Core" Version="5.0.12" />
-    <PackageReference Include="R2API.DamageType" Version="1.0.4" />
-    <PackageReference Include="R2API.Dot" Version="1.0.1" />
-    <PackageReference Include="R2API.Elites" Version="1.0.3" />
-    <PackageReference Include="R2API.Items" Version="1.0.*" />
-    <PackageReference Include="R2API.Language" Version="1.0.*" />
-    <PackageReference Include="R2API.Orb" Version="1.0.1" />
+    <PackageReference Include="R2API" Version="*" />
     <PackageReference Include="R2API.RecalculateStats" Version="1.3.0" />
     <PackageReference Include="RiskOfRain2.GameLibs" Version="1.2.4-r.0" />
     <PackageReference Include="UnityEngine.Modules" Version="2019.4.26" />
@@ -98,7 +91,7 @@
     <Folder Include="Equipment\Stoppedwatch\" />
     <Folder Include="Equipment\StormInABox\" />
     <Folder Include="Items\NoTier\" />
-    <Folder Include="Items\Tier1\PlasticBrick\" />
+    <Folder Include="Items\Void\TwistedRegrets\" />
     <Folder Include="MyEntityStates\Survivors\Outlaw\" />
     <Folder Include="MyEntityStates\Survivors\RogueChimera\" />
     <Folder Include="MyEntityStates\Survivors\Warlock\" />
@@ -106,12 +99,10 @@
     <Folder Include="Interactables\Chests\" />
     <Folder Include="Interactables\Shrines\" />
     <Folder Include="Items\Boss\" />
-    <Folder Include="Items\Lunar\NarrowMagnifier\" />
     <Folder Include="Items\Lunar\VengefulHammer\" />
     <Folder Include="Items\Prototype\BloodInfusedCore\" />
     <Folder Include="Items\Prototype\TremorKnuckles\" />
     <Folder Include="Items\Prototype\TotemOfDesign\" />
-    <Folder Include="Items\Tier2\WhackAMole\" />
     <Folder Include="Items\Tier2\PocketLint\" />
     <Folder Include="Items\Tier3\Boulderball\" />
     <Folder Include="Items\Void\GlassSpinner\" />

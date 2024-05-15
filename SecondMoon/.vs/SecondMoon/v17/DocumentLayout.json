@@ -3,28 +3,40 @@
   "WorkspaceRootPath": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|c:\\users\\orkan\\source\\repos\\secondmoonmod\\secondmoon\\items\\prototype\\gravityflask\\gravityflask.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|solutionrelative:items\\prototype\\gravityflask\\gravityflask.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|c:\\users\\orkan\\source\\repos\\secondmoonmod\\secondmoon\\items\\lunar\\narrowmagnifier\\narrowmagnifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|solutionrelative:items\\lunar\\narrowmagnifier\\narrowmagnifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|c:\\users\\orkan\\source\\repos\\secondmoonmod\\secondmoon\\secondmoon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|solutionrelative:secondmoon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|c:\\users\\orkan\\source\\repos\\secondmoonmod\\secondmoon\\items\\prototype\\celestineauger\\celestineauger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|solutionrelative:items\\prototype\\celestineauger\\celestineauger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|c:\\users\\orkan\\source\\repos\\secondmoonmod\\secondmoon\\buffsanddebuffs\\buffs\\equipment\\channeling.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|solutionrelative:buffsanddebuffs\\buffs\\equipment\\channeling.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|c:\\users\\orkan\\source\\repos\\secondmoonmod\\secondmoon\\secondmoon.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|solutionrelative:secondmoon.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|c:\\users\\orkan\\source\\repos\\secondmoonmod\\secondmoon\\buffsanddebuffs\\debuffs\\puredebuffs\\item\\tier1\\incomparablepain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|solutionrelative:buffsanddebuffs\\debuffs\\puredebuffs\\item\\tier1\\incomparablepain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|c:\\users\\orkan\\source\\repos\\secondmoonmod\\secondmoon\\items\\prototype\\hydra\\hydra.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|solutionrelative:items\\prototype\\hydra\\hydra.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|c:\\users\\orkan\\source\\repos\\secondmoonmod\\secondmoon\\attacktypes\\orbs\\item\\prototype\\hydra\\hydraorb.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|solutionrelative:attacktypes\\orbs\\item\\prototype\\hydra\\hydraorb.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|c:\\users\\orkan\\source\\repos\\secondmoonmod\\secondmoon\\buffsanddebuffs\\debuffs\\dots\\item\\prototype\\corrosiondebuff.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|solutionrelative:buffsanddebuffs\\debuffs\\dots\\item\\prototype\\corrosiondebuff.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|c:\\users\\orkan\\source\\repos\\secondmoonmod\\secondmoon\\attacktypes\\orbs\\item\\prototype\\gravityflask\\gravityflasksmiteorb.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|solutionrelative:attacktypes\\orbs\\item\\prototype\\gravityflask\\gravityflasksmiteorb.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|c:\\users\\orkan\\source\\repos\\secondmoonmod\\secondmoon\\items\\prototype\\flailofmass\\flailofmass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|solutionrelative:items\\prototype\\flailofmass\\flailofmass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|c:\\users\\orkan\\source\\repos\\secondmoonmod\\secondmoon\\buffsanddebuffs\\debuffs\\dots\\item\\void\\popperseeds.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|solutionrelative:buffsanddebuffs\\debuffs\\dots\\item\\void\\popperseeds.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|c:\\users\\orkan\\source\\repos\\secondmoonmod\\secondmoon\\items\\tier1\\plasticbrick\\plasticbrick.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{20A5808E-14FD-4079-9852-0BBFEBB6BF05}|SecondMoon.csproj|solutionrelative:items\\tier1\\plasticbrick\\plasticbrick.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -46,67 +58,88 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "HydraOrb.cs",
-              "DocumentMoniker": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\AttackTypes\\Orbs\\Item\\Prototype\\Hydra\\HydraOrb.cs",
-              "RelativeDocumentMoniker": "AttackTypes\\Orbs\\Item\\Prototype\\Hydra\\HydraOrb.cs",
-              "ToolTip": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\AttackTypes\\Orbs\\Item\\Prototype\\Hydra\\HydraOrb.cs",
-              "RelativeToolTip": "AttackTypes\\Orbs\\Item\\Prototype\\Hydra\\HydraOrb.cs",
-              "ViewState": "AQIAAA4AAAAAAAAAAAAQwCAAAAAUAAAA",
+              "DocumentIndex": 4,
+              "Title": "SecondMoon.csproj",
+              "DocumentMoniker": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.csproj",
+              "RelativeDocumentMoniker": "SecondMoon.csproj",
+              "ToolTip": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.csproj",
+              "RelativeToolTip": "SecondMoon.csproj",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABQAAAAwAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-05-14T20:24:43.876Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Channeling.cs",
+              "DocumentMoniker": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\BuffsAndDebuffs\\Buffs\\Equipment\\Channeling.cs",
+              "RelativeDocumentMoniker": "BuffsAndDebuffs\\Buffs\\Equipment\\Channeling.cs",
+              "ToolTip": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\BuffsAndDebuffs\\Buffs\\Equipment\\Channeling.cs",
+              "RelativeToolTip": "BuffsAndDebuffs\\Buffs\\Equipment\\Channeling.cs",
+              "ViewState": "AQIAAAsAAAAAAAAAAIAywBIAAAArAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-10T05:09:24.023Z",
+              "WhenOpened": "2024-05-14T17:02:35.596Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SecondMoon.cs",
+              "DocumentMoniker": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.cs",
+              "RelativeDocumentMoniker": "SecondMoon.cs",
+              "ToolTip": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.cs",
+              "RelativeToolTip": "SecondMoon.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABYAAAAGAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-14T16:24:22.975Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CelestineAuger.cs",
+              "DocumentMoniker": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\Items\\Prototype\\CelestineAuger\\CelestineAuger.cs",
+              "RelativeDocumentMoniker": "Items\\Prototype\\CelestineAuger\\CelestineAuger.cs",
+              "ToolTip": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\Items\\Prototype\\CelestineAuger\\CelestineAuger.cs",
+              "RelativeToolTip": "Items\\Prototype\\CelestineAuger\\CelestineAuger.cs",
+              "ViewState": "AQIAALUAAAAAAAAAAAA5wMcAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-14T16:03:54.877Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "NarrowMagnifier.cs",
+              "DocumentMoniker": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\Items\\Lunar\\NarrowMagnifier\\NarrowMagnifier.cs",
+              "RelativeDocumentMoniker": "Items\\Lunar\\NarrowMagnifier\\NarrowMagnifier.cs",
+              "ToolTip": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\Items\\Lunar\\NarrowMagnifier\\NarrowMagnifier.cs",
+              "RelativeToolTip": "Items\\Lunar\\NarrowMagnifier\\NarrowMagnifier.cs",
+              "ViewState": "AQIAADoAAAAAAAAAAAAkwF8AAAAVAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-14T05:38:39.989Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "Popperseeds.cs",
-              "DocumentMoniker": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\BuffsAndDebuffs\\Debuffs\\Dots\\Item\\Void\\Popperseeds.cs",
-              "RelativeDocumentMoniker": "BuffsAndDebuffs\\Debuffs\\Dots\\Item\\Void\\Popperseeds.cs",
-              "ToolTip": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\BuffsAndDebuffs\\Debuffs\\Dots\\Item\\Void\\Popperseeds.cs",
-              "RelativeToolTip": "BuffsAndDebuffs\\Debuffs\\Dots\\Item\\Void\\Popperseeds.cs",
-              "ViewState": "AQIAAA8AAAAAAAAAAAAtwCoAAAAJAAAA",
+              "Title": "IncomparablePain.cs",
+              "DocumentMoniker": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\BuffsAndDebuffs\\Debuffs\\PureDebuffs\\Item\\Tier1\\IncomparablePain.cs",
+              "RelativeDocumentMoniker": "BuffsAndDebuffs\\Debuffs\\PureDebuffs\\Item\\Tier1\\IncomparablePain.cs",
+              "ToolTip": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\BuffsAndDebuffs\\Debuffs\\PureDebuffs\\Item\\Tier1\\IncomparablePain.cs",
+              "RelativeToolTip": "BuffsAndDebuffs\\Debuffs\\PureDebuffs\\Item\\Tier1\\IncomparablePain.cs",
+              "ViewState": "AQIAABQAAAAAAAAAAAASwCsAAAAcAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-09T17:58:43.973Z"
+              "WhenOpened": "2024-05-13T15:53:20.834Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "FlailOfMass.cs",
-              "DocumentMoniker": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\Items\\Prototype\\FlailOfMass\\FlailOfMass.cs",
-              "RelativeDocumentMoniker": "Items\\Prototype\\FlailOfMass\\FlailOfMass.cs",
-              "ToolTip": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\Items\\Prototype\\FlailOfMass\\FlailOfMass.cs",
-              "RelativeToolTip": "Items\\Prototype\\FlailOfMass\\FlailOfMass.cs",
-              "ViewState": "AQIAAFoAAAAAAAAAAAAIwH0AAAALAAAA",
+              "DocumentIndex": 8,
+              "Title": "PlasticBrick.cs",
+              "DocumentMoniker": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\Items\\Tier1\\PlasticBrick\\PlasticBrick.cs",
+              "RelativeDocumentMoniker": "Items\\Tier1\\PlasticBrick\\PlasticBrick.cs",
+              "ToolTip": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\Items\\Tier1\\PlasticBrick\\PlasticBrick.cs",
+              "RelativeToolTip": "Items\\Tier1\\PlasticBrick\\PlasticBrick.cs",
+              "ViewState": "AQIAABoAAAAAAAAAAAA9wDoAAAA3AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-09T08:55:49.471Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "GravityFlaskSmiteOrb.cs",
-              "DocumentMoniker": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\AttackTypes\\Orbs\\Item\\Prototype\\GravityFlask\\GravityFlaskSmiteOrb.cs",
-              "RelativeDocumentMoniker": "AttackTypes\\Orbs\\Item\\Prototype\\GravityFlask\\GravityFlaskSmiteOrb.cs",
-              "ToolTip": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\AttackTypes\\Orbs\\Item\\Prototype\\GravityFlask\\GravityFlaskSmiteOrb.cs",
-              "RelativeToolTip": "AttackTypes\\Orbs\\Item\\Prototype\\GravityFlask\\GravityFlaskSmiteOrb.cs",
-              "ViewState": "AQIAAA0AAAAAAAAAAAAgwC4AAAA1AAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-09T08:19:29.511Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "GravityFlask.cs",
-              "DocumentMoniker": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\Items\\Prototype\\GravityFlask\\GravityFlask.cs",
-              "RelativeDocumentMoniker": "Items\\Prototype\\GravityFlask\\GravityFlask.cs",
-              "ToolTip": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\Items\\Prototype\\GravityFlask\\GravityFlask.cs",
-              "RelativeToolTip": "Items\\Prototype\\GravityFlask\\GravityFlask.cs",
-              "ViewState": "AQIAAG4AAAAAAAAAAAA5wI4AAAArAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-06T20:21:08.107Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-05-12T20:13:46.078Z"
             }
           ]
         },
@@ -116,16 +149,28 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 6,
               "Title": "Hydra.cs",
               "DocumentMoniker": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\Items\\Prototype\\Hydra\\Hydra.cs",
               "RelativeDocumentMoniker": "Items\\Prototype\\Hydra\\Hydra.cs",
               "ToolTip": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\Items\\Prototype\\Hydra\\Hydra.cs",
               "RelativeToolTip": "Items\\Prototype\\Hydra\\Hydra.cs",
-              "ViewState": "AQIAACsAAAAAAAAAAAAYwD0AAAA0AAAA",
+              "ViewState": "AQIAAE8AAAAAAAAAAAApwGgAAAAfAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-09T08:18:03.704Z",
+              "WhenOpened": "2024-05-14T16:20:46.165Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "CorrosionDebuff.cs",
+              "DocumentMoniker": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\BuffsAndDebuffs\\Debuffs\\Dots\\Item\\Prototype\\CorrosionDebuff.cs",
+              "RelativeDocumentMoniker": "BuffsAndDebuffs\\Debuffs\\Dots\\Item\\Prototype\\CorrosionDebuff.cs",
+              "ToolTip": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\BuffsAndDebuffs\\Debuffs\\Dots\\Item\\Prototype\\CorrosionDebuff.cs",
+              "RelativeToolTip": "BuffsAndDebuffs\\Debuffs\\Dots\\Item\\Prototype\\CorrosionDebuff.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-14T16:26:20.834Z"
             }
           ]
         }

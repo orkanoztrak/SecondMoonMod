@@ -78,7 +78,7 @@ public class MalachiteNeedles : Item<MalachiteNeedles>
     private void MalachiteNeedlesApplyTotalCorrosion(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, RoR2.GlobalEventManager self, RoR2.DamageInfo damageInfo, GameObject victim)
     {
         orig(self, damageInfo, victim);
-        if (damageInfo.procCoefficient > 0f)
+        if (damageInfo.attacker && damageInfo.procCoefficient > 0f)
         {
             var attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
             if (attackerBody)

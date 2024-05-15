@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using UnityEngine.AddressableAssets;
-using static R2API.RecalculateStatsAPI;
 
 namespace SecondMoon.Items.Lunar.Moonstone;
 
@@ -46,7 +45,7 @@ public class Moonstone : Item<Moonstone>
     public override void Hooks()
     {
         On.RoR2.CharacterBody.OnInventoryChanged += MoonstoneSetupTeamStackCounts;
-        GetStatCoefficients += MoonstoneBoostStats;
+        RecalculateStatsAPI.GetStatCoefficients += MoonstoneBoostStats;
     }
 
     private void MoonstoneSetupTeamStackCounts(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
@@ -68,7 +67,7 @@ public class Moonstone : Item<Moonstone>
 
     }
 
-    private void MoonstoneBoostStats(CharacterBody sender, StatHookEventArgs args)
+    private void MoonstoneBoostStats(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
     {
         var stackCount = GetCount(sender);
         if (stackCount > 0)

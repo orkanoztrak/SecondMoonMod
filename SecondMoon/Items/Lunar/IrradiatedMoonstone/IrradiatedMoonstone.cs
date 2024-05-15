@@ -10,7 +10,6 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
-using static R2API.RecalculateStatsAPI;
 
 namespace SecondMoon.Items.Lunar.IrradiatedMoonstone;
 
@@ -76,7 +75,7 @@ public class IrradiatedMoonstone : Item<IrradiatedMoonstone>
 
     public override void Hooks()
     {
-        GetStatCoefficients += IrradiatedMoonstoneBoostStats;
+        RecalculateStatsAPI.GetStatCoefficients += IrradiatedMoonstoneBoostStats;
         On.RoR2.CharacterBody.OnInventoryChanged += IrradiatedMoonstoneSetupTeamStackCounts;
         On.RoR2.HoldoutZoneController.Start += IrradiatedMoonstoneBoostTPRate;
         On.RoR2.Projectile.ProjectileController.Start += IrradiatedMoonstoneFasterProjectiles;
@@ -184,7 +183,7 @@ public class IrradiatedMoonstone : Item<IrradiatedMoonstone>
         orig(self);
     }
 
-    private void IrradiatedMoonstoneBoostStats(CharacterBody sender, StatHookEventArgs args)
+    private void IrradiatedMoonstoneBoostStats(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
     {
         var stackCount = GetCount(sender);
         if (stackCount > 0)

@@ -3,19 +3,11 @@ using HarmonyLib;
 using R2API;
 using RoR2;
 using RoR2.ExpansionManagement;
-using RoR2.Items;
 using SecondMoon.BuffsAndDebuffs;
-using SecondMoon.Items;
-using SecondMoon.Equipment;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UnityEngine;
 using UnityEngine.AddressableAssets;
-using static Facepunch.Steamworks.Inventory;
-using static Facepunch.Steamworks.Workshop;
-using SecondMoon.AttackTypes.Orbs.Item.Prototype.Hydra;
 
 [assembly: HG.Reflection.SearchableAttribute.OptIn]
 
@@ -28,6 +20,8 @@ namespace SecondMoon
     [BepInDependency(PrefabAPI.PluginGUID)]
     [BepInDependency(DamageAPI.PluginGUID)]
     [BepInDependency(OrbAPI.PluginGUID)]
+    //[BepInDependency(ColorsAPI.PluginGUID)]
+    [BepInDependency("com.xoxfaby.BetterUI", BepInDependency.DependencyFlags.SoftDependency)]
 
     // This is the main declaration of our plugin class.
     // BepInEx searches for all classes inheriting from BaseUnityPlugin to initialize on startup.
@@ -104,8 +98,6 @@ namespace SecondMoon
                 equipment.Init();
                 Logger.LogInfo("Equipment: " + equipment.EquipmentName + " Initialized!");
             }
-#pragma warning disable Publicizer001
-#pragma warning restore Publicizer001
         }
 
         private void Corrupt(On.RoR2.Items.ContagiousItemManager.orig_Init orig)
@@ -121,6 +113,5 @@ namespace SecondMoon
             }
             orig();
         }
-
     }
 }

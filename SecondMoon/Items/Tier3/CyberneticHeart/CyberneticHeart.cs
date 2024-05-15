@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using static R2API.RecalculateStatsAPI;
 
 namespace SecondMoon.Items.Tier3.CyberneticHeart;
 
@@ -39,7 +38,7 @@ public class CyberneticHeart : Item<CyberneticHeart>
 
     public override void Hooks()
     {
-        GetStatCoefficients += CyberneticHeartBoostShields;
+        RecalculateStatsAPI.GetStatCoefficients += CyberneticHeartBoostShields;
         On.RoR2.HealthComponent.SendHeal += CyberneticHeartRestoreShields;
     }
 
@@ -61,7 +60,7 @@ public class CyberneticHeart : Item<CyberneticHeart>
         orig(target, amount, isCrit);
     }
 
-    private void CyberneticHeartBoostShields(CharacterBody sender, StatHookEventArgs args)
+    private void CyberneticHeartBoostShields(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
     {
         var stackCount = GetCount(sender);
         if (stackCount > 0)

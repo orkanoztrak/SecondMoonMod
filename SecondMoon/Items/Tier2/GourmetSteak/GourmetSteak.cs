@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine.AddressableAssets;
-using static R2API.RecalculateStatsAPI;
 
 namespace SecondMoon.Items.Tier2.GourmetSteak;
 
@@ -42,10 +41,10 @@ public class GourmetSteak : Item<GourmetSteak>
     public override void Hooks()
     {
         On.RoR2.CharacterBody.RecalculateStats += GourmetSteakIncreaseOSPThreshold;
-        GetStatCoefficients += GourmetSteakIncreaseHealth;
+        RecalculateStatsAPI.GetStatCoefficients += GourmetSteakIncreaseHealth;
     }
 
-    private void GourmetSteakIncreaseHealth(CharacterBody sender, StatHookEventArgs args)
+    private void GourmetSteakIncreaseHealth(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
     {
         var stackCount = GetCount(sender);
         if (stackCount > 0)

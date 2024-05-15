@@ -36,7 +36,7 @@ public class Bloodletter : Item<Bloodletter>
         $"• {4 * 100}%: <style=cIsDamage>+{3 * BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{3 * BloodletterDamageScalingStack * 100}% per stack)</style> extra damage.\r\n" +
         $"• {6 * 100}%: <style=cIsDamage>+{3 * BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{3 * BloodletterDamageScalingStack * 100}% per stack)</style> extra damage. <style=cIsDamage>{BloodletterProcChance + BloodletterProcChanceScaling}%</style> chance for proc.\r\n" +
         $"• {8 * 100}%: <style=cIsDamage>+{4 * BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{4 * BloodletterDamageScalingStack * 100}% per stack)</style> extra damage. <style=cIsDamage>{BloodletterProcChance + BloodletterProcChanceScaling}%</style> chance for proc.\r\n" +
-        $"• {10 * 100}%: <style=cIsDamage>+{4 * BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{4 * BloodletterDamageScalingStack * 100}% per stack)</style> extra damage. <style=cIsDamage>{BloodletterProcChance + 2 * BloodletterProcChanceScaling}%</style> chance for proc.\r\n";
+        $"• {10 * 100}%: <style=cIsDamage>+{4 * BloodletterDamageScalingInit * 100}%</style> <style=cStack>(+{4 * BloodletterDamageScalingStack * 100}% per stack)</style> extra damage. <style=cIsDamage>{BloodletterProcChance + 2 * BloodletterProcChanceScaling}%</style> chance for proc.";
 
     public override string ItemLore => "Test";
 
@@ -59,49 +59,52 @@ public class Bloodletter : Item<Bloodletter>
     private void BloodletterWoundEnemy(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, RoR2.GlobalEventManager self, RoR2.DamageInfo damageInfo, GameObject victim)
     {
         orig(self, damageInfo, victim);
-        if (damageInfo.attacker)
+        if (damageInfo.attacker && damageInfo.procCoefficient > 0)
         {
             var attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
-            var attacker = attackerBody.master;
             var victimComponent = victim.GetComponent<HealthComponent>();
-            if (attacker && attackerBody && victimComponent)
+            if (attackerBody && victimComponent)
             {
-                var stackCount = GetCount(attacker);
-                if (stackCount > 0)
+                var attacker = attackerBody.master;
+                if (attacker)
                 {
-                    float finalChance = BloodletterProcChance;
-                    if (damageInfo.damage / attackerBody.damage >= 6)
+                    var stackCount = GetCount(attacker);
+                    if (stackCount > 0)
                     {
-                        finalChance += BloodletterProcChanceScaling;
-                        if (damageInfo.damage / attackerBody.damage >= 10)
+                        float finalChance = BloodletterProcChance;
+                        if (damageInfo.damage / attackerBody.damage >= 6)
                         {
                             finalChance += BloodletterProcChanceScaling;
+                            if (damageInfo.damage / attackerBody.damage >= 10)
+                            {
+                                finalChance += BloodletterProcChanceScaling;
+                            }
                         }
-                    }
-                    if (Util.CheckRoll(finalChance * damageInfo.procCoefficient, attacker))
-                    {
-                        var procDamage = HandleDamageCalc(damageInfo.damage, attackerBody.damage, stackCount);
-                        DamageInfo bloodletterProc = new DamageInfo
+                        if (Util.CheckRoll(finalChance * damageInfo.procCoefficient, attacker))
                         {
-                            damage = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, procDamage),
-                            damageColorIndex = DamageColorIndex.Item,
-                            damageType = DamageType.Generic,
-                            attacker = damageInfo.attacker,
-                            crit = damageInfo.crit,
-                            force = Vector3.zero,
-                            inflictor = null,
-                            position = damageInfo.position,
-                            procCoefficient = 0
-                        };
-                        InflictDotInfo ınflictDotInfo = default(InflictDotInfo);
-                        ınflictDotInfo.victimObject = victim;
-                        ınflictDotInfo.attackerObject = damageInfo.attacker;
-                        ınflictDotInfo.dotIndex = Gash.instance.DotIndex;
-                        ınflictDotInfo.damageMultiplier = 1;
-                        ınflictDotInfo.totalDamage = bloodletterProc.damage / 2;
-                        EffectManager.SimpleImpactEffect(HealthComponent.AssetReferences.executeEffectPrefab, bloodletterProc.position, Vector3.up, transmit: true);
-                        victimComponent.TakeDamage(bloodletterProc);
-                        DotController.InflictDot(ref ınflictDotInfo);
+                            var procDamage = HandleDamageCalc(damageInfo.damage, attackerBody.damage, stackCount);
+                            DamageInfo bloodletterProc = new DamageInfo
+                            {
+                                damage = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, procDamage),
+                                damageColorIndex = DamageColorIndex.Item,
+                                damageType = DamageType.Generic,
+                                attacker = damageInfo.attacker,
+                                crit = damageInfo.crit,
+                                force = Vector3.zero,
+                                inflictor = null,
+                                position = damageInfo.position,
+                                procCoefficient = 0
+                            };
+                            InflictDotInfo ınflictDotInfo = default(InflictDotInfo);
+                            ınflictDotInfo.victimObject = victim;
+                            ınflictDotInfo.attackerObject = damageInfo.attacker;
+                            ınflictDotInfo.dotIndex = Gash.instance.DotIndex;
+                            ınflictDotInfo.damageMultiplier = 1;
+                            ınflictDotInfo.totalDamage = bloodletterProc.damage / 2;
+                            EffectManager.SimpleImpactEffect(HealthComponent.AssetReferences.executeEffectPrefab, bloodletterProc.position, Vector3.up, transmit: true);
+                            victimComponent.TakeDamage(bloodletterProc);
+                            DotController.InflictDot(ref ınflictDotInfo);
+                        }
                     }
                 }
             }

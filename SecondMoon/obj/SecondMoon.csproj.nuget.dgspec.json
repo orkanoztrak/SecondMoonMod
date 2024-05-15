@@ -72,35 +72,7 @@
             },
             "R2API": {
               "target": "Package",
-              "version": "[5.0.5, )"
-            },
-            "R2API.Core": {
-              "target": "Package",
-              "version": "[5.0.12, )"
-            },
-            "R2API.DamageType": {
-              "target": "Package",
-              "version": "[1.0.4, )"
-            },
-            "R2API.Dot": {
-              "target": "Package",
-              "version": "[1.0.1, )"
-            },
-            "R2API.Elites": {
-              "target": "Package",
-              "version": "[1.0.3, )"
-            },
-            "R2API.Items": {
-              "target": "Package",
-              "version": "[1.0.*, )"
-            },
-            "R2API.Language": {
-              "target": "Package",
-              "version": "[1.0.*, )"
-            },
-            "R2API.Orb": {
-              "target": "Package",
-              "version": "[1.0.1, )"
+              "version": "[*, )"
             },
             "R2API.RecalculateStats": {
               "target": "Package",

@@ -20,7 +20,7 @@ public class Channeling : Buff<Channeling>
 
     public override void Hooks()
     {
-        RecalculateStatsAPI.GetStatCoefficients += ChannelingEffect;
+        R2API.RecalculateStatsAPI.GetStatCoefficients += ChannelingEffect;
     }
 
     private void ChannelingEffect(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)

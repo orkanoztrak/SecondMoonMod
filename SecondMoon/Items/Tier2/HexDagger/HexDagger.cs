@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using static R2API.RecalculateStatsAPI;
 
 namespace SecondMoon.Items.Tier2.HexDagger;
 
@@ -42,7 +41,7 @@ public class HexDagger : Item<HexDagger>
 
     public override void Hooks()
     {
-        GetStatCoefficients += HexDaggerInitBuffCrit;
+        RecalculateStatsAPI.GetStatCoefficients += HexDaggerInitBuffCrit;
         On.RoR2.HealthComponent.TakeDamage += HexDaggerDOTsCanCrit;
     }
 
@@ -71,7 +70,7 @@ public class HexDagger : Item<HexDagger>
         orig(self, newDamageInfo);
     }
 
-    private void HexDaggerInitBuffCrit(CharacterBody sender, StatHookEventArgs args)
+    private void HexDaggerInitBuffCrit(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
     {
         var stackCount = GetCount(sender);
         if (stackCount > 0)

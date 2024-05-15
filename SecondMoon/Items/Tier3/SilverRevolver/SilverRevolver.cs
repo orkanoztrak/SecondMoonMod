@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using static R2API.RecalculateStatsAPI;
 
 
 namespace SecondMoon.Items.Tier3.SilverRevolver;
@@ -43,7 +42,7 @@ public class SilverRevolver : Item<SilverRevolver>
     public override void Hooks()
     {
         On.RoR2.HealthComponent.TakeDamage += SilverRevolverAlwaysCritsOnElite;
-        GetStatCoefficients += SilverRevolverInitBuffCrit;
+        RecalculateStatsAPI.GetStatCoefficients += SilverRevolverInitBuffCrit;
         On.RoR2.GlobalEventManager.OnHitEnemy += SilverRevolverReduceCooldowns;
     }
 
@@ -72,7 +71,7 @@ public class SilverRevolver : Item<SilverRevolver>
         orig(self, damageInfo, victim);
     }
 
-    private void SilverRevolverInitBuffCrit(CharacterBody sender, StatHookEventArgs args)
+    private void SilverRevolverInitBuffCrit(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
     {
         var stackCount = GetCount(sender);
         if (stackCount > 0)
@@ -103,6 +102,10 @@ public class SilverRevolver : Item<SilverRevolver>
                 }
                 orig(self, newDamageInfo);
             }
+        }
+        else
+        {
+            orig(self, damageInfo);
         }
     }
 

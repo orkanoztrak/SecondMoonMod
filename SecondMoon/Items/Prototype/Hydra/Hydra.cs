@@ -18,8 +18,6 @@ public class Hydra : Item<Hydra>
 {
     public static ConfigOption<float> HydraBaseDamageInit;
     public static ConfigOption<float> HydraBaseDamageStack;
-
-    public int RecursionPrevention;
     public override string ItemName => "Hydra";
 
     public override string ItemLangTokenName => "SECONDMOONMOD_HYDRA";
@@ -54,44 +52,53 @@ public class Hydra : Item<Hydra>
             if (attackerBody)
             {
                 var stackCount = GetCount(attackerBody);
-                if (stackCount > 0 && RecursionPrevention < 2 && damageInfo.procCoefficient > 0)
+                if (stackCount > 0 && damageInfo.procCoefficient > 0)
                 {
-                    var teamComponent = attackerBody.GetComponent<TeamComponent>();
-                    var victimBody = victim ? victim.GetComponent<CharacterBody>() : null;
+                    for (int i = 0; i < 2; i++)
+                    {
+                        var teamComponent = attackerBody.GetComponent<TeamComponent>();
+                        var victimBody = victim ? victim.GetComponent<CharacterBody>() : null;
 
-                    HydraOrb hydraOrb = new HydraOrb
-                    {
-                        origin = damageInfo.position,
-                        damageValue = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, 1f) / (HydraBaseDamageInit + ((stackCount - 1) * HydraBaseDamageStack)),
-                        isCrit = damageInfo.crit,
-                        totalStrikes = 1,
-                        teamIndex = teamComponent ? teamComponent.teamIndex : TeamIndex.Neutral,
-                        attacker = damageInfo.attacker,
-                        inflictor = damageInfo.inflictor,
-                        procCoefficient = damageInfo.procCoefficient,
-                        damageColorIndex = damageInfo.damageColorIndex,
-                        procChainMask = damageInfo.procChainMask,
-                        damageType = damageInfo.damageType,
-                        secondsPerStrike = 0.1f
-                    };
-                    HurtBox mainHurtBox2 = victimBody.mainHurtBox;
-                    try
-                    {
-                        RecursionPrevention++;
+                        HydraOrb hydraOrb = new HydraOrb
+                        {
+                            origin = damageInfo.position,
+                            damageValue = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, 1f),
+                            isCrit = damageInfo.crit,
+                            teamIndex = teamComponent ? teamComponent.teamIndex : TeamIndex.Neutral,
+                            attacker = damageInfo.attacker,
+                            inflictor = damageInfo.inflictor,
+                            procCoefficient = damageInfo.procCoefficient,
+                            damageColorIndex = damageInfo.damageColorIndex,
+                            procChainMask = damageInfo.procChainMask,
+                            damageType = damageInfo.damageType,
+                        };
+                        HurtBox mainHurtBox2 = victimBody.mainHurtBox;
                         if ((bool)mainHurtBox2)
                         {
                             hydraOrb.target = mainHurtBox2;
                             OrbManager.instance.AddOrb(hydraOrb);
                         }
-                    }
-
-                    finally
-                    {
-                        RecursionPrevention = 0;
+                        DamageInfo newDamageInfo = new()
+                        {
+                            damage = hydraOrb.damageValue,
+                            crit = hydraOrb.isCrit,
+                            inflictor = damageInfo.inflictor,
+                            attacker = hydraOrb.attacker,
+                            position = damageInfo.position,
+                            force = damageInfo.force,
+                            rejected = damageInfo.rejected,
+                            procChainMask = damageInfo.procChainMask,
+                            procCoefficient = damageInfo.procCoefficient,
+                            damageType = hydraOrb.damageType,
+                            damageColorIndex = hydraOrb.damageColorIndex
+                        };
+                        orig(self, newDamageInfo, victim);
+                        GlobalEventManager.instance.OnHitAll(newDamageInfo, victim);
                     }
                 }
             }
         }
+
         orig(self, damageInfo, victim);
     }
 
@@ -100,10 +107,13 @@ public class Hydra : Item<Hydra>
         var newDamageInfo = damageInfo;
         if (newDamageInfo.attacker)
         {
-            var stackCount = GetCount(newDamageInfo.attacker.GetComponent<CharacterBody>());
-            if (stackCount > 0 && newDamageInfo.procCoefficient > 0)
+            if (newDamageInfo.attacker.GetComponent<CharacterBody>())
             {
-                newDamageInfo.damage *= HydraBaseDamageInit + ((stackCount - 1) * HydraBaseDamageStack);
+                var stackCount = GetCount(newDamageInfo.attacker.GetComponent<CharacterBody>());
+                if (stackCount > 0 && newDamageInfo.procCoefficient > 0)
+                {
+                    newDamageInfo.damage *= HydraBaseDamageInit + ((stackCount - 1) * HydraBaseDamageStack);
+                }
             }
         }
         orig(self, newDamageInfo);

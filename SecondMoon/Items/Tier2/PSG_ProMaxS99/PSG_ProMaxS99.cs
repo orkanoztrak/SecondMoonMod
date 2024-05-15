@@ -10,7 +10,6 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
-using static R2API.RecalculateStatsAPI;
 
 namespace SecondMoon.Items.Tier2.PSG_ProMaxS99;
 
@@ -47,7 +46,7 @@ public class PSG_ProMaxS99 : Item<PSG_ProMaxS99>
 
     public override void Hooks()
     {
-        GetStatCoefficients += PSGBoostShields;
+        RecalculateStatsAPI.GetStatCoefficients += PSGBoostShields;
         IL.RoR2.CharacterBody.FixedUpdate += PSGQuickerOutOfDanger;
         IL.RoR2.HealthComponent.ServerFixedUpdate += PSGQuickerShieldRecharge;
     }
@@ -111,7 +110,7 @@ public class PSG_ProMaxS99 : Item<PSG_ProMaxS99>
         cursor.Emit(Mono.Cecil.Cil.OpCodes.Br, target2.Target);
     }
 
-    private void PSGBoostShields(CharacterBody sender, StatHookEventArgs args)
+    private void PSGBoostShields(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
     {
         var stackCount = GetCount(sender);
         if (stackCount > 0)

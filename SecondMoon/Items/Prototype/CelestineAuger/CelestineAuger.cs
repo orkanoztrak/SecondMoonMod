@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using static R2API.RecalculateStatsAPI;
 namespace SecondMoon.Items.Prototype.CelestineAuger;
 public class CelestineAuger : Item<CelestineAuger>
 {
@@ -49,7 +48,7 @@ public class CelestineAuger : Item<CelestineAuger>
 
     public override void Hooks()
     {
-        GetStatCoefficients += CelestineAugerInitBuffCrit;
+        RecalculateStatsAPI.GetStatCoefficients += CelestineAugerInitBuffCrit;
         On.RoR2.CharacterBody.RecalculateStats += CelestineAugerBuffCCCD;
         IL.RoR2.BulletAttack.FireSingle += CelestineAugerIgnoreCollisionBullet;
         RoR2Application.onLoad += CelestineAugerSetBlacklistedProjectiles;
@@ -208,7 +207,7 @@ public class CelestineAuger : Item<CelestineAuger>
         CelestineAugerInitialCritChance = config.ActiveBind("Item: " + ItemName, "Critical chance with at least one " + ItemName, 5f, "By what % should critical chance be increased by with at least one Celestine Auger?");
     }
 
-    public void CelestineAugerInitBuffCrit(CharacterBody sender, StatHookEventArgs args)
+    public void CelestineAugerInitBuffCrit(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
     {
         var stackCount = GetCount(sender);
         if (stackCount > 0)

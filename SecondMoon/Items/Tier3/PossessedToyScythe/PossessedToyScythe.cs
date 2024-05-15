@@ -25,8 +25,8 @@ internal class PossessedToyScythe : Item<PossessedToyScythe>
 
     public override string ItemPickupDesc => "Your non-critical hits have a chance to deal extra damage based on target health.";
 
-    public override string ItemFullDesc => $"<style=cIsDamage>{PossessedToyScytheProcChanceInit}%</style> <style=cStack>(+{PossessedToyScytheProcChanceStack}% per stack)</style> chance on non-critical hit " +
-        $"to deal <style=cIsDamage>{PossessedToyScytheFixedDamage * 100}%</style> TOTAL damage or damage equal to <style=cIsHealth>{PossessedToyScythePercentHealthDamage * 100}% of the target's maximum health</style>, whichever is greater. " +
+    public override string ItemFullDesc => $"<style=cIsDamage>{PossessedToyScytheProcChanceInit}%</style> <style=cStack>(+{PossessedToyScytheProcChanceStack}% per stack)</style> chance on <style=cIsDamage>non-critical hit</style> " +
+        $"to deal <style=cIsDamage>{PossessedToyScytheFixedDamage * 100}%</style> TOTAL damage or damage equal to <style=cIsHealth>{PossessedToyScythePercentHealthDamage * 100}% of the target's maximum health</style>, whichever is less. " +
         $"Chance increases with <style=cIsDamage>critical chance</style> to try to ensure the overall odds stay the same.";
 
     public override string ItemLore => "Test";
@@ -49,47 +49,43 @@ internal class PossessedToyScythe : Item<PossessedToyScythe>
     private void PossessedToyScytheReap(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
         orig(self, damageInfo, victim);
-        if (!damageInfo.crit)
+        if (!damageInfo.crit && damageInfo.procCoefficient > 0)
         {
             if (damageInfo.attacker)
             {
                 var attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
-                var attacker = attackerBody.master;
                 var victimComponent = victim.GetComponent<HealthComponent>();
-                if (attacker && attackerBody && victimComponent)
+                if (attackerBody && victimComponent)
                 {
-                    var stackCount = GetCount(attacker);
-                    if (stackCount > 0)
+                    var attacker = attackerBody.master;
+                    if (attacker)
                     {
-                        var finalChance = PossessedToyScytheProcChanceInit + ((stackCount - 1) * PossessedToyScytheProcChanceStack);
-                        if (attackerBody.crit < 100)
+                        var stackCount = GetCount(attacker);
+                        if (stackCount > 0)
                         {
-                            finalChance = finalChance / (100 - attackerBody.crit) * 100;
-                        }
-                        else
-                        {
-                            finalChance = 100;
-                        }
-                        if (Util.CheckRoll(finalChance * damageInfo.procCoefficient, attacker))
-                        {
-                            var procHit = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, PossessedToyScytheFixedDamage);
-                            var healthDamageCheck = damageInfo.damage / attackerBody.damage > 1 ? 1 : damageInfo.damage / attackerBody.damage;
-                            var healthHit = victimComponent.fullCombinedHealth * PossessedToyScythePercentHealthDamage * healthDamageCheck;
-                            var finalDamage = procHit > healthHit ? procHit : healthHit;
-                            DamageInfo scytheProc = new DamageInfo
+                            var finalChance = PossessedToyScytheProcChanceInit + ((stackCount - 1) * PossessedToyScytheProcChanceStack);
+                            finalChance = attackerBody.crit < 100 ? finalChance / (100 - attackerBody.crit) * 100 : 100;
+                            if (Util.CheckRoll(finalChance * damageInfo.procCoefficient, attacker))
                             {
-                                damage = finalDamage,
-                                damageColorIndex = DamageColorIndex.Item,
-                                damageType = DamageType.Generic,
-                                attacker = damageInfo.attacker,
-                                crit = false,
-                                force = Vector3.zero,
-                                inflictor = null,
-                                position = damageInfo.position,
-                                procCoefficient = 0
-                            };
-                            EffectManager.SimpleImpactEffect(HealthComponent.AssetReferences.executeEffectPrefab, scytheProc.position, Vector3.up, transmit: true);
-                            victimComponent.TakeDamage(scytheProc);
+                                var procHit = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, PossessedToyScytheFixedDamage);
+                                var healthDamageCheck = damageInfo.damage / attackerBody.damage > 1 ? 1 : damageInfo.damage / attackerBody.damage;
+                                var healthHit = victimComponent.fullCombinedHealth * PossessedToyScythePercentHealthDamage * healthDamageCheck;
+                                var finalDamage = procHit > healthHit ? healthHit : procHit;
+                                DamageInfo scytheProc = new DamageInfo
+                                {
+                                    damage = finalDamage,
+                                    damageColorIndex = DamageColorIndex.Item,
+                                    damageType = DamageType.Generic,
+                                    attacker = damageInfo.attacker,
+                                    crit = damageInfo.crit,
+                                    force = Vector3.zero,
+                                    inflictor = null,
+                                    position = damageInfo.position,
+                                    procCoefficient = 0
+                                };
+                                EffectManager.SimpleImpactEffect(HealthComponent.AssetReferences.executeEffectPrefab, scytheProc.position, Vector3.up, transmit: true);
+                                victimComponent.TakeDamage(scytheProc);
+                            }
                         }
                     }
                 }
@@ -111,8 +107,8 @@ internal class PossessedToyScythe : Item<PossessedToyScythe>
 
     private void CreateConfig(ConfigFile config)
     {
-        PossessedToyScythePercentHealthDamage = config.ActiveBind("Item: " + ItemName, "Percent health damage", 0.05f, "What % of maximum combined health should the proc do as damage? This value scales down with on hit damage if the proccing hit has less than 100%. (0.05 = 5%)");
-        PossessedToyScytheFixedDamage = config.ActiveBind("Item: " + ItemName, "Damage of the proc at small health", 5f, "What % of TOTAL damage should the proc do? This only happens if the health check is less than this value. (5 = 500%)");
+        PossessedToyScythePercentHealthDamage = config.ActiveBind("Item: " + ItemName, "Percent health damage", 0.1f, "What % of maximum combined health should the proc do as damage? This value scales down with on hit damage if the proccing hit has less than 100%. (0.1 = 10%)");
+        PossessedToyScytheFixedDamage = config.ActiveBind("Item: " + ItemName, "Damage of the proc at high health", 9f, "What % of TOTAL damage should the proc do? This only happens if the health check is greater than this value. (9 = 900%)");
 
         PossessedToyScytheProcChanceInit = config.ActiveBind("Item: " + ItemName, "Proc chance with one " + ItemName, 10f, "What % of non-critical hits should proc with one Possessed Toy Scythe?");
         PossessedToyScytheProcChanceStack = config.ActiveBind("Item: " + ItemName, "Proc chance per stack after one " + ItemName, 10f, "What % of non-critical hits should proc per stack of Possessed Toy Scythe after one ?");

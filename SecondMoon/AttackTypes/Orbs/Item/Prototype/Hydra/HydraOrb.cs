@@ -9,17 +9,13 @@ namespace SecondMoon.AttackTypes.Orbs.Item.Prototype.Hydra;
 
 public class HydraOrb : GenericDamageOrb
 {
-    public int totalStrikes;
-
-    public float secondsPerStrike = 0.5f;
-
     private GameObject effectPrefab;
 
     public GameObject inflictor;
 
     public override void Begin()
     {
-        base.duration = (float)(totalStrikes - 1) * secondsPerStrike;
+        duration = 0.5f;
         effectPrefab = LegacyResourcesAPI.Load<GameObject>("Prefabs/Effects/OrbEffects/VoidLightningOrbEffect");
         Strike();
     }
@@ -37,20 +33,22 @@ public class HydraOrb : GenericDamageOrb
         HealthComponent healthComponent = target.healthComponent;
         if ((bool)healthComponent)
         {
-            DamageInfo damageInfo = new DamageInfo();
-            damageInfo.damage = damageValue;
-            damageInfo.attacker = attacker;
-            damageInfo.inflictor = inflictor;
-            damageInfo.force = Vector3.zero;
-            damageInfo.crit = isCrit;
-            damageInfo.procChainMask = procChainMask;
-            damageInfo.procCoefficient = procCoefficient;
-            damageInfo.position = target.transform.position;
-            damageInfo.damageColorIndex = damageColorIndex;
-            damageInfo.damageType = damageType;
+            DamageInfo damageInfo = new()
+            {
+                damage = damageValue,
+                attacker = attacker,
+                inflictor = inflictor,
+                force = Vector3.zero,
+                crit = isCrit,
+                procChainMask = procChainMask,
+                procCoefficient = 0,
+                position = target.transform.position,
+                damageColorIndex = damageColorIndex,
+                damageType = damageType
+            };
             healthComponent.TakeDamage(damageInfo);
-            GlobalEventManager.instance.OnHitEnemy(damageInfo, healthComponent.gameObject);
-            GlobalEventManager.instance.OnHitAll(damageInfo, healthComponent.gameObject);
+            //GlobalEventManager.instance.OnHitEnemy(damageInfo, healthComponent.gameObject);
+            //GlobalEventManager.instance.OnHitAll(damageInfo, healthComponent.gameObject);
             if ((bool)target.hurtBoxGroup)
             {
                 target = target.hurtBoxGroup.hurtBoxes[UnityEngine.Random.Range(0, target.hurtBoxGroup.hurtBoxes.Length)];
