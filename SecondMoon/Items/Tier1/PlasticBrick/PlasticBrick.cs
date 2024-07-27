@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 
 namespace SecondMoon.Items.Tier1.PlasticBrick;
 
@@ -47,8 +48,7 @@ public class PlasticBrick : Item<PlasticBrick>
 
     private void PlasticBrickReduceArmor(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
-        orig(self, damageInfo, victim);
-        if (!damageInfo.crit && damageInfo.procCoefficient > 0)
+        if (!damageInfo.crit && damageInfo.procCoefficient > 0 && NetworkServer.active && !damageInfo.rejected)
         {
             if (damageInfo.attacker)
             {
@@ -73,6 +73,7 @@ public class PlasticBrick : Item<PlasticBrick>
                 }
             }
         }
+        orig(self, damageInfo, victim);
     }
 
     public override void Init(ConfigFile config)
@@ -92,7 +93,7 @@ public class PlasticBrick : Item<PlasticBrick>
         PlasticBrickArmorReduction = config.ActiveBind("Item: " + ItemName, "Armor reduction", 2f, "Armor is reduced by this per stack of the debuff.");
         PlasticBrickDebuffDuration = config.ActiveBind("Item: " + ItemName, "Debuff duration", 3f, "The debuff lasts this many seconds.");
 
-        PlasticBrickProcChanceInit = config.ActiveBind("Item: " + ItemName, "Proc chance with one " + ItemName, 10f, "What % of non-critical hits should proc with one Plastic Brick?");
-        PlasticBrickProcChanceStack = config.ActiveBind("Item: " + ItemName, "Proc chance per stack after one " + ItemName, 10f, "What % of non-critical hits should proc per stack of Plastic Brick after one ?");
+        PlasticBrickProcChanceInit = config.ActiveBind("Item: " + ItemName, "Proc chance with one " + ItemName, 10f, "What % of non-critical hits should proc with one " + ItemName + "?");
+        PlasticBrickProcChanceStack = config.ActiveBind("Item: " + ItemName, "Proc chance per stack after one " + ItemName, 10f, "What % of non-critical hits should proc per stack of " + ItemName + " after one ?");
     }
 }

@@ -13,13 +13,6 @@ public class CorrosionDebuff : Buff<CorrosionDebuff>
 
     public override Color BuffColor => new Color32(150, 150, 0, 255);
 
-    public override bool IsDebuff => true;
-
-    public override void Hooks()
-    {
-
-    }
-
     public override void Init()
     {
         CreateBuff();

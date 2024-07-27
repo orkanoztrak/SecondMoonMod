@@ -84,7 +84,7 @@ public class CyberneticHeart : Item<CyberneticHeart>
 
     private void CreateConfig(ConfigFile config)
     {
-        CyberneticHeartShieldInit = config.ActiveBind("Item: " + ItemName, "Maximum shield increase with one " + ItemName, 0.2f, "Gain shield equal to what % of maximum health with one Cybernetic Heart? (0.2 = 20%)");
-        CyberneticHeartShieldStack = config.ActiveBind("Item: " + ItemName, "Maximum shield increase per stack after one " + ItemName, 0.2f, "Gain shield equal to what % of maximum health per stack of Cybernetic Heart after one? (0.2 = 20%)");
+        CyberneticHeartShieldInit = config.ActiveBind("Item: " + ItemName, "Maximum shield increase with one " + ItemName, 0.2f, "Gain shield equal to what % of maximum health with one " + ItemName + "? (0.2 = 20%)");
+        CyberneticHeartShieldStack = config.ActiveBind("Item: " + ItemName, "Maximum shield increase per stack after one " + ItemName, 0.2f, "Gain shield equal to what % of maximum health per stack of " + ItemName + " after one? (0.2 = 20%)");
     }
 }

@@ -13,7 +13,7 @@ public abstract class DOT<T> : DOT where T : DOT<T>
 
     public DOT()
     {
-        if (instance != null) throw new InvalidOperationException("Singleton class \"" + typeof(T).Name + "\" inheriting BuffBase was instantiated twice");
+        if (instance != null) throw new InvalidOperationException("Singleton class \"" + typeof(T).Name + "\" inheriting DOT was instantiated twice");
         instance = this as T;
     }
 }
@@ -35,7 +35,7 @@ public abstract class DOT
         DotIndex = DotAPI.RegisterDotDef(Interval, DamageCoefficient, DamageColorIndex, AssociatedBuff, CustomDotBehaviour, CustomDotVisual);
     }
     public abstract void Init();
-    public abstract void Hooks();
+    public virtual void Hooks() { }
     public abstract void SetAssociatedBuff();
     public virtual void CreateCustomDotBehaviour() { }
     public virtual void CreateCustomDotVisual() { }

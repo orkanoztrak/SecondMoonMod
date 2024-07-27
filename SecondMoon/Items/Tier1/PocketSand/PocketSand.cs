@@ -50,9 +50,9 @@ public class PocketSand : Item<PocketSand>
         var cursor = new ILCursor(il);
         cursor.GotoNext(x => x.MatchStloc(19));
         cursor.Index -= 4;
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc_0); //attacker(master)
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_1); //damageInfo
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0); //HealthComponent(victim)
+        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc_0);
+        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_1);
+        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
         cursor.EmitDelegate<Action<CharacterMaster, DamageInfo, HealthComponent>>((attacker, damageInfo, healthComponent) =>
         {
             var stackCount = GetCount(attacker);
@@ -80,7 +80,7 @@ public class PocketSand : Item<PocketSand>
     {
         PocketSandHealthThreshold = config.ActiveBind("Item: " + ItemName, "Health threshold for debuff", 0.9f, "Above what % of target health should hits apply the debuff? (0.9f = 90%)");
         PocketSandReduction = config.ActiveBind("Item: " + ItemName, "Amount of movement and attack speed reduction", 0.45f, "By what % should target attack and movement speeds be reduced from the debuff? (0.45 = 45%)");
-        PocketSandTimerInit = config.ActiveBind("Item: " + ItemName, "Debuff timer with one " + ItemName, 3f, "How many seconds should the debuff last with one Pocket Sand?");
-        PocketSandTimerStack = config.ActiveBind("Item: " + ItemName, "Debuff timer per stack after one " + ItemName, 2f, "How many seconds should the debuff be extended by per stack of Pocket Sand after one?");
+        PocketSandTimerInit = config.ActiveBind("Item: " + ItemName, "Debuff timer with one " + ItemName, 3f, "How many seconds should the debuff last with one " + ItemName + "?");
+        PocketSandTimerStack = config.ActiveBind("Item: " + ItemName, "Debuff timer per stack after one " + ItemName, 2f, "How many seconds should the debuff be extended by per stack of " + ItemName + " after one?");
     }
 }

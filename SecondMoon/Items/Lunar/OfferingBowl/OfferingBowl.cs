@@ -151,11 +151,11 @@ public class OfferingBowl : Item<OfferingBowl>
 
     private void CreateConfig(ConfigFile config)
     {
-        OfferingBowlIncomingDamageIncreaseInit = config.ActiveBind("Item: " + ItemName, "Increased damage taken with one " + ItemName, 2f, "What multipler should be applied to damage taken with one Offering Bowl? This scales exponentially (Refer to Shaped Glass on the wiki).");
-        OfferingBowlIncomingDamageIncreaseStack = config.ActiveBind("Item: " + ItemName, "Increased damage taken per stack after one " + ItemName, 2f, "What multipler should be applied to damage taken per stack of Offering Bowl after one? This scales exponentially (Refer to Shaped Glass on the wiki).");
+        OfferingBowlIncomingDamageIncreaseInit = config.ActiveBind("Item: " + ItemName, "Increased damage taken with one " + ItemName, 2f, "What multipler should be applied to damage taken with one " + ItemName + "? This scales exponentially (Refer to Shaped Glass on the wiki).");
+        OfferingBowlIncomingDamageIncreaseStack = config.ActiveBind("Item: " + ItemName, "Increased damage taken per stack after one " + ItemName, 2f, "What multipler should be applied to damage taken per stack of " + ItemName + " after one? This scales exponentially (Refer to Shaped Glass on the wiki).");
 
-        OfferingBowlOutgoingDamageReductionInit = config.ActiveBind("Item: " + ItemName, "Reduced damage dealt with one " + ItemName, 0.5f, "What multipler should be applied to damage taken with one Offering Bowl? This scales exponentially (Refer to Shaped Glass on the wiki).");
-        OfferingBowlOutgoingDamageReductionStack = config.ActiveBind("Item: " + ItemName, "Reduced damage dealt per stack after one " + ItemName, 0.5f, "What multipler should be applied to damage taken per stack of Offering Bowl after one? This scales exponentially (Refer to Shaped Glass on the wiki).");
+        OfferingBowlOutgoingDamageReductionInit = config.ActiveBind("Item: " + ItemName, "Reduced damage dealt with one " + ItemName, 0.5f, "What multipler should be applied to damage taken with one " + ItemName + "? This scales exponentially (Refer to Shaped Glass on the wiki).");
+        OfferingBowlOutgoingDamageReductionStack = config.ActiveBind("Item: " + ItemName, "Reduced damage dealt per stack after one " + ItemName, 0.5f, "What multipler should be applied to damage taken per stack of " + ItemName + " after one? This scales exponentially (Refer to Shaped Glass on the wiki).");
     }
 
     internal class Droptable

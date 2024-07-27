@@ -308,7 +308,7 @@ public class UniversalKey : Item<UniversalKey>
 
     private void CreateConfig(ConfigFile config)
     {
-        UniversalKeyInteractableCountInit = config.ActiveBind("Item: " + ItemName, "Free interactable count with one " + ItemName, 1, "The first how many interactables in a map should be free and trigger twice with one Universal Key?");
-        UniversalKeyInteractableCountStack = config.ActiveBind("Item: " + ItemName, "Free interactable count per stack after one " + ItemName, 1, "How many additional interactables in a map after the first should be free and trigger twice per stack of Universal Key after one?");
+        UniversalKeyInteractableCountInit = config.ActiveBind("Item: " + ItemName, "Free interactable count with one " + ItemName, 1, "The first how many interactables in a map should be free and trigger twice with one " + ItemName + "?");
+        UniversalKeyInteractableCountStack = config.ActiveBind("Item: " + ItemName, "Free interactable count per stack after one " + ItemName, 1, "How many additional interactables in a map after the first should be free and trigger twice per stack of " + ItemName + " after one?");
     }
 }

@@ -90,7 +90,7 @@ public class KnitClover : Item<KnitClover>
     private void CreateConfig(ConfigFile config)
     {
         KnitCloverProcCoefficientBoost = config.ActiveBind("Item: " + ItemName, "Proc coefficient boost", 0.33f, "By what % should proc coefficient be increased? (0.33f = 33%)");
-        KnitCloverProcChanceInit = config.ActiveBind("Item: " + ItemName, "Proc chance with one " + ItemName, 10f, "What % of non-critical hits should proc with one Knit Clover?");
-        KnitCloverProcChanceStack = config.ActiveBind("Item: " + ItemName, "Proc chance per stack after one " + ItemName, 10f, "What % of non-critical hits should proc per stack of Knit Clover after one ?");
+        KnitCloverProcChanceInit = config.ActiveBind("Item: " + ItemName, "Proc chance with one " + ItemName, 10f, "What % of non-critical hits should proc with one " + ItemName + "?");
+        KnitCloverProcChanceStack = config.ActiveBind("Item: " + ItemName, "Proc chance per stack after one " + ItemName, 10f, "What % of non-critical hits should proc per stack of " + ItemName + " after one ?");
     }
 }

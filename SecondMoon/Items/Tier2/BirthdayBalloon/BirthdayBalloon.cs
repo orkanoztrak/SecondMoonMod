@@ -62,9 +62,9 @@ public class BirthdayBalloon : Item<BirthdayBalloon>
 
     private void CreateConfig(ConfigFile config)
     {
-        BirthdayBalloonHealInit = config.ActiveBind("Item: " + ItemName, "Heal with one " + ItemName, 2f, "How much should health be restored by with one Birthday Balloon?");
-        BirthdayBalloonHealStack = config.ActiveBind("Item: " + ItemName, "Heal per stack after one " + ItemName, 2f, "How much should health be restored by per stack of Birthday Balloon after one?");
-        BirthdayBalloonHealInterval = config.ActiveBind("Item: " + ItemName, "Heal interval", 0.5f, "Birthday Balloon heals per n seconds while floating, where n is the value of this config option.");
+        BirthdayBalloonHealInit = config.ActiveBind("Item: " + ItemName, "Heal with one " + ItemName, 2f, "How much should health be restored by with one " + ItemName + "?");
+        BirthdayBalloonHealStack = config.ActiveBind("Item: " + ItemName, "Heal per stack after one " + ItemName, 2f, "How much should health be restored by per stack of " + ItemName + " after one?");
+        BirthdayBalloonHealInterval = config.ActiveBind("Item: " + ItemName, "Heal interval", 0.5f, "" + ItemName + " heals per n seconds while floating, where n is the value of this config option.");
     }
 
     private void CreateController()

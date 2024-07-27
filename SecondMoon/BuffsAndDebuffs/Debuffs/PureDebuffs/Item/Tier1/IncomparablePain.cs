@@ -17,6 +17,8 @@ public class IncomparablePain : Buff<IncomparablePain>
 
     public override Color BuffColor => Color.red;
 
+    public override bool IsDebuff => true;
+
     public override void Hooks()
     {
         RecalculateStatsAPI.GetStatCoefficients += ReduceArmor;

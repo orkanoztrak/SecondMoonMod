@@ -14,11 +14,6 @@ public class Momentum : Buff<Momentum>
 
     public override Color BuffColor => new Color32(124, 253, 234, 255);
 
-    public override void Hooks()
-    {
-        
-    }
-
     public override void Init()
     {
         CreateBuff();

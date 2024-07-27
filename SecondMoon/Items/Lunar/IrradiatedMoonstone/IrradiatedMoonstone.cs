@@ -193,8 +193,7 @@ public class IrradiatedMoonstone : Item<IrradiatedMoonstone>
             args.moveSpeedMultAdd += IrradiatedMoonstoneMovementInit + (stackCount - 1) * IrradiatedMoonstoneMovementStack;
             args.sprintSpeedAdd += IrradiatedMoonstoneSprintInit + (stackCount - 1) * IrradiatedMoonstoneSprintStack;
             args.attackSpeedMultAdd += IrradiatedMoonstoneAttackSpeedInit + (stackCount - 1) * IrradiatedMoonstoneAttackSpeedStack;
-            args.baseRegenAdd += IrradiatedMoonstoneRegenInit + (stackCount - 1) * IrradiatedMoonstoneRegenStack;
-            args.levelRegenAdd += (IrradiatedMoonstoneRegenInit + (stackCount - 1) * IrradiatedMoonstoneRegenStack) / 5;
+            args.regenMultAdd += IrradiatedMoonstoneRegenInit + (stackCount - 1) * IrradiatedMoonstoneRegenStack;
         }
         if (sender.teamComponent)
         {
@@ -229,31 +228,31 @@ public class IrradiatedMoonstone : Item<IrradiatedMoonstone>
 
     private void CreateConfig(ConfigFile config)
     {
-        IrradiatedMoonstoneCooldownReductionInit = config.ActiveBind("Item: " + ItemName, "Cooldown reduction with one " + ItemName, 0.15f, "How much should cooldowns be reduced by with one Irradiated Moonstone? This scales exponentially (0.15 = 15%, refer to Alien Head on the wiki).");
-        IrradiatedMoonstoneCooldownReductionStack = config.ActiveBind("Item: " + ItemName, "Cooldown reduction per stack after one " + ItemName, 0.15f, "How much should cooldowns be reduced by per stack of Irradiated Moonstone after one? This scales exponentially (0.15 = 15%, refer to Alien Head on the wiki).");
+        IrradiatedMoonstoneCooldownReductionInit = config.ActiveBind("Item: " + ItemName, "Cooldown reduction with one " + ItemName, 0.15f, "How much should cooldowns be reduced by with one " + ItemName + "? This scales exponentially (0.15 = 15%, refer to Alien Head on the wiki).");
+        IrradiatedMoonstoneCooldownReductionStack = config.ActiveBind("Item: " + ItemName, "Cooldown reduction per stack after one " + ItemName, 0.15f, "How much should cooldowns be reduced by per stack of " + ItemName + " after one? This scales exponentially (0.15 = 15%, refer to Alien Head on the wiki).");
 
-        IrradiatedMoonstoneMovementInit = config.ActiveBind("Item: " + ItemName, "Movement speed with one " + ItemName, 0.15f, "How much should movement speed be increased by with one Irradiated Moonstone? (0.15 = 15%)");
-        IrradiatedMoonstoneMovementStack = config.ActiveBind("Item: " + ItemName, "Movement speed per stack after one " + ItemName, 0.15f, "How much should movement speed be increased by per stack of Irradiated Moonstone after one? (0.15 = 15%)");
+        IrradiatedMoonstoneMovementInit = config.ActiveBind("Item: " + ItemName, "Movement speed with one " + ItemName, 0.15f, "How much should movement speed be increased by with one " + ItemName + "? (0.15 = 15%)");
+        IrradiatedMoonstoneMovementStack = config.ActiveBind("Item: " + ItemName, "Movement speed per stack after one " + ItemName, 0.15f, "How much should movement speed be increased by per stack of " + ItemName + " after one? (0.15 = 15%)");
 
-        IrradiatedMoonstoneSprintInit = config.ActiveBind("Item: " + ItemName, "Sprint speed with one " + ItemName, 0.15f, "How much should sprint speed be increased by with one Irradiated Moonstone? (0.15 = 15%)");
-        IrradiatedMoonstoneSprintStack = config.ActiveBind("Item: " + ItemName, "Sprint speed per stack after one " + ItemName, 0.15f, "How much should sprint speed be increased by per stack of Irradiated Moonstone after one? (0.15 = 15%)");
+        IrradiatedMoonstoneSprintInit = config.ActiveBind("Item: " + ItemName, "Sprint speed with one " + ItemName, 0.15f, "How much should sprint speed be increased by with one " + ItemName + "? (0.15 = 15%)");
+        IrradiatedMoonstoneSprintStack = config.ActiveBind("Item: " + ItemName, "Sprint speed per stack after one " + ItemName, 0.15f, "How much should sprint speed be increased by per stack of " + ItemName + " after one? (0.15 = 15%)");
 
-        IrradiatedMoonstoneAttackSpeedInit = config.ActiveBind("Item: " + ItemName, "Attack speed with one " + ItemName, 0.15f, "How much should attack speed be increased by with one Irradiated Moonstone? (0.15 = 15%)");
-        IrradiatedMoonstoneAttackSpeedStack = config.ActiveBind("Item: " + ItemName, "Attack speed per stack after one " + ItemName, 0.15f, "How much should attack speed be increased by per stack of Irradiated Moonstone after one? (0.15 = 15%)");
+        IrradiatedMoonstoneAttackSpeedInit = config.ActiveBind("Item: " + ItemName, "Attack speed with one " + ItemName, 0.15f, "How much should attack speed be increased by with one " + ItemName + "? (0.15 = 15%)");
+        IrradiatedMoonstoneAttackSpeedStack = config.ActiveBind("Item: " + ItemName, "Attack speed per stack after one " + ItemName, 0.15f, "How much should attack speed be increased by per stack of " + ItemName + " after one? (0.15 = 15%)");
 
-        IrradiatedMoonstoneRegenInit = config.ActiveBind("Item: " + ItemName, "Health regeneration with one " + ItemName, 0.15f, "How much should health regeneration be increased by with one Irradiated Moonstone? (0.15 = roughly 15%, refer to Irradiant Pearl on the wiki, this gives 0.15 (+0.03 per level))");
-        IrradiatedMoonstoneRegenStack = config.ActiveBind("Item: " + ItemName, "Health regeneration per stack after one " + ItemName, 0.15f, "How much should health regeneration be increased by per stack of Irradiated Moonstone after one? (0.15 = roughly 15%, refer to Irradiant Pearl on the wiki, this gives 0.15 (+0.03 per level))");
+        IrradiatedMoonstoneRegenInit = config.ActiveBind("Item: " + ItemName, "Health regeneration with one " + ItemName, 0.15f, "How much should health regeneration be increased by with one " + ItemName + "? (0.15 = 15%)");
+        IrradiatedMoonstoneRegenStack = config.ActiveBind("Item: " + ItemName, "Health regeneration per stack after one " + ItemName, 0.15f, "How much should health regeneration be increased by per stack of " + ItemName + " after one? (0.15 = 15%)");
 
-        IrradiatedMoonstoneSelfDebuffDurationReductionInit = config.ActiveBind("Item: " + ItemName, "Reduced debuff duration on holder with one " + ItemName, 0.15f, "How much should the durations of debuffs inflicted on the holder be reduced by with one Irradiated Moonstone? Collapse's damage will be reduced by this value instead. (0.15 = 15%)");
-        IrradiatedMoonstoneSelfDebuffDurationReductionStack = config.ActiveBind("Item: " + ItemName, "Reduced debuff duration on holder per stack after one " + ItemName, 0.15f, "How much should the durations of debuffs inflicted on the holder be reduced by per stack of Irradiated Moonstone after one? Collapse's damage will be reduced by this value instead. (0.15 = 15%)");
+        IrradiatedMoonstoneSelfDebuffDurationReductionInit = config.ActiveBind("Item: " + ItemName, "Reduced debuff duration on holder with one " + ItemName, 0.15f, "How much should the durations of debuffs inflicted on the holder be reduced by with one " + ItemName + "? Collapse's damage will be reduced by this value instead. (0.15 = 15%)");
+        IrradiatedMoonstoneSelfDebuffDurationReductionStack = config.ActiveBind("Item: " + ItemName, "Reduced debuff duration on holder per stack after one " + ItemName, 0.15f, "How much should the durations of debuffs inflicted on the holder be reduced by per stack of " + ItemName + " after one? Collapse's damage will be reduced by this value instead. (0.15 = 15%)");
 
-        IrradiatedMoonstoneProjectileSpeedInit = config.ActiveBind("Item: " + ItemName, "Projectile speed with one " + ItemName, 0.15f, "How much should untargeted projectile speed be increased by with one Irradiated Moonstone? (0.15 = 15%)");
-        IrradiatedMoonstoneProjectileSpeedStack = config.ActiveBind("Item: " + ItemName, "Projectile speed per stack after one " + ItemName, 0.15f, "How much should untargeted projectile speed be increased by per stack of Irradiated Moonstone after one? (0.15 = 15%)");
+        IrradiatedMoonstoneProjectileSpeedInit = config.ActiveBind("Item: " + ItemName, "Projectile speed with one " + ItemName, 0.15f, "How much should untargeted projectile speed be increased by with one " + ItemName + "? (0.15 = 15%)");
+        IrradiatedMoonstoneProjectileSpeedStack = config.ActiveBind("Item: " + ItemName, "Projectile speed per stack after one " + ItemName, 0.15f, "How much should untargeted projectile speed be increased by per stack of " + ItemName + " after one? (0.15 = 15%)");
 
-        IrradiatedMoonstoneTeleporterChargeRateIncreaseInit = config.ActiveBind("Item: " + ItemName, "Teleporter charge rate with one " + ItemName, 0.15f, "How much should holdout zone charge rate be increased by with one Irradiated Moonstone? (0.15 = 15%)");
-        IrradiatedMoonstoneTeleporterChargeRateIncreaseStack = config.ActiveBind("Item: " + ItemName, "Teleporter charge rate per stack after one " + ItemName, 0.15f, "How much should holdout zone charge rate be increased by per stack of Irradiated Moonstone after one? (0.15 = 15%)");
+        IrradiatedMoonstoneTeleporterChargeRateIncreaseInit = config.ActiveBind("Item: " + ItemName, "Teleporter charge rate with one " + ItemName, 0.15f, "How much should holdout zone charge rate be increased by with one " + ItemName + "? (0.15 = 15%)");
+        IrradiatedMoonstoneTeleporterChargeRateIncreaseStack = config.ActiveBind("Item: " + ItemName, "Teleporter charge rate per stack after one " + ItemName, 0.15f, "How much should holdout zone charge rate be increased by per stack of " + ItemName + " after one? (0.15 = 15%)");
 
-        IrradiatedMoonstoneTeleporterChargeRateIncreaseCap = config.ActiveBind("Item: " + ItemName, "Teleporter charge rate cap for " + ItemName, 8, "After how many Irradiated Moonstones should holdout zone charge rate not be increased?");
+        IrradiatedMoonstoneTeleporterChargeRateIncreaseCap = config.ActiveBind("Item: " + ItemName, "Teleporter charge rate cap for " + ItemName, 8, "After how many " + ItemName + "s should holdout zone charge rate not be increased?");
     }
 
     public class IrradiatedMoonstoneTPBoosterController : MonoBehaviour

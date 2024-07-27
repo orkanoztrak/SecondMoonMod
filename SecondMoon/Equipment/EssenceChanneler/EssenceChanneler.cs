@@ -23,9 +23,9 @@ public class EssenceChanneler : Equipment<EssenceChanneler>
 
     public override string EquipmentLangTokenName => "SECONDMOONMOD_ESSENCE_CHANNELER_EQUIP";
 
-    public override string EquipmentPickupDesc => $"Briefly increase all stats. Gain the powers of a random Elite type with each use.";
+    public override string EquipmentPickupDesc => $"Briefly increase all stats. Gain the powers of a random classic Elite type with each use.";
 
-    public override string EquipmentFullDescription => $"For <style=cIsUtility>{EssenceChannelerDuration}s</style>, increase <style=cIsUtility>ALL stats</style> by <style=cIsUtility>{ChannelingBoost * 100}</style>." +
+    public override string EquipmentFullDescription => $"For <style=cIsUtility>{EssenceChannelerDuration}s</style>, increase <style=cIsUtility>ALL stats</style> by <style=cIsUtility>{ChannelingBoost * 100}%</style>." +
         $"Gain a random classic Elite affix upon using this that changes with each use.";
 
     public override string EquipmentLore => "Test";

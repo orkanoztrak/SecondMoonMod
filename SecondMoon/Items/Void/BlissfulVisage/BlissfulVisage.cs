@@ -64,8 +64,8 @@ public class BlissfulVisage : Item<BlissfulVisage>
     private void CreateConfig(ConfigFile config)
     {
         BlissfulVisageGhostCooldown = config.ActiveBind("Item: " + ItemName, "Cooldown for ghost to respawn", 120f, "How many seconds need to pass before the ghost respwans?");
-        BlissfulVisageReduceTimerOnKillInit = config.ActiveBind("Item: " + ItemName, "Ghost cooldown reduction on kill with one " + ItemName, 0.5f, "How many seconds should the ghost cooldown be reduced by upon getting a kill with one Blissful Visage?");
-        BlissfulVisageReduceTimerOnKillStack = config.ActiveBind("Item: " + ItemName, "Ghost cooldown reduction on kill per stack after one " + ItemName, 0.5f, "How many seconds should the ghost cooldown be reduced by upon getting a kill per stack of Blissful Visage after one?");
+        BlissfulVisageReduceTimerOnKillInit = config.ActiveBind("Item: " + ItemName, "Ghost cooldown reduction on kill with one " + ItemName, 0.5f, "How many seconds should the ghost cooldown be reduced by upon getting a kill with one " + ItemName + "?");
+        BlissfulVisageReduceTimerOnKillStack = config.ActiveBind("Item: " + ItemName, "Ghost cooldown reduction on kill per stack after one " + ItemName, 0.5f, "How many seconds should the ghost cooldown be reduced by upon getting a kill per stack of " + ItemName + " after one?");
         BlissfulVisageSuicideTimer = config.ActiveBind("Item: " + ItemName, "Ghost lifespan", 30f, "How many seconds should the ghost last?");
     }
 }
@@ -97,12 +97,10 @@ public class BlissfulVisageSuicideComponent : Item<BlissfulVisageSuicideComponen
         On.RoR2.CharacterBody.OnInventoryChanged += BlissfulVisageAddSuicideItemBehavior;
     }
 
+    [Server]
     private void BlissfulVisageAddSuicideItemBehavior(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
     {
-        if (NetworkServer.active)
-        {
-            self.AddItemBehavior<BlissfulVisageSuicideComponentBehavior>(self.inventory.GetItemCount(instance.ItemDef));
-        }
+        self.AddItemBehavior<BlissfulVisageSuicideComponentBehavior>(self.inventory.GetItemCount(instance.ItemDef));
         orig(self);
     }
 

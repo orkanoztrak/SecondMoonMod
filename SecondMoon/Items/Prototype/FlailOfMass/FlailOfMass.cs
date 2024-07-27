@@ -1,16 +1,15 @@
 ﻿using BepInEx.Configuration;
 using MonoMod.Cil;
+using Newtonsoft.Json.Utilities;
 using R2API;
 using RoR2;
+using SecondMoon.Items.ItemTiers.TierPrototype;
 using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
-using static R2API.RecalculateStatsAPI;
 
 namespace SecondMoon.Items.Prototype.FlailOfMass;
 
@@ -38,7 +37,7 @@ public class FlailOfMass : Item<FlailOfMass>
 
     public override string ItemLore => "Test";
 
-    public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
+    public override ItemTierDef ItemTierDef => TierPrototype.instance.ItemTierDef;
 
     public override ItemTag[] Category => [ItemTag.Utility, ItemTag.Damage, ItemTag.SprintRelated];
 
@@ -52,14 +51,39 @@ public class FlailOfMass : Item<FlailOfMass>
     {
         RoR2Application.onLoad += FlailOfMassRegisterDebuffsToIgnore;
         On.RoR2.CharacterBody.AddBuff_BuffIndex += FlailOfMassIgnoreSlowingDebuffs;
+        On.RoR2.CharacterBody.AddTimedBuff_BuffDef_float += FlailOfMassIgnoreSlowingDebuffs;
         IL.RoR2.CharacterBody.RecalculateStats += FlailOfMassIgnoreSlows;
         On.RoR2.CharacterBody.OnInventoryChanged += FlailOfMassAddIgnoreStunBehavior;
+    }
+
+    private void FlailOfMassIgnoreSlowingDebuffs(On.RoR2.CharacterBody.orig_AddTimedBuff_BuffDef_float orig, CharacterBody self, BuffDef buffDef, float duration)
+    {
+        if (FlailOfMassSlowsAndRoots.Contains(buffDef.buffIndex))
+        {
+            var stackCount = GetCount(self);
+            if (stackCount == 0)
+            {
+                orig(self, buffDef, duration);
+            }
+        }
+        else
+        {
+            orig(self, buffDef, duration);
+        }
     }
 
     [Server]
     private void FlailOfMassIgnoreSlowingDebuffs(On.RoR2.CharacterBody.orig_AddBuff_BuffIndex orig, CharacterBody self, BuffIndex buffType)
     {
-        if (!FlailOfMassSlowsAndRoots.Contains(buffType))
+        if (FlailOfMassSlowsAndRoots.Contains(buffType))
+        {
+            var stackCount = GetCount(self);
+            if (stackCount == 0)
+            {
+                orig(self, buffType);
+            }
+        }
+        else
         {
             orig(self, buffType);
         }
@@ -76,16 +100,14 @@ public class FlailOfMass : Item<FlailOfMass>
         }
     }
 
+    [Server]
     private void FlailOfMassAddIgnoreStunBehavior(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
     {
-        if (NetworkServer.active)
+        if (self.healthComponent)
         {
-            if (self.healthComponent)
+            if (self.healthComponent.GetComponent<SetStateOnHurt>())
             {
-                if (self.healthComponent.GetComponent<SetStateOnHurt>())
-                {
-                    self.AddItemBehavior<FlailOfMassIgnoreStunBehavior>(self.inventory.GetItemCount(instance.ItemDef));
-                }
+                self.AddItemBehavior<FlailOfMassIgnoreStunBehavior>(self.inventory.GetItemCount(instance.ItemDef));
             }
         }
         orig(self);
@@ -98,34 +120,40 @@ public class FlailOfMass : Item<FlailOfMass>
         int slowTrackerIndex = 76;
 
         var cursor = new ILCursor(il);
-        cursor.GotoNext(x => x.MatchLdloc(movementTrackerIndex),
+
+        if (cursor.TryGotoNext(x => x.MatchLdloc(movementTrackerIndex),
                         x => x.MatchLdloc(speedTrackerIndex),
-                        x => x.MatchLdloc(slowTrackerIndex));
-        ILLabel target = cursor.MarkLabel();
-
-        cursor.GotoNext(x => x.MatchStloc(movementTrackerIndex),
-                        x => x.MatchLdloc(59),
-                        x => x.MatchLdcI4(0));
-        cursor.Index++;
-        ILLabel target2 = cursor.MarkLabel();
-
-        cursor.GotoPrev(x => x.MatchLdloc(movementTrackerIndex));
-
-        cursor.MoveBeforeLabels();
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
-        cursor.EmitDelegate<Func<CharacterBody, int>>(GetCount);
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldc_I4_0);
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ble_S, target.Target);
-
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc, movementTrackerIndex);
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc, speedTrackerIndex);
-        cursor.EmitDelegate<Func<float, float, float>>((movement, speed) =>
+                        x => x.MatchLdloc(slowTrackerIndex)))
         {
-            movement *= speed;
-            return movement;
-        });
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Stloc, movementTrackerIndex);
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Br, target2.Target);
+            ILLabel target = cursor.MarkLabel();
+
+            if (cursor.TryGotoNext(x => x.MatchStloc(movementTrackerIndex),
+                            x => x.MatchLdloc(59),
+                            x => x.MatchLdcI4(0)))
+            {
+                cursor.Index++;
+                ILLabel target2 = cursor.MarkLabel();
+
+                if (cursor.TryGotoPrev(x => x.MatchLdloc(movementTrackerIndex)))
+                {
+                    cursor.MoveBeforeLabels();
+                    cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
+                    cursor.EmitDelegate<Func<CharacterBody, int>>(GetCount);
+                    cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldc_I4_0);
+                    cursor.Emit(Mono.Cecil.Cil.OpCodes.Ble_S, target.Target);
+
+                    cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc, movementTrackerIndex);
+                    cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc, speedTrackerIndex);
+                    cursor.EmitDelegate<Func<float, float, float>>((movement, speed) =>
+                    {
+                        movement *= speed;
+                        return movement;
+                    });
+                    cursor.Emit(Mono.Cecil.Cil.OpCodes.Stloc, movementTrackerIndex);
+                    cursor.Emit(Mono.Cecil.Cil.OpCodes.Br, target2.Target);
+                }
+            }
+        }
     }
 
     public override void Init(ConfigFile config)
@@ -144,8 +172,8 @@ public class FlailOfMass : Item<FlailOfMass>
     {
         FlailOfMassMomentumLimit = config.ActiveBind("Item: " + ItemName, "Momentum stacks necessary to access the attack", 100, "At this number of Momentum stacks, they will not decay until the attack is fired.");
         FlailOfMassRadius = config.ActiveBind("Item: " + ItemName, "Attack explosion radius", 25f, "The explosion of the attack will have a radius of this many meters.");
-        FlailOfMassDamageMultiplierInit = config.ActiveBind("Item: " + ItemName, "Damage multiplier of the attack with one " + ItemName, 150f, "What % of base damage should the attack do with one Flail of Mass? (150 = 15000%)");
-        FlailOfMassDamageMultiplierStack = config.ActiveBind("Item: " + ItemName, "Damage multiplier of the attack per stack after one " + ItemName, 150f, "What % of base damage should be added to the attack per stack of Flail of Mass after one? (150 = 15000%)");
+        FlailOfMassDamageMultiplierInit = config.ActiveBind("Item: " + ItemName, "Damage multiplier of the attack with one " + ItemName, 150f, "What % of base damage should the attack do with one " + ItemName + "? (150 = 15000%)");
+        FlailOfMassDamageMultiplierStack = config.ActiveBind("Item: " + ItemName, "Damage multiplier of the attack per stack after one " + ItemName, 150f, "What % of base damage should be added to the attack per stack of " + ItemName + " after one? (150 = 15000%)");
         FlailOfMassProcCoefficient = config.ActiveBind("Item: " + ItemName, "Attack proc coefficient", 1f, "The proc coefficient of the attack and the explosion it makes.");
         FlailOfMassMomentumBuildRate = config.ActiveBind("Item: " + ItemName, "Momentum build rate", 1f, "Momentum is added every (10.15/(totalSpeed * buildRate)) seconds while sprinting, where buildRate is this config value.");
         FlailOfMassMomentumDecayRate = config.ActiveBind("Item: " + ItemName, "Momentum build rate", 1f, "Momentum is removed every 1/decayRate seconds while not sprinting, where decayRate is this config value.");
@@ -159,26 +187,37 @@ public class FlailOfMass : Item<FlailOfMass>
         bool hs;
         bool s;
 
+        private void Awake()
+        {
+            enabled = false;
+        }
+
         private void OnEnable()
         {
-            component = GetComponent<SetStateOnHurt>();
+            if (body)
+            {
+                component = GetComponent<SetStateOnHurt>();
 
-            f = component.canBeFrozen;
-            hs = component.canBeHitStunned;
-            s = component.canBeStunned;
+                f = component.canBeFrozen;
+                hs = component.canBeHitStunned;
+                s = component.canBeStunned;
 
-            component.canBeFrozen = false;
-            component.canBeHitStunned = false;
-            component.canBeStunned = false;
+                component.canBeFrozen = false;
+                component.canBeHitStunned = false;
+                component.canBeStunned = false;
+            }
         }
 
         private void OnDisable()
         {
-            if (GetComponent<SetStateOnHurt>())
+            if (body)
             {
-                component.canBeFrozen = f;
-                component.canBeHitStunned = hs;
-                component.canBeStunned = s;
+                if (GetComponent<SetStateOnHurt>())
+                {
+                    component.canBeFrozen = f;
+                    component.canBeHitStunned = hs;
+                    component.canBeStunned = s;
+                }
             }
         }
     }

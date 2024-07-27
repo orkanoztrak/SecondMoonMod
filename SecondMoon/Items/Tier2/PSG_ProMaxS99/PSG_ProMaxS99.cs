@@ -134,11 +134,11 @@ public class PSG_ProMaxS99 : Item<PSG_ProMaxS99>
 
     private void CreateConfig(ConfigFile config)
     {
-        PSGShieldInit = config.ActiveBind("Item: " + ItemName, "Maximum shield increase with one " + ItemName, 0.12f, "Gain shield equal to what % of maximum health with one P.S.G.+ Pro Max S99? (0.12 = 12%)");
-        PSGShieldStack = config.ActiveBind("Item: " + ItemName, "Maximum shield increase per stack after one " + ItemName, 0.12f, "Gain shield equal to what % of maximum health per stack of P.S.G.+ Pro Max S99 after one? (0.12 = 12%)");
-        PSGDangerStopwatchReductionInit = config.ActiveBind("Item: " + ItemName, "Shield recharge delay reduction with one " + ItemName, 0.15f, "How much should shield recharge delay be reduced by with one P.S.G.+ Pro Max S99? This scales hyperbolically (0.15 = 15%, refer to Tougher Times on the wiki).");
-        PSGDangerStopwatchReductionStack = config.ActiveBind("Item: " + ItemName, "Shield recharge delay reduction per stack after one " + ItemName, 0.15f, "How much should shield recharge delay be reduced by per stack of P.S.G.+ Pro Max S99 after one? This scales hyperbolically (0.15 = 15%, refer to Tougher Times on the wiki).");
-        PSGShieldRechargeRateInit = config.ActiveBind("Item: " + ItemName, "Shield recharge rate increase with one " + ItemName, 0.15f, "How much should shield recharge rate be increased by with one P.S.G.+ Pro Max S99? This scales exponentially (0.15 = 15%, refer to Fuel Cell on the wiki).");
-        PSGShieldRechargeRateStack = config.ActiveBind("Item: " + ItemName, "Shield recharge rate increase per stack after one " + ItemName, 0.15f, "How much should shield recharge rate be increased by per stack of P.S.G.+ Pro Max S99 after one? This scales exponentially (0.15 = 15%, refer to Fuel Cell on the wiki).");
+        PSGShieldInit = config.ActiveBind("Item: " + ItemName, "Maximum shield increase with one " + ItemName, 0.12f, "Gain shield equal to what % of maximum health with one " + ItemName + "? (0.12 = 12%)");
+        PSGShieldStack = config.ActiveBind("Item: " + ItemName, "Maximum shield increase per stack after one " + ItemName, 0.12f, "Gain shield equal to what % of maximum health per stack of " + ItemName + " after one? (0.12 = 12%)");
+        PSGDangerStopwatchReductionInit = config.ActiveBind("Item: " + ItemName, "Shield recharge delay reduction with one " + ItemName, 0.15f, "How much should shield recharge delay be reduced by with one " + ItemName + "? This scales hyperbolically (0.15 = 15%, refer to Tougher Times on the wiki).");
+        PSGDangerStopwatchReductionStack = config.ActiveBind("Item: " + ItemName, "Shield recharge delay reduction per stack after one " + ItemName, 0.15f, "How much should shield recharge delay be reduced by per stack of " + ItemName + " after one? This scales hyperbolically (0.15 = 15%, refer to Tougher Times on the wiki).");
+        PSGShieldRechargeRateInit = config.ActiveBind("Item: " + ItemName, "Shield recharge rate increase with one " + ItemName, 0.15f, "How much should shield recharge rate be increased by with one " + ItemName + "? This scales exponentially (0.15 = 15%, refer to Fuel Cell on the wiki).");
+        PSGShieldRechargeRateStack = config.ActiveBind("Item: " + ItemName, "Shield recharge rate increase per stack after one " + ItemName, 0.15f, "How much should shield recharge rate be increased by per stack of " + ItemName + " after one? This scales exponentially (0.15 = 15%, refer to Fuel Cell on the wiki).");
     }
 }

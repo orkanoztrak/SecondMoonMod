@@ -20,7 +20,7 @@ public class Channeling : Buff<Channeling>
 
     public override void Hooks()
     {
-        R2API.RecalculateStatsAPI.GetStatCoefficients += ChannelingEffect;
+        RecalculateStatsAPI.GetStatCoefficients += ChannelingEffect;
     }
 
     private void ChannelingEffect(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
@@ -28,8 +28,7 @@ public class Channeling : Buff<Channeling>
         if (sender.HasBuff(BuffDef))
         {
             args.healthMultAdd += ChannelingBoost;
-            args.baseRegenAdd += ChannelingBoost;
-            args.levelRegenAdd += ChannelingBoost / 5;
+            args.regenMultAdd += ChannelingBoost;
             args.moveSpeedMultAdd += ChannelingBoost;
             args.damageMultAdd += ChannelingBoost;
             args.attackSpeedMultAdd += ChannelingBoost;

@@ -14,13 +14,6 @@ public class GashDebuff : Buff<GashDebuff>
 
     public override Color BuffColor => new Color32(90, 0, 0, 255);
 
-    public override bool IsDebuff => true;
-
-    public override void Hooks()
-    {
-        
-    }
-
     public override void Init()
     {
         CreateBuff();

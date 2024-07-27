@@ -19,7 +19,7 @@ public abstract class Equipment<T> : Equipment where T : Equipment<T>
 
     public Equipment()
     {
-        if (instance != null) throw new InvalidOperationException("Singleton class \"" + typeof(T).Name + "\" inheriting EquipmentBoilerplate/Equipment was instantiated twice");
+        if (instance != null) throw new InvalidOperationException("Singleton class \"" + typeof(T).Name + "\" inheriting Equipment was instantiated twice");
         instance = this as T;
     }
 }

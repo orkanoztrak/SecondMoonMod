@@ -4,6 +4,7 @@ using R2API;
 using RoR2;
 using RoR2.Orbs;
 using SecondMoon.AttackTypes.Orbs.Item.Prototype.GravityFlask;
+using SecondMoon.Items.ItemTiers.TierPrototype;
 using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
@@ -75,7 +76,7 @@ public class GravityFlask : Item<GravityFlask>
 
     public override string ItemLore => "Test";
 
-    public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
+    public override ItemTierDef ItemTierDef => TierPrototype.instance.ItemTierDef;
 
     public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Healing, ItemTag.Utility];
 
@@ -269,12 +270,10 @@ public class GravityFlask : Item<GravityFlask>
         }
     }
 
+    [Server]
     private void AddItemBehavior(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
     {
-        if (NetworkServer.active && self.master)
-        {
-            self.AddItemBehavior<GravityFlaskBehavior>(self.inventory.GetItemCount(instance.ItemDef));
-        }
+        self.AddItemBehavior<GravityFlaskBehavior>(self.inventory.GetItemCount(instance.ItemDef));
         orig(self);
     }
 
@@ -298,33 +297,33 @@ public class GravityFlask : Item<GravityFlask>
         GravityFlaskThirdThreshold = config.ActiveBind("Item: " + ItemName, "Third threshold", 10, "Every this many items the holder has of a category grants the third respective category boost.");
         GravityFlaskFinalThreshold = config.ActiveBind("Item: " + ItemName, "Final threshold", 20, "Having at least this many items of a category grants the final respective category boost.");
 
-        GravityFlaskAttackSpeedInit = config.ActiveBind("Item: " + ItemName, "Attack speed with one " + ItemName, 0.015f, "How much should attack speed be increased by with one Gravity Flask? (0.015 = 1.5%)");
-        GravityFlaskAttackSpeedStack = config.ActiveBind("Item: " + ItemName, "Attack speed per stack after one " + ItemName, 0.015f, "How much should attack speed be increased by per stack of Gravity Flask after one? (0.015 = 1.5%)");
-        GravityFlaskDamageInit = config.ActiveBind("Item: " + ItemName, "Damage with one " + ItemName, 0.075f, "How much should damage be increased by with one Gravity Flask? (0.075 = 7.5%)");
-        GravityFlaskDamageStack = config.ActiveBind("Item: " + ItemName, "Damage per stack after one " + ItemName, 0.075f, "How much should damage be increased by per stack of Gravity Flask after one? (0.075 = 7.5%)");
-        GravityFlaskCritInit = config.ActiveBind("Item: " + ItemName, "Critical chance with one " + ItemName, 15f, "How much should critical chance be increased by with one Gravity Flask?");
-        GravityFlaskCritStack = config.ActiveBind("Item: " + ItemName, "Critical per stack after one " + ItemName, 15f, "How much should critical chance be increased by per stack of Gravity Flask after one?");
-        GravityFlaskProcDamageInit = config.ActiveBind("Item: " + ItemName, "Damage of the proc with one " + ItemName, 0.5f, "What % of TOTAL damage should the proc do with one Gravity Flask? (0.5 = 50%)");
-        GravityFlaskProcDamageStack = config.ActiveBind("Item: " + ItemName, "Damage of the proc per stack after one " + ItemName, 0.5f, "What % of TOTAL damage should be added to the proc per stack of Gravity Flask after one? (0.5 = 50%)");
+        GravityFlaskAttackSpeedInit = config.ActiveBind("Item: " + ItemName, "Attack speed with one " + ItemName, 0.015f, "How much should attack speed be increased by with one " + ItemName + "? (0.015 = 1.5%)");
+        GravityFlaskAttackSpeedStack = config.ActiveBind("Item: " + ItemName, "Attack speed per stack after one " + ItemName, 0.015f, "How much should attack speed be increased by per stack of " + ItemName + " after one? (0.015 = 1.5%)");
+        GravityFlaskDamageInit = config.ActiveBind("Item: " + ItemName, "Damage with one " + ItemName, 0.075f, "How much should damage be increased by with one " + ItemName + "? (0.075 = 7.5%)");
+        GravityFlaskDamageStack = config.ActiveBind("Item: " + ItemName, "Damage per stack after one " + ItemName, 0.075f, "How much should damage be increased by per stack of " + ItemName + " after one? (0.075 = 7.5%)");
+        GravityFlaskCritInit = config.ActiveBind("Item: " + ItemName, "Critical chance with one " + ItemName, 15f, "How much should critical chance be increased by with one " + ItemName + "?");
+        GravityFlaskCritStack = config.ActiveBind("Item: " + ItemName, "Critical per stack after one " + ItemName, 15f, "How much should critical chance be increased by per stack of " + ItemName + " after one?");
+        GravityFlaskProcDamageInit = config.ActiveBind("Item: " + ItemName, "Damage of the proc with one " + ItemName, 0.5f, "What % of TOTAL damage should the proc do with one " + ItemName + "? (0.5 = 50%)");
+        GravityFlaskProcDamageStack = config.ActiveBind("Item: " + ItemName, "Damage of the proc per stack after one " + ItemName, 0.5f, "What % of TOTAL damage should be added to the proc per stack of " + ItemName + " after one? (0.5 = 50%)");
         GravityFlaskProcCoefficient = config.ActiveBind("Item: " + ItemName, "Proc coefficient of the proc", 1f, "What should the proc coefficient of the proc be?");
 
-        GravityFlaskHealthInit = config.ActiveBind("Item: " + ItemName, "Maximum health increase with one " + ItemName, 0.015f, "How much should maximum health be increased by with one Gravity Flask? (0.015 = 1.5%)");
-        GravityFlaskHealthStack = config.ActiveBind("Item: " + ItemName, "Maximum health increase per stack after one " + ItemName, 0.015f, "How much should maximum health be increased by per stack of Gravity Flask after one? (0.015 = 1.5%)");
-        GravityFlaskHealInit = config.ActiveBind("Item " + ItemName, "Heal on getting damaged with one " + ItemName, 3f, "How much should the holder be healed by upon taking damage with one Gravity Flask?");
-        GravityFlaskHealStack = config.ActiveBind("Item " + ItemName, "Heal on getting damaged per stack after one " + ItemName, 3f, "How much should the holder be healed by upon taking damage per stack of Gravity Flask after one?");
-        GravityFlaskHealBoostInit = config.ActiveBind("Item: " + ItemName, "Heal increase with one " + ItemName, 0.5f, "How much should healing be increased by with one Gravity Flask? (0.5 = 50%)");
-        GravityFlaskHealBoostStack = config.ActiveBind("Item: " + ItemName, "Heal increase per stack after one " + ItemName, 0.5f, "How much should healing be increased by per stack of Gravity Flask after one? (0.5 = 50%)");
-        GravityFlaskDamageReductionInit = config.ActiveBind("Item: " + ItemName, "Multiplicative incoming damage reduction with one " + ItemName, 0.5f, "What should incoming damage be multiplicatively reduced to with one Gravity Flask? This scales exponentially (0.5 = 50%, refer to Shaped Glass on the wiki).");
-        GravityFlaskDamageReductionStack = config.ActiveBind("Item: " + ItemName, "Multiplicative incoming damage reduction per stack after one " + ItemName, 0.5f, "What should incoming damage be multiplicatively reduced to per stack of Gravity Flask after one? This scales exponentially (0.5 = 50%, refer to Shaped Glass on the wiki).");
+        GravityFlaskHealthInit = config.ActiveBind("Item: " + ItemName, "Maximum health increase with one " + ItemName, 0.015f, "How much should maximum health be increased by with one " + ItemName + "? (0.015 = 1.5%)");
+        GravityFlaskHealthStack = config.ActiveBind("Item: " + ItemName, "Maximum health increase per stack after one " + ItemName, 0.015f, "How much should maximum health be increased by per stack of " + ItemName + " after one? (0.015 = 1.5%)");
+        GravityFlaskHealInit = config.ActiveBind("Item " + ItemName, "Heal on getting damaged with one " + ItemName, 3f, "How much should the holder be healed by upon taking damage with one " + ItemName + "?");
+        GravityFlaskHealStack = config.ActiveBind("Item " + ItemName, "Heal on getting damaged per stack after one " + ItemName, 3f, "How much should the holder be healed by upon taking damage per stack of " + ItemName + " after one?");
+        GravityFlaskHealBoostInit = config.ActiveBind("Item: " + ItemName, "Heal increase with one " + ItemName, 0.5f, "How much should healing be increased by with one " + ItemName + "? (0.5 = 50%)");
+        GravityFlaskHealBoostStack = config.ActiveBind("Item: " + ItemName, "Heal increase per stack after one " + ItemName, 0.5f, "How much should healing be increased by per stack of " + ItemName + " after one? (0.5 = 50%)");
+        GravityFlaskDamageReductionInit = config.ActiveBind("Item: " + ItemName, "Multiplicative incoming damage reduction with one " + ItemName, 0.5f, "What should incoming damage be multiplicatively reduced to with one " + ItemName + "? This scales exponentially (0.5 = 50%, refer to Shaped Glass on the wiki).");
+        GravityFlaskDamageReductionStack = config.ActiveBind("Item: " + ItemName, "Multiplicative incoming damage reduction per stack after one " + ItemName, 0.5f, "What should incoming damage be multiplicatively reduced to per stack of " + ItemName + " after one? This scales exponentially (0.5 = 50%, refer to Shaped Glass on the wiki).");
 
-        GravityFlaskMovementInit = config.ActiveBind("Item: " + ItemName, "Movement speed with one " + ItemName, 0.015f, "How much should movement speed be increased by with one Gravity Flask? (0.015 = 1.5%)");
-        GravityFlaskMovementStack = config.ActiveBind("Item: " + ItemName, "Movement speed per stack after one " + ItemName, 0.015f, "How much should movement speed be increased by per stack of Gravity Flask after one? (0.015 = 1.5%)");
-        GravityFlaskGoldInit = config.ActiveBind("Item: " + ItemName, "Gold with one " + ItemName, 0.075f, "How much should gold gain be increased by with one Gravity Flask? (0.075 = 7.5%)");
-        GravityFlaskGoldStack = config.ActiveBind("Item: " + ItemName, "Gold per stack after one " + ItemName, 0.075f, "How much should gold gain be increased by per stack of Gravity Flask after one? (0.075 = 7.5%)");
-        GravityFlaskCooldownReductionInit = config.ActiveBind("Item: " + ItemName, "Cooldown reduction with one " + ItemName, 0.15f, "How much should cooldowns be reduced by with one Gravity Flask? This scales exponentially (0.15 = 15%, refer to Alien Head on the wiki).");
-        GravityFlaskCooldownReductionStack = config.ActiveBind("Item: " + ItemName, "Cooldown reduction per stack after one " + ItemName, 0.15f, "How much should cooldowns be reduced by per stack of Gravity Flask after one? This scales exponentially (0.15 = 15%, refer to Alien Head on the wiki).");
-        GravityFlaskBonusBoostInit = config.ActiveBind("Item: " + ItemName, "Bonus boost coefficient with one " + ItemName, 1f, "By what % should non-final category bonuses be boosted with one Gravity Flask? (1 = 100%)");
-        GravityFlaskBonusBoostStack = config.ActiveBind("Item: " + ItemName, "Bonus boost coefficient per stack after one " + ItemName, 1f, "By what % should non-final category bonuses be boosted per stack of Gravity Flask after one? (1 = 100%)");
+        GravityFlaskMovementInit = config.ActiveBind("Item: " + ItemName, "Movement speed with one " + ItemName, 0.015f, "How much should movement speed be increased by with one " + ItemName + "? (0.015 = 1.5%)");
+        GravityFlaskMovementStack = config.ActiveBind("Item: " + ItemName, "Movement speed per stack after one " + ItemName, 0.015f, "How much should movement speed be increased by per stack of " + ItemName + " after one? (0.015 = 1.5%)");
+        GravityFlaskGoldInit = config.ActiveBind("Item: " + ItemName, "Gold with one " + ItemName, 0.075f, "How much should gold gain be increased by with one " + ItemName + "? (0.075 = 7.5%)");
+        GravityFlaskGoldStack = config.ActiveBind("Item: " + ItemName, "Gold per stack after one " + ItemName, 0.075f, "How much should gold gain be increased by per stack of " + ItemName + " after one? (0.075 = 7.5%)");
+        GravityFlaskCooldownReductionInit = config.ActiveBind("Item: " + ItemName, "Cooldown reduction with one " + ItemName, 0.15f, "How much should cooldowns be reduced by with one " + ItemName + "? This scales exponentially (0.15 = 15%, refer to Alien Head on the wiki).");
+        GravityFlaskCooldownReductionStack = config.ActiveBind("Item: " + ItemName, "Cooldown reduction per stack after one " + ItemName, 0.15f, "How much should cooldowns be reduced by per stack of " + ItemName + " after one? This scales exponentially (0.15 = 15%, refer to Alien Head on the wiki).");
+        GravityFlaskBonusBoostInit = config.ActiveBind("Item: " + ItemName, "Bonus boost coefficient with one " + ItemName, 1f, "By what % should non-final category bonuses be boosted with one " + ItemName + "? (1 = 100%)");
+        GravityFlaskBonusBoostStack = config.ActiveBind("Item: " + ItemName, "Bonus boost coefficient per stack after one " + ItemName, 1f, "By what % should non-final category bonuses be boosted per stack of " + ItemName + " after one? (1 = 100%)");
     }
 
     public class GravityFlaskBehavior : CharacterBody.ItemBehavior
@@ -340,8 +339,11 @@ public class GravityFlask : Item<GravityFlask>
 
         private void OnEnable()
         {
-            body.inventory.onInventoryChanged += UpdateTrackers;
-            UpdateTrackers();
+            if (body)
+            {
+                body.inventory.onInventoryChanged += UpdateTrackers;
+                UpdateTrackers();
+            }
         }
 
         private void UpdateTrackers()
@@ -372,21 +374,17 @@ public class GravityFlask : Item<GravityFlask>
                             }
                         }
                     }
-                    Debug.Log("Inventory updated. Current trackers:\nDamage:" + GravityFlaskDamageTracker + "\nHealing: " + GravityFlaskHealingTracker + "\nUtility: " + GravityFlaskUtilityTracker);
                 }
             }
         }
 
         private void OnDisable()
         {
-            if (enabled)
+            if (body)
             {
-                if (body)
+                if (body.inventory)
                 {
-                    if (body.inventory)
-                    {
-                        body.inventory.onInventoryChanged -= UpdateTrackers;
-                    }
+                    body.inventory.onInventoryChanged -= UpdateTrackers;
                 }
             }
         }

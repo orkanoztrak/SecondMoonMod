@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 using static UnityEngine.ParticleSystem.PlaybackState;
 
 namespace SecondMoon.Items.Tier3.Bloodletter;
@@ -58,8 +59,7 @@ public class Bloodletter : Item<Bloodletter>
 
     private void BloodletterWoundEnemy(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, RoR2.GlobalEventManager self, RoR2.DamageInfo damageInfo, GameObject victim)
     {
-        orig(self, damageInfo, victim);
-        if (damageInfo.attacker && damageInfo.procCoefficient > 0)
+        if (damageInfo.attacker && damageInfo.procCoefficient > 0 && NetworkServer.active && !damageInfo.rejected)
         {
             var attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
             var victimComponent = victim.GetComponent<HealthComponent>();
@@ -109,6 +109,7 @@ public class Bloodletter : Item<Bloodletter>
                 }
             }
         }
+        orig(self, damageInfo, victim);
     }
 
     public override void Init(ConfigFile config)
@@ -126,10 +127,10 @@ public class Bloodletter : Item<Bloodletter>
     private void CreateConfig(ConfigFile config)
     {
         BloodletterProcChance = config.ActiveBind("Item: " + ItemName, "Proc chance", 10f, "The % chance of hits proccing this.");
-        BloodletterDamageInit = config.ActiveBind("Item: " + ItemName, "Damage of the proc with one " + ItemName, 2f, "What % of TOTAL damage should the proc do with one Bloodletter? (2 = 200%)");
-        BloodletterDamageStack = config.ActiveBind("Item: " + ItemName, "Damage of the proc per stack after one " + ItemName, 2f, "What % of TOTAL damage should be added to the proc per stack of Bloodletter after one? (1 = 100%)");
-        BloodletterDamageScalingInit = config.ActiveBind("Item: " + ItemName, "Damage scaling of thresholds for stronger hits with one " + ItemName, 0.5f, "How much should the respective damage thresholds boost Bloodletter damage by with one Bloodletter? (0.5 = 50%)");
-        BloodletterDamageScalingStack = config.ActiveBind("Item: " + ItemName, "Damage scaling of thresholds for stronger hits per stack after one " + ItemName, 0.5f, "How much should the respective damage thresholds boost Bloodletter damage by per stack of Bloodletter after one? (0.25 = 25%)");
+        BloodletterDamageInit = config.ActiveBind("Item: " + ItemName, "Damage of the proc with one " + ItemName, 2f, "What % of TOTAL damage should the proc do with one " + ItemName + "? (2 = 200%)");
+        BloodletterDamageStack = config.ActiveBind("Item: " + ItemName, "Damage of the proc per stack after one " + ItemName, 2f, "What % of TOTAL damage should be added to the proc per stack of " + ItemName + " after one? (2 = 200%)");
+        BloodletterDamageScalingInit = config.ActiveBind("Item: " + ItemName, "Damage scaling of thresholds for stronger hits with one " + ItemName, 0.5f, "How much should the respective damage thresholds boost proc damage by with one " + ItemName + "? (0.5 = 50%)");
+        BloodletterDamageScalingStack = config.ActiveBind("Item: " + ItemName, "Damage scaling of thresholds for stronger hits per stack after one " + ItemName, 0.5f, "How much should the respective damage thresholds boost proc damage by per stack of " + ItemName + " after one? (0.5 = 50%)");
         BloodletterProcChanceScaling = config.ActiveBind("Item: " + ItemName, "Proc chance scaling of thresholds for stronger hits", 5f, "What % should proc chance be increased by at respective damage thresholds?");
     }
 

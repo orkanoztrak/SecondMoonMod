@@ -1,11 +1,10 @@
 ﻿using BepInEx.Configuration;
-using EntityStates.BrotherMonster;
 using MonoMod.Cil;
 using R2API;
 using RoR2;
+using SecondMoon.Items.ItemTiers.TierPrototype;
 using SecondMoon.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -32,7 +31,7 @@ public class CelestineAuger : Item<CelestineAuger>
 
     public override string ItemLore => "Test";
 
-    public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
+    public override ItemTierDef ItemTierDef => TierPrototype.instance.ItemTierDef;
 
     public override ItemTag[] Category => [ItemTag.Damage];
 
@@ -191,20 +190,13 @@ public class CelestineAuger : Item<CelestineAuger>
         }
     }
 
-    /*    public static ConfigOption<float> CelestineAugerCriticalChanceInit = 0.5f;
-    public static ConfigOption<float> CelestineAugerCriticalChanceStack = 0.5f;
-    public static ConfigOption<float> CelestineAugerCriticalDamageInit = 0.5f;
-    public static ConfigOption<float> CelestineAugerCriticalDamageStack = 0.5f;
-    public static ConfigOption<float> CelestineAugerInitialCritChance = 5f;
-    */
-
     private void CreateConfig(ConfigFile config)
     {
-        CelestineAugerCriticalChanceInit = config.ActiveBind("Item: " + ItemName, "Multiplicative critical chance with one " + ItemName, 0.5f, "How much should critical chance be increased by multiplicatively with one Celestine Auger? (0.5 = 50%, meaning 1.50x critical chance.)");
-        CelestineAugerCriticalChanceStack = config.ActiveBind("Item: " + ItemName, "Multiplicative critical chance per stack after one " + ItemName, 0.5f, "How much should critical chance be increased by multiplicatively per stack of Celestine Auger after one? (0.5 = 50%, meaning 1.50x critical chance.)");
-        CelestineAugerCriticalDamageInit = config.ActiveBind("Item: " + ItemName, "Multiplicative critical damage with one " + ItemName, 0.5f, "How much should critical damage be increased by multiplicatively with one Celestine Auger? (0.5 = 50%, meaning 1.50x critical damage.)");
-        CelestineAugerCriticalDamageStack = config.ActiveBind("Item: " + ItemName, "Multiplicative critical damage per stack after one " + ItemName, 0.5f, "How much should critical damage be increased by multiplicatively per stack of Celestine Auger after one? (0.5 = 50%, meaning 1.50x critical damage.)");
-        CelestineAugerInitialCritChance = config.ActiveBind("Item: " + ItemName, "Critical chance with at least one " + ItemName, 5f, "By what % should critical chance be increased by with at least one Celestine Auger?");
+        CelestineAugerCriticalChanceInit = config.ActiveBind("Item: " + ItemName, "Multiplicative critical chance with one " + ItemName, 0.5f, "How much should critical chance be increased by multiplicatively with one " + ItemName + "? (0.5 = 50%, meaning 1.50x critical chance.)");
+        CelestineAugerCriticalChanceStack = config.ActiveBind("Item: " + ItemName, "Multiplicative critical chance per stack after one " + ItemName, 0.5f, "How much should critical chance be increased by multiplicatively per stack of " + ItemName + " after one? (0.5 = 50%, meaning 1.50x critical chance.)");
+        CelestineAugerCriticalDamageInit = config.ActiveBind("Item: " + ItemName, "Multiplicative critical damage with one " + ItemName, 0.5f, "How much should critical damage be increased by multiplicatively with one " + ItemName + "? (0.5 = 50%, meaning 1.50x critical damage.)");
+        CelestineAugerCriticalDamageStack = config.ActiveBind("Item: " + ItemName, "Multiplicative critical damage per stack after one " + ItemName, 0.5f, "How much should critical damage be increased by multiplicatively per stack of " + ItemName + " after one? (0.5 = 50%, meaning 1.50x critical damage.)");
+        CelestineAugerInitialCritChance = config.ActiveBind("Item: " + ItemName, "Critical chance with at least one " + ItemName, 5f, "By what % should critical chance be increased by with at least one " + ItemName + "?");
     }
 
     public void CelestineAugerInitBuffCrit(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)

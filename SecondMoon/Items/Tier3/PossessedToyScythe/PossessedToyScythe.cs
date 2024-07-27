@@ -110,7 +110,7 @@ internal class PossessedToyScythe : Item<PossessedToyScythe>
         PossessedToyScythePercentHealthDamage = config.ActiveBind("Item: " + ItemName, "Percent health damage", 0.1f, "What % of maximum combined health should the proc do as damage? This value scales down with on hit damage if the proccing hit has less than 100%. (0.1 = 10%)");
         PossessedToyScytheFixedDamage = config.ActiveBind("Item: " + ItemName, "Damage of the proc at high health", 9f, "What % of TOTAL damage should the proc do? This only happens if the health check is greater than this value. (9 = 900%)");
 
-        PossessedToyScytheProcChanceInit = config.ActiveBind("Item: " + ItemName, "Proc chance with one " + ItemName, 10f, "What % of non-critical hits should proc with one Possessed Toy Scythe?");
-        PossessedToyScytheProcChanceStack = config.ActiveBind("Item: " + ItemName, "Proc chance per stack after one " + ItemName, 10f, "What % of non-critical hits should proc per stack of Possessed Toy Scythe after one ?");
+        PossessedToyScytheProcChanceInit = config.ActiveBind("Item: " + ItemName, "Proc chance with one " + ItemName, 10f, "What % of non-critical hits should proc with one " + ItemName + "?");
+        PossessedToyScytheProcChanceStack = config.ActiveBind("Item: " + ItemName, "Proc chance per stack after one " + ItemName, 10f, "What % of non-critical hits should proc per stack of " + ItemName + " after one ?");
     }
 }

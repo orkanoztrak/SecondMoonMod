@@ -109,10 +109,10 @@ public class Moonstone : Item<Moonstone>
 
     private void CreateConfig(ConfigFile config)
     {
-        MoonstoneCooldownReductionInit = config.ActiveBind("Item: " + ItemName, "Cooldown reduction with one " + ItemName, 0.15f, "How much should cooldowns be reduced by with one Moonstone? (0.15 = 15%)");
-        MoonstoneCooldownReductionStack = config.ActiveBind("Item: " + ItemName, "Cooldown reduction per stack after one " + ItemName, 0.15f, "How much should cooldowns be reduced by per stack of Moonstone after one? (0.15 = 15%)");
+        MoonstoneCooldownReductionInit = config.ActiveBind("Item: " + ItemName, "Cooldown reduction with one " + ItemName, 0.15f, "How much should cooldowns be reduced by with one " + ItemName + "? (0.15 = 15%)");
+        MoonstoneCooldownReductionStack = config.ActiveBind("Item: " + ItemName, "Cooldown reduction per stack after one " + ItemName, 0.15f, "How much should cooldowns be reduced by per stack of " + ItemName + " after one? (0.15 = 15%)");
 
-        MoonstoneAttackSpeedInit = config.ActiveBind("Item: " + ItemName, "Attack speed with one " + ItemName, 0.15f, "How much should attack speed be increased by with one Moonstone? (0.15 = 15%)");
-        MoonstoneAttackSpeedStack = config.ActiveBind("Item: " + ItemName, "Attack speed per stack after one " + ItemName, 0.15f, "How much should attack speed be increased by per stack of Moonstone after one? (0.15 = 15%)");
+        MoonstoneAttackSpeedInit = config.ActiveBind("Item: " + ItemName, "Attack speed with one " + ItemName, 0.15f, "How much should attack speed be increased by with one " + ItemName + "? (0.15 = 15%)");
+        MoonstoneAttackSpeedStack = config.ActiveBind("Item: " + ItemName, "Attack speed per stack after one " + ItemName, 0.15f, "How much should attack speed be increased by per stack of " + ItemName + " after one? (0.15 = 15%)");
     }
 }

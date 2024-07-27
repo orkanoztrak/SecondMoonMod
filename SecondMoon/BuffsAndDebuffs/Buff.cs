@@ -14,7 +14,7 @@ public abstract class Buff<T> : Buff where T : Buff<T>
 
     public Buff()
     {
-        if (instance != null) throw new InvalidOperationException("Singleton class \"" + typeof(T).Name + "\" inheriting BuffBase was instantiated twice");
+        if (instance != null) throw new InvalidOperationException("Singleton class \"" + typeof(T).Name + "\" inheriting Buff was instantiated twice");
         instance = this as T;
     }
 }
@@ -47,5 +47,5 @@ public abstract class Buff
         ContentAddition.AddBuffDef(BuffDef);
     }
     public abstract void Init();
-    public abstract void Hooks();
+    public virtual void Hooks() { }
 }

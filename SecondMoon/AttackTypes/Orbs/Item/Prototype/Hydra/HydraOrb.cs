@@ -47,8 +47,6 @@ public class HydraOrb : GenericDamageOrb
                 damageType = damageType
             };
             healthComponent.TakeDamage(damageInfo);
-            //GlobalEventManager.instance.OnHitEnemy(damageInfo, healthComponent.gameObject);
-            //GlobalEventManager.instance.OnHitAll(damageInfo, healthComponent.gameObject);
             if ((bool)target.hurtBoxGroup)
             {
                 target = target.hurtBoxGroup.hurtBoxes[UnityEngine.Random.Range(0, target.hurtBoxGroup.hurtBoxes.Length)];

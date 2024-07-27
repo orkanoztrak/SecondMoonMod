@@ -113,8 +113,8 @@ public class GazingSoulstealer : Item<GazingSoulstealer>
 
     private void CreateConfig(ConfigFile config)
     {
-        GazingSoulstealerEquipmentCDRInit = config.ActiveBind("Item: " + ItemName, "Equipment cooldown reduction with one " + ItemName, 0.15f, "How much should equipment cooldown be reduced by with one Gazing Soulstealer? This scales exponentially (0.15 = 15%, refer to Fuel Cell on the wiki).");
-        GazingSoulstealerEquipmentCDRStack = config.ActiveBind("Item: " + ItemName, "Equipment cooldown reduction per stack after one " + ItemName, 0.15f, "How much should equipment cooldown be reduced by per stack of Gazing Soulstealer after one? This scales exponentially (0.15 = 15%, refer to Fuel Cell on the wiki).");
+        GazingSoulstealerEquipmentCDRInit = config.ActiveBind("Item: " + ItemName, "Equipment cooldown reduction with one " + ItemName, 0.15f, "How much should equipment cooldown be reduced by with one " + ItemName + "? This scales exponentially (0.15 = 15%, refer to Fuel Cell on the wiki).");
+        GazingSoulstealerEquipmentCDRStack = config.ActiveBind("Item: " + ItemName, "Equipment cooldown reduction per stack after one " + ItemName, 0.15f, "How much should equipment cooldown be reduced by per stack of " + ItemName + " after one? This scales exponentially (0.15 = 15%, refer to Fuel Cell on the wiki).");
         GazingSoulstealerBlacklistedEquipmentNames = config.ActiveBind("Item: " + ItemName, "Blacklisted equipment names", "MultiShopCard", "These equipment do not reset cooldowns upon activation. Uses case sensitive, comma separated values with no spaces in between (MultiShopCard,BFG for example disables Executive Card and Preon Accumulator).");
     }
 }

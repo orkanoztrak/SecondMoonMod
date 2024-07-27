@@ -93,8 +93,8 @@ public class HexDagger : Item<HexDagger>
 
     private void CreateConfig(ConfigFile config)
     {
-        HexDaggerInitialCritChance = config.ActiveBind("Item: " + ItemName, "Critical chance with at least one " + ItemName, 5f, "By what % should critical chance be increased by with at least one Hex Dagger?");
-        HexDaggerCriticalDOTDamageInit = config.ActiveBind("Item: " + ItemName, "Critical status damage with one " + ItemName, 0f, "By what % should critical status effect damage be boosted with one Hex Dagger?");
-        HexDaggerCriticalDOTDamageStack = config.ActiveBind("Item: " + ItemName, "Critical status damage per stack after one " + ItemName, 0.5f, "By what % should critical status effect damage be boosted per stack of Hex Dagger after one? (0.5f = 50%)");
+        HexDaggerInitialCritChance = config.ActiveBind("Item: " + ItemName, "Critical chance with at least one " + ItemName, 5f, "By what % should critical chance be increased by with at least one " + ItemName + "?");
+        HexDaggerCriticalDOTDamageInit = config.ActiveBind("Item: " + ItemName, "Critical status damage with one " + ItemName, 0f, "By what % should critical status effect damage be boosted with one " + ItemName + "?");
+        HexDaggerCriticalDOTDamageStack = config.ActiveBind("Item: " + ItemName, "Critical status damage per stack after one " + ItemName, 0.5f, "By what % should critical status effect damage be boosted per stack of " + ItemName + " after one? (0.5f = 50%)");
     }
 }

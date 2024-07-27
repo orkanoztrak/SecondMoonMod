@@ -82,7 +82,7 @@ public class SilverRevolver : Item<SilverRevolver>
 
     private void SilverRevolverAlwaysCritsOnElite(On.RoR2.HealthComponent.orig_TakeDamage orig, RoR2.HealthComponent self, RoR2.DamageInfo damageInfo)
     {
-        if (self.body)
+        if (self.body && damageInfo.attacker)
         {
             if (!self.body.isElite)
             {
@@ -123,8 +123,8 @@ public class SilverRevolver : Item<SilverRevolver>
 
     private void CreateConfig(ConfigFile config)
     {
-        SilverRevolverCDRInit = config.ActiveBind("Item: " + ItemName, "Cooldown reduction with one " + ItemName, 0.5f, "How many seconds should cooldowns be reduced by with one Silver Revolver?");
-        SilverRevolverCDRStack = config.ActiveBind("Item: " + ItemName, "Cooldown reduction per stack after one " + ItemName, 0.5f, "How many seconds should cooldowns be reduced by per stack of Silver Revolver after one ?");
-        SilverRevolverInitialCritChance = config.ActiveBind("Item: " + ItemName, "Critical chance with at least one " + ItemName, 5f, "By what % should critical chance be increased by with at least one Silver Revolver?");
+        SilverRevolverCDRInit = config.ActiveBind("Item: " + ItemName, "Cooldown reduction with one " + ItemName, 0.5f, "How many seconds should cooldowns be reduced by with one " + ItemName + "?");
+        SilverRevolverCDRStack = config.ActiveBind("Item: " + ItemName, "Cooldown reduction per stack after one " + ItemName, 0.5f, "How many seconds should cooldowns be reduced by per stack of " + ItemName + " after one ?");
+        SilverRevolverInitialCritChance = config.ActiveBind("Item: " + ItemName, "Critical chance with at least one " + ItemName, 5f, "By what % should critical chance be increased by with at least one " + ItemName + "?");
     }
 }

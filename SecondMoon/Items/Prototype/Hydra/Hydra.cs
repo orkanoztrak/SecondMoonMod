@@ -4,6 +4,7 @@ using R2API;
 using RoR2;
 using RoR2.Orbs;
 using SecondMoon.AttackTypes.Orbs.Item.Prototype.Hydra;
+using SecondMoon.Items.ItemTiers.TierPrototype;
 using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ public class Hydra : Item<Hydra>
 
     public override string ItemLore => "Test";
 
-    public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
+    public override ItemTierDef ItemTierDef => TierPrototype.instance.ItemTierDef;
 
     public override ItemTag[] Category => [ItemTag.Damage];
 
@@ -46,13 +47,13 @@ public class Hydra : Item<Hydra>
 
     private void HydraMultiHits(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
-        if (damageInfo.attacker)
+        if (damageInfo.attacker && damageInfo.procCoefficient > 0)
         {
             var attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
             if (attackerBody)
             {
                 var stackCount = GetCount(attackerBody);
-                if (stackCount > 0 && damageInfo.procCoefficient > 0)
+                if (stackCount > 0)
                 {
                     for (int i = 0; i < 2; i++)
                     {
@@ -72,7 +73,7 @@ public class Hydra : Item<Hydra>
                             procChainMask = damageInfo.procChainMask,
                             damageType = damageInfo.damageType,
                         };
-                        HurtBox mainHurtBox2 = victimBody.mainHurtBox;
+                        HurtBox mainHurtBox2 = victimBody?.mainHurtBox;
                         if ((bool)mainHurtBox2)
                         {
                             hydraOrb.target = mainHurtBox2;
@@ -98,7 +99,6 @@ public class Hydra : Item<Hydra>
                 }
             }
         }
-
         orig(self, damageInfo, victim);
     }
 
@@ -134,34 +134,7 @@ public class Hydra : Item<Hydra>
 
     private void CreateConfig(ConfigFile config)
     {
-        HydraBaseDamageInit = config.ActiveBind("Item: " + ItemName, "Damage modifier with one " + ItemName, 0.4f, "How much should damage be set to on hits with proc coefficient greater than zero with one Hydra? (0.4 = 40%)");
-        HydraBaseDamageStack = config.ActiveBind("Item: " + ItemName, "Damage modifier per stack after one " + ItemName, 0.1f, "How much should damage be increased for hits with proc coefficient greater than zero per stack of Hydra after one? (0.1 = 10%)");
+        HydraBaseDamageInit = config.ActiveBind("Item: " + ItemName, "Damage modifier with one " + ItemName, 0.4f, "How much should damage be set to on hits with proc coefficient greater than zero with one " + ItemName + "? (0.4 = 40%)");
+        HydraBaseDamageStack = config.ActiveBind("Item: " + ItemName, "Damage modifier per stack after one " + ItemName, 0.1f, "How much should damage be increased for hits with proc coefficient greater than zero per stack of " + ItemName + " after one? (0.1 = 10%)");
     }
-
-    /*private void HydraSetDamage(ILContext il)
-{
-    var cursor = new ILCursor(il);
-    cursor.GotoNext(
-        x => x.MatchLdloc(4),
-        x => x.MatchLdarg(0),
-        x => x.MatchCall<HealthComponent>("get_fullCombinedHealth"),
-        x => x.MatchLdcR4(0.9f)
-        );
-
-    cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_1);
-    cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc, 6);
-    cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc_0);
-    cursor.EmitDelegate<Func<DamageInfo, float, CharacterMaster, float>>((damageInfo, num, master) =>
-    {
-        var stackCount = GetCount(master);
-        if (stackCount > 0 && damageInfo.procCoefficient > 0)
-        {
-            num *= HydraBaseDamageInit + ((stackCount - 1) * HydraBaseDamageStack);
-        }
-        return num;
-    });
-    cursor.Emit(Mono.Cecil.Cil.OpCodes.Stloc, 6);
-}
-*/
-
 }

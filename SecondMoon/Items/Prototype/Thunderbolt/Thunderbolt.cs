@@ -3,6 +3,7 @@ using Facepunch.Steamworks;
 using R2API;
 using RoR2;
 using RoR2.Projectile;
+using SecondMoon.Items.ItemTiers.TierPrototype;
 using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
@@ -30,13 +31,13 @@ public class Thunderbolt : Item<Thunderbolt>
 
     public override string ItemFullDesc => $"Increases <style=cIsDamage>attack speed</style> by <style=cIsDamage>{ThunderboltASInit * 100}%</style> <style=cStack>(+{ThunderboltASStack * 100}% per stack)</style>. " +
         $"<color=#7CFDEA>Your attack speed increase percentage also translates into the following</color>:\r\n\r\n" +
-        $"• Gain <style=cIsUtility>movement speed</style> equal to <color=#7CFDEA>{ThunderboltASToMS * 100}%</color> of it. \r\n" +
-        $"• Gain <style=cIsUtility>cooldown reduction</style> equal to <color=#7CFDEA>{(1f - 1f / (1f + (0.25f * 0.5f))) * ThunderboltASToCD * 400 * ThunderboltCDMultiplier}%</color> of it. \r\n" +
-        $"• Gain <style=cIsDamage>projectile speed</style> equal to <color=#7CFDEA>{ThunderboltASToProjectileSpeed * 100}%</color> of it for projectiles without targets.";
+        $"• Increase <style=cIsUtility>movement speed</style> by <color=#7CFDEA>{ThunderboltASToMS * 100}%</color> of it. \r\n" +
+        $"• Increase <style=cIsUtility>cooldown reduction</style> by <color=#7CFDEA>{(1f - 1f / (1f + (0.25f * 0.5f))) * ThunderboltASToCD * 400 * ThunderboltCDMultiplier}%</color> of it. \r\n" +
+        $"• Increase <style=cIsDamage>projectile speed</style> by <color=#7CFDEA>{ThunderboltASToProjectileSpeed * 100}%</color> of it for projectiles without targets.";
 
     public override string ItemLore => "Test";
 
-    public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
+    public override ItemTierDef ItemTierDef => TierPrototype.instance.ItemTierDef;
     public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Utility];
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
@@ -84,10 +85,25 @@ public class Thunderbolt : Item<Thunderbolt>
             float increase = self.attackSpeed / unchanged - 1;
             self.moveSpeed *= 1 + increase * ThunderboltASToMS;
             float cdr = (1 - 1 / (1 + (increase * 0.5f))) * ThunderboltASToCD * ThunderboltCDMultiplier;
-            self.skillLocator.primaryBonusStockSkill.cooldownScale *= 1 - cdr;
-            self.skillLocator.secondaryBonusStockSkill.cooldownScale *= 1 - cdr;
-            self.skillLocator.utilityBonusStockSkill.cooldownScale *= 1 - cdr;
-            self.skillLocator.specialBonusStockSkill.cooldownScale *= 1 - cdr;
+            if (self.skillLocator)
+            {
+                if (self.skillLocator.primaryBonusStockSkill)
+                {
+                    self.skillLocator.primaryBonusStockSkill.cooldownScale *= 1 - cdr;
+                }
+                if (self.skillLocator.secondaryBonusStockSkill)
+                {
+                    self.skillLocator.secondaryBonusStockSkill.cooldownScale *= 1 - cdr;
+                }
+                if (self.skillLocator.utilityBonusStockSkill)
+                {
+                    self.skillLocator.utilityBonusStockSkill.cooldownScale *= 1 - cdr;
+                }
+                if (self.skillLocator.specialBonusStockSkill)
+                {
+                    self.skillLocator.specialBonusStockSkill.cooldownScale *= 1 - cdr;
+                }
+            }
         }
     }
 
@@ -105,8 +121,8 @@ public class Thunderbolt : Item<Thunderbolt>
 
     private void CreateConfig(ConfigFile config)
     {
-        ThunderboltASInit = config.ActiveBind("Item: " + ItemName, "Multiplicative attack speed with one " + ItemName, 0.25f, "How much should attack speed be increased multiplicatively with one Thunderbolt? (0.25 = 25%, meaning 1.25x attack speed.)");
-        ThunderboltASStack = config.ActiveBind("Item: " + ItemName, "Multiplicative attack speed per stack after one " + ItemName, 0.25f, "How much should attack speed be increased multiplicatively per stack of Thunderbolt after one? (0.25 = 25%, meaning 1.25x attack speed.)");
+        ThunderboltASInit = config.ActiveBind("Item: " + ItemName, "Multiplicative attack speed with one " + ItemName, 0.25f, "How much should attack speed be increased multiplicatively with one " + ItemName + "? (0.25 = 25%, meaning 1.25x attack speed.)");
+        ThunderboltASStack = config.ActiveBind("Item: " + ItemName, "Multiplicative attack speed per stack after one " + ItemName, 0.25f, "How much should attack speed be increased multiplicatively per stack of " + ItemName + " after one? (0.25 = 25%, meaning 1.25x attack speed.)");
         ThunderboltASToMS = config.ActiveBind("Item: " + ItemName, "Movement speed translation rate", 0.75f, "What % of attack speed increase % should movement speed be increased by? (0.75 = 75%)");
         ThunderboltCDMultiplier = config.ActiveBind("Item: " + ItemName, "Cooldown reduction translation rate", 1f, "What % of attack speed increase % should cooldowns be reduced by? This has a hyperbolic calculation method, and by default cooldowns are reduced by 12.5% at +25% attack speed (for reference). Multiply cooldown reduction by this config value.");
         ThunderboltASToProjectileSpeed = config.ActiveBind("Item: " + ItemName, "Projectile speed translation rate", 1f, "What % of attack speed increase % should untargeted projectile speed be increased by? (1 = 100%)");

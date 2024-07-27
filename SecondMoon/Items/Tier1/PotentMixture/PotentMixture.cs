@@ -89,7 +89,7 @@ public class PotentMixture : Item<PotentMixture>
 
     private void CreateConfig(ConfigFile config)
     {
-        PotentMixtureExtensionInit = config.ActiveBind("Item: " + ItemName, "DOT timer extension with one " + ItemName, 0.2f, "How much should damage over time effect timers be extended by with one Potent Mixture? Collapse's damage will be increased by this value instead. (0.2 = 20%)");
-        PotentMixtureExtensionStack = config.ActiveBind("Item: " + ItemName, "DOT timer extension per stack after one " + ItemName, 0.2f, "How much should damage over time effect timers be extended by per stack of Potent Mixture after one? Collapse's damage will be increased by this value instead. (0.2 = 20%)");
+        PotentMixtureExtensionInit = config.ActiveBind("Item: " + ItemName, "DOT timer extension with one " + ItemName, 0.2f, "How much should damage over time effect timers be extended by with one " + ItemName + "? Collapse's damage will be increased by this value instead. (0.2 = 20%)");
+        PotentMixtureExtensionStack = config.ActiveBind("Item: " + ItemName, "DOT timer extension per stack after one " + ItemName, 0.2f, "How much should damage over time effect timers be extended by per stack of " + ItemName + " after one? Collapse's damage will be increased by this value instead. (0.2 = 20%)");
     }
 }

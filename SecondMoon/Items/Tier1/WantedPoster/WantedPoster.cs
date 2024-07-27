@@ -104,10 +104,10 @@ public class WantedPoster : Item<WantedPoster>
 
     private void CreateConfig(ConfigFile config)
     {
-        WantedPosterBossDamageInit = config.ActiveBind("Item: " + ItemName, "Boss damage with one " + ItemName, 0.1f, "How much should boss damage be increased by with one Wanted Poster? (0.1 = 10%)");
-        WantedPosterBossDamageStack = config.ActiveBind("Item: " + ItemName, "Boss damage per stack after one " + ItemName, 0.1f, "How much should boss damage be increased by per stack of Wanted Poster after one? (0.1 = 10%)");
+        WantedPosterBossDamageInit = config.ActiveBind("Item: " + ItemName, "Boss damage with one " + ItemName, 0.1f, "How much should boss damage be increased by with one " + ItemName + "? (0.1 = 10%)");
+        WantedPosterBossDamageStack = config.ActiveBind("Item: " + ItemName, "Boss damage per stack after one " + ItemName, 0.1f, "How much should boss damage be increased by per stack of " + ItemName + " after one? (0.1 = 10%)");
 
-        WantedPosterBossGoldInit = config.ActiveBind("Item: " + ItemName, "Boss gold with one " + ItemName, 0.1f, "How much should boss gold reward on death be increased by with one Wanted Poster? (0.1 = 10%)");
-        WantedPosterBossGoldStack = config.ActiveBind("Item: " + ItemName, "Boss gold per stack after one " + ItemName, 0.1f, "How much should boss gold reward on death be increased by per stack of Wanted Poster after one? (0.1 = 10%)");
+        WantedPosterBossGoldInit = config.ActiveBind("Item: " + ItemName, "Boss gold with one " + ItemName, 0.1f, "How much should boss gold reward on death be increased by with one " + ItemName + "? (0.1 = 10%)");
+        WantedPosterBossGoldStack = config.ActiveBind("Item: " + ItemName, "Boss gold per stack after one " + ItemName, 0.1f, "How much should boss gold reward on death be increased by per stack of " + ItemName + " after one? (0.1 = 10%)");
     }
 }

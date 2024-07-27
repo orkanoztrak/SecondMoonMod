@@ -18,11 +18,6 @@ public class Corrosion : DOT<Corrosion>
 
     public override string AssociatedBuffName => "CorrosionDebuff";
 
-    public override void Hooks()
-    {
-        
-    }
-
     public override void Init()
     {
         SetAssociatedBuff();

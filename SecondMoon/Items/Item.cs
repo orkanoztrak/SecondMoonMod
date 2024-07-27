@@ -30,7 +30,6 @@ public abstract class Item<T> : Item where T : Item<T>
 
 public abstract class Item
 {
-    public Item() { }
     public abstract string ItemName { get; }
     public abstract string ItemLangTokenName { get; }
     public abstract string ItemPickupDesc { get; }
@@ -48,6 +47,10 @@ public abstract class Item
     public bool EnableCheck;
 
     public virtual ItemDef ItemToCorrupt { get; } = null;
+
+    public virtual List<ItemDef> ItemsToCorrupt { get; } = null;
+
+    public virtual ItemTierDef ItemTierToCorrupt { get; } = null;
 
     public virtual UnlockableDef ItemUnlockableDef { get; set; } = null;
 

@@ -1,6 +1,7 @@
 ﻿using BepInEx.Configuration;
 using R2API;
 using RoR2;
+using SecondMoon.Items.ItemTiers.TierPrototype;
 using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ public class SoulPoweredMantle : Item<SoulPoweredMantle>
 
     public override string ItemLore => "Test";
 
-    public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
+    public override ItemTierDef ItemTierDef => TierPrototype.instance.ItemTierDef;
 
     public override ItemTag[] Category => [ItemTag.Utility];
 
@@ -67,9 +68,10 @@ public class SoulPoweredMantle : Item<SoulPoweredMantle>
         }
     }
 
+    [Server]
     private void AddItemBehavior(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
     {
-        if (NetworkServer.active && self.master)
+        if (self.master)
         {
             self.AddItemBehavior<SoulPoweredMantleAddLuckBehavior>(self.inventory.GetItemCount(instance.ItemDef));
         }
@@ -90,11 +92,11 @@ public class SoulPoweredMantle : Item<SoulPoweredMantle>
 
     private void CreateConfig(ConfigFile config)
     {
-        SoulPoweredMantleLuckInit = config.ActiveBind("Item: " + ItemName, "Luck with one " + ItemName, 2f, "How much should luck be increased by with one Soul-Powered Mantle? Luck modifiers in the base game increase/decrease by 1.");
-        SoulPoweredMantleLuckStack = config.ActiveBind("Item: " + ItemName, "Luck per stack after one " + ItemName, 2f, "How much should luck be increased by per stack of Soul-Powered Mantle after one? Luck modifiers in the base game increase/decrease by 1.");
-        SoulPoweredMantleMaxInvis = config.ActiveBind("Item: " + ItemName, "Maximum invisibility duration granted by " + ItemName, 7f, "The invisibility granted by Soul-Powered Mantle is no longer than this many seconds.");
+        SoulPoweredMantleLuckInit = config.ActiveBind("Item: " + ItemName, "Luck with one " + ItemName, 2f, "How much should luck be increased by with one " + ItemName + "? Luck modifiers in the base game increase/decrease by 1.");
+        SoulPoweredMantleLuckStack = config.ActiveBind("Item: " + ItemName, "Luck per stack after one " + ItemName, 2f, "How much should luck be increased by per stack of " + ItemName + " after one? Luck modifiers in the base game increase/decrease by 1.");
+        SoulPoweredMantleMaxInvis = config.ActiveBind("Item: " + ItemName, "Maximum invisibility duration granted by " + ItemName, 7f, "The invisibility granted by " + ItemName + " is no longer than this many seconds.");
         SoulPoweredMantleInvisPercent = config.ActiveBind("Item: " + ItemName, "Cooldown remaining to invisibility duration", 0.5f, "The cooldown remaining upon using the last stock on a skill will be multiplied by this, and that many seconds of invisibility will be granted.");
-        SoulPoweredMantleActivationLowerThreshold = config.ActiveBind("Item: " + ItemName, "Minimum cooldown required for " + ItemName + " to activate", 4f, "Skills wilth cooldown below this many seconds will not activate Soul-Powered Mantle.");
+        SoulPoweredMantleActivationLowerThreshold = config.ActiveBind("Item: " + ItemName, "Minimum cooldown required for " + ItemName + " to activate", 4f, "Skills wilth cooldown below this many seconds will not activate " + ItemName + ".");
     }
 
     public class SoulPoweredMantleAddLuckBehavior : CharacterBody.ItemBehavior
@@ -108,37 +110,46 @@ public class SoulPoweredMantle : Item<SoulPoweredMantle>
 
         private void OnEnable()
         {
-            On.RoR2.CharacterMaster.OnInventoryChanged += UpdateCachedLuck;
-            cachedLuck = body.master.luck;
+            if (body)
+            {
+                On.RoR2.CharacterMaster.OnInventoryChanged += UpdateCachedLuck;
+                cachedLuck = body.master.luck;
+            }
         }
 
         private void UpdateCachedLuck(On.RoR2.CharacterMaster.orig_OnInventoryChanged orig, CharacterMaster self)
         {
             orig(self);
-            if (self.Equals(body.master))
+            if (body)
             {
-                cachedLuck = self.luck;
+                if (self.Equals(body.master))
+                {
+                    cachedLuck = self.luck;
+                }
             }
         }
 
         private void FixedUpdate()
         {
-            var modelLocator = body.gameObject.GetComponent<ModelLocator>();
-            if (modelLocator)
+            if (body)
             {
-                var modelTransform = modelLocator.modelTransform;
-                if (modelTransform)
+                var modelLocator = body.gameObject.GetComponent<ModelLocator>();
+                if (modelLocator)
                 {
-                    var model = modelTransform.gameObject.GetComponent<CharacterModel>();
-                    if (model)
+                    var modelTransform = modelLocator.modelTransform;
+                    if (modelTransform)
                     {
-                        if (model.visibility == VisibilityLevel.Cloaked || model.visibility == VisibilityLevel.Revealed)
+                        var model = modelTransform.gameObject.GetComponent<CharacterModel>();
+                        if (model)
                         {
-                            body.master.luck = cachedLuck + SoulPoweredMantleLuckInit + (stack - 1) * SoulPoweredMantleLuckStack;
-                        }
-                        else
-                        {
-                            body.master.luck = cachedLuck;
+                            if (model.visibility == VisibilityLevel.Cloaked || model.visibility == VisibilityLevel.Revealed)
+                            {
+                                body.master.luck = cachedLuck + SoulPoweredMantleLuckInit + (stack - 1) * SoulPoweredMantleLuckStack;
+                            }
+                            else
+                            {
+                                body.master.luck = cachedLuck;
+                            }
                         }
                     }
                 }
@@ -147,7 +158,7 @@ public class SoulPoweredMantle : Item<SoulPoweredMantle>
 
         private void OnDisable()
         {
-            if (enabled)
+            if (body)
             {
                 body.master.luck = cachedLuck;
                 On.RoR2.CharacterMaster.OnInventoryChanged -= UpdateCachedLuck;

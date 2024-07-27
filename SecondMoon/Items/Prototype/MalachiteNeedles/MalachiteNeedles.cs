@@ -13,6 +13,8 @@ using SecondMoon.Utils;
 using BepInEx.Configuration;
 using SecondMoon.Items.Tier2.HexDagger;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
+using SecondMoon.Items.ItemTiers.TierPrototype;
 
 namespace SecondMoon.Items.Prototype.MalachiteNeedles;
 
@@ -33,7 +35,7 @@ public class MalachiteNeedles : Item<MalachiteNeedles>
 
     public override string ItemLore => "Test";
 
-    public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
+    public override ItemTierDef ItemTierDef => TierPrototype.instance.ItemTierDef;
 
     public override ItemTag[] Category => [ItemTag.Damage];
     public override ItemDisplayRuleDict CreateItemDisplayRules()
@@ -77,8 +79,7 @@ public class MalachiteNeedles : Item<MalachiteNeedles>
 
     private void MalachiteNeedlesApplyTotalCorrosion(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, RoR2.GlobalEventManager self, RoR2.DamageInfo damageInfo, GameObject victim)
     {
-        orig(self, damageInfo, victim);
-        if (damageInfo.attacker && damageInfo.procCoefficient > 0f)
+        if (damageInfo.attacker && damageInfo.procCoefficient > 0f && NetworkServer.active && !damageInfo.rejected)
         {
             var attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
             if (attackerBody)
@@ -96,6 +97,7 @@ public class MalachiteNeedles : Item<MalachiteNeedles>
                 }
             }
         }
+        orig(self, damageInfo, victim);
     }
 
     public override void Init(ConfigFile config)
@@ -112,8 +114,8 @@ public class MalachiteNeedles : Item<MalachiteNeedles>
 
     private void CreateConfig(ConfigFile config)
     {
-        MalachiteNeedlesCorrosionDmgInit = config.ActiveBind("Item: " + ItemName, "Corrosion multiplier with one " + ItemName, 0.35f, "What % of TOTAL damage should Corrosion do with one Malachite Needles? (0.35 = 35%)");
-        MalachiteNeedlesCorrosionDmgStack = config.ActiveBind("Item: " + ItemName, "Corrosion multiplier per stack after one " + ItemName, 0.35f, "What % of TOTAL damage should be added to Corrosion per stack of Malachite Needles after one? (0.35 = 35%)");
+        MalachiteNeedlesCorrosionDmgInit = config.ActiveBind("Item: " + ItemName, "Corrosion multiplier with one " + ItemName, 0.35f, "What % of TOTAL damage should Corrosion do with one " + ItemName + "? (0.35 = 35%)");
+        MalachiteNeedlesCorrosionDmgStack = config.ActiveBind("Item: " + ItemName, "Corrosion multiplier per stack after one " + ItemName, 0.35f, "What % of TOTAL damage should be added to Corrosion per stack of " + ItemName + " after one? (0.35 = 35%)");
         MalachiteNeedlesDOTBurstConversion = config.ActiveBind("Item: " + ItemName, "DOT burst damage multiplier", 1f, "What % of a damage over time effect's total damage should be dealt as additional damage when it is applied? (1 = 100%)");
     }
 }

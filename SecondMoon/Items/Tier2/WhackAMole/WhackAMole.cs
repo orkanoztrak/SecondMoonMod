@@ -113,7 +113,7 @@ internal class WhackAMole : Item<WhackAMole>
         WhackAMoleDamage = config.ActiveBind("Item: " + ItemName, "Damage of the proc", 1f, "What % of TOTAL damage should the proc do? (1 = 100%)");
         WhackAMoleRadius = config.ActiveBind("Item: " + ItemName, "Radius of the proc", 6f, "The explosion proc will have a radius of this many meters.");
 
-        WhackAMoleProcChanceInit = config.ActiveBind("Item: " + ItemName, "Proc chance with one " + ItemName, 10f, "What % of non-critical hits should proc with one Whack-A-Mole Hammer?");
-        WhackAMoleProcChanceStack = config.ActiveBind("Item: " + ItemName, "Proc chance per stack after one " + ItemName, 10f, "What % of non-critical hits should proc per stack of Whack-A-Mole Hammer after one ?");
+        WhackAMoleProcChanceInit = config.ActiveBind("Item: " + ItemName, "Proc chance with one " + ItemName, 10f, "What % of non-critical hits should proc with one " + ItemName + "?");
+        WhackAMoleProcChanceStack = config.ActiveBind("Item: " + ItemName, "Proc chance per stack after one " + ItemName, 10f, "What % of non-critical hits should proc per stack of " + ItemName + " after one ?");
     }
 }

@@ -49,7 +49,7 @@ public class FlailOfMassBuildingMomentum : FlailOfMassBase
                 if (decayTimer >= decayRate)
                 {
                     decayTimer = 0f;
-                    if (body.HasBuff(Momentum.instance.BuffDef.buffIndex))
+                    if (body.HasBuff(Momentum.instance.BuffDef))
                     {
                         body.SetBuffCount(Momentum.instance.BuffDef.buffIndex, body.GetBuffCount(Momentum.instance.BuffDef.buffIndex) - 1);
                     }

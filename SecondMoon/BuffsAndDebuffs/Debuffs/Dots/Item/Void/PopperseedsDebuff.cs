@@ -14,12 +14,6 @@ public class PopperseedsDebuff : Buff<PopperseedsDebuff>
 
     public override Color BuffColor => new Color32(255, 0, 100, 255);
 
-    public override bool IsDebuff => true;
-
-    public override void Hooks()
-    {
-    }
-
     public override void Init()
     {
         CreateBuff();
