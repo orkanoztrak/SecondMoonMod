@@ -102,21 +102,20 @@ public class Hydra : Item<Hydra>
         orig(self, damageInfo, victim);
     }
 
-    private void HydraSetDamage(On.RoR2.HealthComponent.orig_TakeDamage orig, RoR2.HealthComponent self, RoR2.DamageInfo damageInfo)
+    private void HydraSetDamage(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
     {
-        var newDamageInfo = damageInfo;
-        if (newDamageInfo.attacker)
+        if (damageInfo.attacker)
         {
-            if (newDamageInfo.attacker.GetComponent<CharacterBody>())
+            if (damageInfo.attacker.GetComponent<CharacterBody>())
             {
-                var stackCount = GetCount(newDamageInfo.attacker.GetComponent<CharacterBody>());
-                if (stackCount > 0 && newDamageInfo.procCoefficient > 0)
+                var stackCount = GetCount(damageInfo.attacker.GetComponent<CharacterBody>());
+                if (stackCount > 0 && damageInfo.procCoefficient > 0)
                 {
-                    newDamageInfo.damage *= HydraBaseDamageInit + ((stackCount - 1) * HydraBaseDamageStack);
+                    damageInfo.damage *= HydraBaseDamageInit + ((stackCount - 1) * HydraBaseDamageStack);
                 }
             }
         }
-        orig(self, newDamageInfo);
+        orig(self, damageInfo);
     }
 
     public override void Init(ConfigFile config)

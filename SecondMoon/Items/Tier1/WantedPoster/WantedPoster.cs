@@ -31,7 +31,7 @@ public class WantedPoster : Item<WantedPoster>
     public override string ItemLore => "Test";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier1Def.asset").WaitForCompletion();
-    public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Utility, ItemTag.BrotherBlacklist];
+    public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Utility, ItemTag.AIBlacklist, ItemTag.OnKillEffect];
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
         displayRules = new ItemDisplayRuleDict(null);
@@ -54,7 +54,8 @@ public class WantedPoster : Item<WantedPoster>
             {
                 if (damageReport.victimBody && damageReport.victimBody.isBoss)
                 {
-                    self.goldReward *= (uint)(1 + (WantedPosterBossGoldInit + ((stackCount - 1) * WantedPosterBossGoldStack)));
+                    var gold = self.goldReward * (1 + (WantedPosterBossGoldInit + ((stackCount - 1) * WantedPosterBossGoldStack)));
+                    self.goldReward = (uint)gold;
                 }
             }
         }

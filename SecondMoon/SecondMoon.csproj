@@ -106,11 +106,7 @@
     <Folder Include="Interactables\Chests\" />
     <Folder Include="Interactables\Shrines\" />
     <Folder Include="Items\Boss\" />
-    <Folder Include="Items\Lunar\VengefulHammer\" />
-    <Folder Include="Items\Tier2\PocketLint\" />
-    <Folder Include="Items\Tier3\Boulderball\" />
     <Folder Include="Items\Void\Lightbulb\" />
-    <Folder Include="Items\Void\MirrorVeil\" />
     <Folder Include="Monsters\" />
     <Folder Include="Stages\Lunar\" />
     <Folder Include="Stages\Badlands\" />

@@ -142,5 +142,17 @@ public class BloodInfusedCore : Item<BloodInfusedCore>
             }
             orig(target, amount, isCrit);
         }
+
+        private void OnDisable()
+        {
+            if (body && enabled)
+            {
+                On.RoR2.HealthComponent.SendHeal -= UpdateBloodFrenzyPool;
+                if (body.HasBuff(BloodFrenzy.instance.BuffDef.buffIndex))
+                {
+                    body.RemoveBuff(BloodFrenzy.instance.BuffDef.buffIndex);
+                }
+            }
+        }
     }
 }
