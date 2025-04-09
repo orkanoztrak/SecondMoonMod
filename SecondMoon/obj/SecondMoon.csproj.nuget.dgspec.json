@@ -1,34 +1,35 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\HP\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.csproj": {}
+    "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.csproj": {}
   },
   "projects": {
-    "C:\\Users\\HP\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.csproj": {
+    "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\HP\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.csproj",
+        "projectUniqueName": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.csproj",
         "projectName": "SecondMoon",
-        "projectPath": "C:\\Users\\HP\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.csproj",
-        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\HP\\source\\repos\\SecondMoonMod\\SecondMoon\\obj\\",
+        "projectPath": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\SecondMoon.csproj",
+        "packagesPath": "C:\\Users\\Orkan\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\SecondMoon\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\HP\\source\\repos\\SecondMoonMod\\NuGet.Config",
-          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Orkan\\source\\repos\\SecondMoonMod\\NuGet.Config",
+          "C:\\Users\\Orkan\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "netstandard2.0"
+          "netstandard2.1"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {},
           "https://nuget.bepinex.dev/v3/index.json": {}
         },
         "frameworks": {
-          "netstandard2.0": {
-            "targetAlias": "netstandard2.0",
+          "netstandard2.1": {
+            "targetAlias": "netstandard2.1",
             "projectReferences": {}
           }
         },
@@ -44,8 +45,8 @@
         }
       },
       "frameworks": {
-        "netstandard2.0": {
-          "targetAlias": "netstandard2.0",
+        "netstandard2.1": {
+          "targetAlias": "netstandard2.1",
           "dependencies": {
             "BepInEx.Analyzers": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
@@ -55,48 +56,50 @@
             },
             "BepInEx.Core": {
               "target": "Package",
-              "version": "[5.4.21, )"
+              "version": "[5.*, )"
             },
             "MMHOOK.RoR2": {
               "target": "Package",
-              "version": "[2024.5.24, )",
+              "version": "[2024.12.10, )",
               "noWarn": [
                 "NU1701"
               ]
             },
-            "NETStandard.Library": {
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[2.0.3, )",
-              "autoReferenced": true
-            },
             "R2API.Colors": {
               "target": "Package",
-              "version": "[1.0.1, )"
+              "version": "[1.0.3, )"
             },
             "R2API.Core": {
               "target": "Package",
-              "version": "[5.1.0, )"
+              "version": "[5.1.5, )"
             },
             "R2API.DamageType": {
               "target": "Package",
-              "version": "[1.1.0, )"
+              "version": "[1.1.7, )"
+            },
+            "R2API.Director": {
+              "target": "Package",
+              "version": "[2.3.2, )"
             },
             "R2API.Dot": {
               "target": "Package",
-              "version": "[1.0.2, )"
+              "version": "[1.0.3, )"
             },
             "R2API.Elites": {
               "target": "Package",
-              "version": "[1.0.3, )"
+              "version": "[1.0.7, )"
             },
             "R2API.Items": {
               "target": "Package",
-              "version": "[1.0.3, )"
+              "version": "[1.0.4, )"
             },
             "R2API.Language": {
               "target": "Package",
               "version": "[1.0.1, )"
+            },
+            "R2API.Networking": {
+              "target": "Package",
+              "version": "[1.0.3, )"
             },
             "R2API.Orb": {
               "target": "Package",
@@ -104,11 +107,11 @@
             },
             "R2API.Prefab": {
               "target": "Package",
-              "version": "[1.0.3, )"
+              "version": "[1.0.4, )"
             },
             "R2API.RecalculateStats": {
               "target": "Package",
-              "version": "[1.3.0, )"
+              "version": "[1.5.0, )"
             },
             "R2API.Unlockable": {
               "target": "Package",
@@ -116,11 +119,7 @@
             },
             "RiskOfRain2.GameLibs": {
               "target": "Package",
-              "version": "[1.2.4-r.0, )"
-            },
-            "UnityEngine.Modules": {
-              "target": "Package",
-              "version": "[2019.4.26, )"
+              "version": "[1.3.6-r.0, )"
             }
           },
           "imports": [
@@ -134,7 +133,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202\\RuntimeIdentifierGraph.json"
+          "frameworkReferences": {
+            "NETStandard.Library": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400\\RuntimeIdentifierGraph.json"
         }
       }
     }

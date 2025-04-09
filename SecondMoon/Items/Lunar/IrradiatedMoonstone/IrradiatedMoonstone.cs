@@ -46,7 +46,7 @@ public class IrradiatedMoonstone : Item<IrradiatedMoonstone>
 
     public override string ItemName => "Irradiated Moonstone";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_SHINYPEARL_LUNAR";
+    public override string ItemLangTokenName => "SHINYPEARL_LUNAR";
 
     public override string ItemPickupDesc => $"You are faster (in almost all aspects)... <color=#FF7F7F>BUT your enemies also benefit from this item.</color>\n";
 
@@ -61,7 +61,13 @@ public class IrradiatedMoonstone : Item<IrradiatedMoonstone>
         $"• Gain <style=cIsDamage>{IrradiatedMoonstoneProjectileSpeedInit * 100}% <style=cStack>(+{IrradiatedMoonstoneProjectileSpeedStack * 100}% per stack)</style> projectile speed</style> for projectiles without targets.\r\n" +
         $"• Gain <style=cIsUtility>{IrradiatedMoonstoneTeleporterChargeRateIncreaseInit * 100}% <style=cStack>(+{IrradiatedMoonstoneTeleporterChargeRateIncreaseStack * 100}% per stack)</style> teleporter charge rate</style>.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "Ah... I have just the idea for this one piece.\r\n\r\n" +
+        "You may not see it, but what I wield is Soul. Something that's in all of us. Something I know HE loves.\r\n\r\n" +
+        "Now, I will shape it with my emotion.\r\n\r\n" +
+        "I will shape it with the pain of being betrayed by the one you love the most.\r\n\r\n" +
+        "I will shape it with the fury of seeing what *I* made being misused by some other that knows no better.\r\n\r\n" +
+        "I will shape it with the HUMILIATION of being DISCARDED over FILTHY, LESSER VERMIN.\r\n\r\n" +
+        "I WILL SHAPE IT WITH MY BURNING DESIRE FOR VENGEANCE.";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/LunarTierDef.asset").WaitForCompletion();
 

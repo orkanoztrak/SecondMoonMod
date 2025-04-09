@@ -3,6 +3,8 @@ using MonoMod.Cil;
 using R2API;
 using RoR2;
 using SecondMoon.BuffsAndDebuffs.Buffs.Equipment;
+using SecondMoon.Equipment;
+using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,24 +15,26 @@ namespace SecondMoon.Equipment.EssenceChanneler;
 
 public class EssenceChanneler : Equipment<EssenceChanneler>
 {
-    public static float EssenceChannelerDuration = 6f;
+    public static ConfigOption<float> EssenceChannelerDuration;
 
-    public static float ChannelingBoost = 0.3f;
+    public static ConfigOption<float> ChannelingBoost;
 
     public static List<string> EssenceChannelerEliteNamesList = ["bdEliteFire", "bdEliteIce", "bdEliteLightning", "bdElitePoison", "bdEliteHaunted"];
     public static List<BuffDef> EssenceChannelerEliteList = new List<BuffDef>();
     public override string EquipmentName => "Essence Channeler";
 
-    public override string EquipmentLangTokenName => "SECONDMOONMOD_ESSENCE_CHANNELER_EQUIP";
+    public override string EquipmentLangTokenName => "ESSENCE_CHANNELER";
 
-    public override string EquipmentPickupDesc => $"Briefly increase all stats. Gain the powers of a random classic Elite type with each use.";
+    public override string EquipmentPickupDesc => $"Briefly gain an increase to all stats. Cycle between the powers of a random classic elite with each use.";
 
-    public override string EquipmentFullDescription => $"For <style=cIsUtility>{EssenceChannelerDuration}s</style>, increase <style=cIsUtility>ALL stats</style> by <style=cIsUtility>{ChannelingBoost * 100}%</style>." +
-        $"Gain a random classic Elite affix upon using this that changes with each use.";
+    public override string EquipmentFullDescription => $"For <style=cIsUtility>{EssenceChannelerDuration}s</style>, gain <style=cIsUtility>{ChannelingBoost * 100}%</style> to <style=cIsUtility>ALL stats</style>." +
+        $"Gain a random classic <style=cIsDamage>elite power</style> upon using this that changes with each use.";
 
-    public override string EquipmentLore => "Test";
-
-    public override float Cooldown => 45f;
+    public override string EquipmentLore => "The Bellwether is written as having seven sons and seven daughters, each representing a different force of nature. Rain, snow, storms, earthquakes, drought and more.\r\n\r\n" +
+        "Each enclave of Bellwether worshippers would mainly worship one child of the Bellwether aside from the Bellwether itself, giving the two equal space in their temples and rituals.\r\n\r\n" +
+        "Modern belief systems have more or less driven the old belief of the Bellwether into obsoletion, however it is possible to find enclaves that still partake in the worship of the Bellwether in lesser developed areas of the galaxy.\r\n\r\n" +
+        "These enclaves (some may even call them \"cults\") usually operate around a warlike subculture, with a \"blessed\" warrior at the centre. These warriors are given unnatural powers by something the enclaves call an \"essence channeler\", which they believe was sent by the Bellwether itself.\r\n\r\n" +
+        "These Warriors hold summits every five years to discuss secret topics, almost like a shadow organization. Nobody except the Warriors are allowed to enter these summits, with utmost secrecy paramount.";
 
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
@@ -43,30 +47,8 @@ public class EssenceChanneler : Equipment<EssenceChanneler>
         RoR2Application.onLoad += EssenceChannelerGetElites;
         On.RoR2.CharacterBody.OnEquipmentGained += AddController;
         On.RoR2.CharacterBody.OnEquipmentLost += RemoveController;
-        //IL.RoR2.CharacterModel.UpdateOverlays += SetEssenceChannelerOverlay;
     }
 
-    private void SetEssenceChannelerOverlay(ILContext il)
-    {
-        var cursor = new ILCursor(il);
-        cursor.GotoNext(x => x.MatchStloc(1));
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
-        cursor.EmitDelegate<Action<CharacterModel>>((model) =>
-        {
-            if (model.body)
-            {
-                var controller = model.body.gameObject.GetComponent<EssenceChannelerEliteControllerComponent>();
-                if (controller)
-                {
-                    if (controller.currentAffix)
-                    {
-                        model.myEliteIndex = controller.currentAffix.eliteDef.eliteIndex;
-                        model.shaderEliteRampIndex = controller.currentAffix.eliteDef.shaderEliteRampIndex;
-                    }
-                }
-            }
-        });
-    }
     private void RemoveController(On.RoR2.CharacterBody.orig_OnEquipmentLost orig, CharacterBody self, EquipmentDef equipmentDef)
     {
         if (equipmentDef == EquipmentDef && self)
@@ -105,11 +87,23 @@ public class EssenceChanneler : Equipment<EssenceChanneler>
         }
     }
 
-    public override void Init()
+    public override void Init(ConfigFile config)
     {
-        CreateLang();
-        CreateEquipment();
-        Hooks();
+        base.Init(config);
+        if (IsEnabled)
+        {
+            CreateConfig(config);
+            CreateLang();
+            CreateEquipment();
+            Hooks();
+        }
+    }
+
+    private void CreateConfig(ConfigFile config)
+    {
+        Cooldown = config.ActiveBind("Equipment: " + EquipmentName, "Cooldown", 45f, "How many seconds will this equipment's cooldown be?");
+        EssenceChannelerDuration = config.ActiveBind("Equipment: " + EquipmentName, Channeling.instance.Name + " buff duration", 6f, "How many seconds should " + Channeling.instance.Name + " last?");
+        ChannelingBoost = config.ActiveBind("Equipment: " + EquipmentName, Channeling.instance.Name + " boost", 0.3f, "By what % should ALL stats be increased with " + Channeling.instance.Name + "? (0.3 = 30%)");
     }
 
     protected override bool ActivateEquipment(EquipmentSlot slot)
@@ -117,18 +111,15 @@ public class EssenceChanneler : Equipment<EssenceChanneler>
         if (slot.characterBody)
         {
             var obj = slot.characterBody.gameObject;
-            if (obj)
+            var controller = obj.GetComponent<EssenceChannelerEliteControllerComponent>();
+            if (controller)
             {
-                var controller = obj.GetComponent<EssenceChannelerEliteControllerComponent>();
-                if (controller)
-                {
-                    slot.characterBody.RemoveBuff(controller.currentAffix);
-                    System.Random rand = new System.Random();
-                    controller.currentAffix = EssenceChannelerEliteList[rand.Next(EssenceChannelerEliteList.Count)];
-                    slot.characterBody.AddBuff(controller.currentAffix);
-                    slot.characterBody.AddTimedBuffAuthority(Channeling.instance.BuffDef.buffIndex, EssenceChannelerDuration);
-                    return true;
-                }
+                slot.characterBody.RemoveBuff(controller.currentAffix);
+                System.Random rand = new System.Random();
+                controller.currentAffix = EssenceChannelerEliteList[rand.Next(EssenceChannelerEliteList.Count)];
+                slot.characterBody.AddBuff(controller.currentAffix);
+                slot.characterBody.AddTimedBuffAuthority(Channeling.instance.BuffDef.buffIndex, EssenceChannelerDuration);
+                return true;
             }
         }
         return false;

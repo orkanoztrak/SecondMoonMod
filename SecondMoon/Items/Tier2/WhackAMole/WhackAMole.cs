@@ -20,7 +20,7 @@ internal class WhackAMole : Item<WhackAMole>
 
     public override string ItemName => "Whack-A-Mole Hammer";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_WHACKAMOLE";
+    public override string ItemLangTokenName => "WHACKAMOLE";
 
     public override string ItemPickupDesc => "Your non-critical hits have a chance to explode!";
 
@@ -28,7 +28,12 @@ internal class WhackAMole : Item<WhackAMole>
         $"to <style=cIsDamage>explode</style> in a <style=cIsDamage>{WhackAMoleRadius}m</style> radius for a bonus <style=cIsDamage>{WhackAMoleDamage * 100}%</style> TOTAL damage to nearby enemies. " +
         $"Chance increases with <style=cIsDamage>critical chance</style> to try to ensure the overall odds stay the same.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "\"Jeremy.\"\r\n\r\n" +
+        "\"Yeah?\"\r\n\r\n" +
+        "\"Don't you \"yeah\" me. You know what I'm talking about.\"\r\n\r\n" +
+        "\"I see no problems with it. I don't get why you're so upset about this.\"\r\n\r\n" +
+        "\"First of all, it's an ancient artifact, you can't just give it to some rando. Second of all, I don't have a clue how you actually got someone to get on board with this. Third of all, I have even less of a clue how you got the idea of \"what if it went\", and I quote, \"BOOMNK!\". Fourth of all-\"\r\n\r\n" +
+        "\"Don't you at least wonder how we got it working?\"";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier2Def.asset").WaitForCompletion();
 
@@ -42,10 +47,10 @@ internal class WhackAMole : Item<WhackAMole>
 
     public override void Hooks()
     {
-        On.RoR2.GlobalEventManager.OnHitEnemy += WhackAMoleExplode;
+        On.RoR2.GlobalEventManager.ProcessHitEnemy += WhackAMoleExplode;
     }
 
-    private void WhackAMoleExplode(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+    private void WhackAMoleExplode(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
         orig(self, damageInfo, victim);
         if (!damageInfo.crit && damageInfo.procCoefficient > 0)
@@ -86,7 +91,7 @@ internal class WhackAMole : Item<WhackAMole>
                                     procCoefficient = 0f,
                                     damageColorIndex = DamageColorIndex.Item,
                                     falloffModel = BlastAttack.FalloffModel.None,
-                                    damageType = damageInfo.damageType
+                                    damageType = DamageType.Generic
                                 }.Fire();
                             }
                         }

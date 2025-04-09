@@ -17,6 +17,8 @@ internal class FlawedDesign : Buff<FlawedDesign>
 
     public override bool IsDebuff => true;
 
+    public override bool IgnoreGrowthNectar => true;
+
     public override void Init()
     {
         CreateBuff();

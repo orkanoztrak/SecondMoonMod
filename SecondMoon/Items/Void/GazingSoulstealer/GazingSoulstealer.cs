@@ -21,7 +21,7 @@ public class GazingSoulstealer : Item<GazingSoulstealer>
     public static List<EquipmentIndex> GazingSoulstealerBlacklistedEquipment = new List<EquipmentIndex>();
     public override string ItemName => "Gazing Soulstealer";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_TALISMANVOID";
+    public override string ItemLangTokenName => "TALISMANVOID";
 
     public override string ItemPickupDesc => "Activating your Equipment resets skill cooldowns. <style=cIsVoid>Corrupts all Soulbound Catalysts</style>.";
 
@@ -65,6 +65,7 @@ public class GazingSoulstealer : Item<GazingSoulstealer>
 
     private void GazingSoulstealerReduceEquipmentCooldown(ILContext il)
     {
+        var numIndex = 3;
         var cursor = new ILCursor(il);
         cursor.GotoNext(x => x.MatchRet());
 
@@ -78,8 +79,8 @@ public class GazingSoulstealer : Item<GazingSoulstealer>
             }
             return total;
         });
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Stloc_3);
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc_3);
+        cursor.Emit(Mono.Cecil.Cil.OpCodes.Stloc, numIndex);
+        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc, numIndex);
     }
 
     private void GazingSoulstealerResetCooldowns(EquipmentSlot slot, EquipmentIndex ındex)
@@ -90,10 +91,14 @@ public class GazingSoulstealer : Item<GazingSoulstealer>
             {
                 if (slot.characterBody)
                 {
-                    slot.characterBody.skillLocator.primary.rechargeStopwatch += slot.characterBody.skillLocator.primary.cooldownRemaining;
-                    slot.characterBody.skillLocator.secondary.rechargeStopwatch += slot.characterBody.skillLocator.secondary.cooldownRemaining;
-                    slot.characterBody.skillLocator.utility.rechargeStopwatch += slot.characterBody.skillLocator.utility.cooldownRemaining;
-                    slot.characterBody.skillLocator.special.rechargeStopwatch += slot.characterBody.skillLocator.special.cooldownRemaining;
+                    var stackCount = GetCount(slot.characterBody);
+                    if (stackCount > 0)
+                    {
+                        slot.characterBody.skillLocator.primary.rechargeStopwatch += slot.characterBody.skillLocator.primary.cooldownRemaining;
+                        slot.characterBody.skillLocator.secondary.rechargeStopwatch += slot.characterBody.skillLocator.secondary.cooldownRemaining;
+                        slot.characterBody.skillLocator.utility.rechargeStopwatch += slot.characterBody.skillLocator.utility.cooldownRemaining;
+                        slot.characterBody.skillLocator.special.rechargeStopwatch += slot.characterBody.skillLocator.special.cooldownRemaining;
+                    }
                 }
             }
         }

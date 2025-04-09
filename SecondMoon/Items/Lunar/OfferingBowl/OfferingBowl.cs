@@ -30,7 +30,7 @@ public class OfferingBowl : Item<OfferingBowl>
 
     public override string ItemName => "Offering Bowl";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_OFFERING_BOWL";
+    public override string ItemLangTokenName => "OFFERING_BOWL";
 
     public override string ItemPickupDesc => $"Break this at the end of the Teleporter event to get a free legendary and boss item... <color=#FF7F7F>BUT take more and deal less damage while you carry it.</color>\n";
 
@@ -39,7 +39,9 @@ public class OfferingBowl : Item<OfferingBowl>
         $"<color=#FF7F7F>and damage received to <style=cIsDamage>{OfferingBowlIncomingDamageIncreaseInit}×</style> <style=cStack>({OfferingBowlIncomingDamageIncreaseStack}× per stack)</style>.</color> " +
         $"Cannot appear outside the Bazaar Between Time.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "-The blood holds power, you see. Power to control. Once I pour even a drop of your blood into this bowl, you are Hers. She is your master, and you are an instrument of her will. I will ask one last time; are you sure about this?\r\n\r\n" +
+        "-I am. Let her take me for all I am and all I could be.\r\n\r\n" +
+        "-Very well. Hold out your arm.";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/LunarTierDef.asset").WaitForCompletion();
 
@@ -54,33 +56,68 @@ public class OfferingBowl : Item<OfferingBowl>
     public override void Hooks()
     {
         IL.RoR2.CharacterBody.RecalculateStats += OfferingBowlSetDamageDealt;
-        On.RoR2.HealthComponent.TakeDamage += OfferingBowlSetDamageTaken;
+        IL.RoR2.HealthComponent.TakeDamageProcess += OfferingBowlSetDamageTaken;
         TeleporterInteraction.onTeleporterChargedGlobal += OfferingBowlRewards;
     }
 
     private void OfferingBowlSetDamageDealt(ILContext il)
     {
         var cursor = new ILCursor(il);
-        cursor.GotoNext(x => x.MatchLdarg(0),
-                        x => x.MatchLdloc(78),
-                        x => x.MatchCall<CharacterBody>("set_damage"));
-
-        cursor.GotoNext(MoveType.After, x => x.MatchCall<CharacterBody>("set_damage"));
-
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
-        cursor.EmitDelegate<Action<CharacterBody>>((body) =>
+        if (cursor.TryGotoNext(x => x.MatchLdarg(0),
+            x => x.MatchLdarg(0),
+            x => x.MatchCallOrCallvirt<CharacterBody>("get_maxShield"),
+            x => x.MatchLdarg(0),
+            x => x.MatchCallOrCallvirt<CharacterBody>("get_cursePenalty")))
         {
-            var stackCount = GetCount(body);
-            if (stackCount > 0)
+            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Action<CharacterBody>>((body) =>
             {
-                body.damage *= OfferingBowlOutgoingDamageReductionInit * (float)Math.Pow(OfferingBowlOutgoingDamageReductionStack, stackCount - 1);
-            }
-        });
+                var stackCount = GetCount(body);
+                if (stackCount > 0)
+                {
+                    body.damage *= OfferingBowlOutgoingDamageReductionInit * (float)Math.Pow(OfferingBowlOutgoingDamageReductionStack, stackCount - 1);
+                }
+            });
+        }
     }
 
-    [Server]
+    private void OfferingBowlSetDamageTaken(ILContext il)
+    {
+        var damageIndex = 7;
+        var flagIndex = 5;
+        var cursor = new ILCursor(il);
+        if (cursor.TryGotoNext(x => x.MatchLdarg(0),
+                               x => x.MatchLdfld(typeof(HealthComponent), nameof(HealthComponent.body)),
+                               x => x.MatchLdsfld(typeof(RoR2Content.Buffs), nameof(RoR2Content.Buffs.DeathMark))))
+        {
+            if (cursor.TryGotoNext(MoveType.After, x => x.MatchLdloc(flagIndex)))
+            {
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc, damageIndex);
+                cursor.EmitDelegate<Func<HealthComponent, float, float>>((self, num) =>
+                {
+                    if (self)
+                    {
+                        var body = self.body;
+                        if (body)
+                        {
+                            var stackCount = GetCount(body);
+                            if (stackCount > 0)
+                            {
+                                num *= OfferingBowlIncomingDamageIncreaseInit * (float)Math.Pow(OfferingBowlIncomingDamageIncreaseStack, stackCount - 1);
+                            }
+                        }
+                    }
+                    return num;
+                });
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Stloc, damageIndex);
+            }
+        }
+    }
+
     private void OfferingBowlRewards(TeleporterInteraction ınteraction)
     {
+        if (!NetworkServer.active) return;
         ReadOnlyCollection<TeamComponent> teamMembers = TeamComponent.GetTeamMembers(TeamIndex.Player);
         OfferingBowlRNG = new Xoroshiro128Plus(Run.instance.seed);
         for (int i = 0; i < teamMembers.Count; i++)
@@ -119,21 +156,6 @@ public class OfferingBowl : Item<OfferingBowl>
                 }
             }
         }
-    }
-
-    private void OfferingBowlSetDamageTaken(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
-    {
-        var newDamageInfo = damageInfo;
-        var body = self.body;
-        if (body)
-        {
-            var stackCount = GetCount(body);
-            if (stackCount > 0)
-            {
-                newDamageInfo.damage *= OfferingBowlIncomingDamageIncreaseInit * (float)Math.Pow(OfferingBowlIncomingDamageIncreaseStack, stackCount - 1);
-            }
-        }
-        orig(self, newDamageInfo);
     }
 
     public override void Init(ConfigFile config)

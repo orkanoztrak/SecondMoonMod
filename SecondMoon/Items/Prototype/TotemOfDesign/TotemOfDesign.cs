@@ -2,11 +2,10 @@
 using MonoMod.Cil;
 using R2API;
 using RoR2;
-using SecondMoon.AttackTypes.Orbs.Item.Prototype.GravityFlask;
 using SecondMoon.BuffsAndDebuffs.Buffs.Item.Prototype;
 using SecondMoon.BuffsAndDebuffs.Debuffs.PureDebuffs.Item.Prototype;
-using SecondMoon.Elites.Lost;
 using SecondMoon.Items.ItemTiers.TierPrototype;
+using SecondMoon.Items.Prototype.GravityFlask;
 using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
@@ -19,9 +18,22 @@ namespace SecondMoon.Items.Prototype.TotemOfDesign;
 
 public class TotemOfDesign : Item<TotemOfDesign>
 {
+    public static ConfigOption<float> TotemOfDesignRegenIncreaseInit;
+    public static ConfigOption<float> TotemOfDesignRegenIncreaseStack;
+    public static ConfigOption<float> TotemOfDesignAttackSpeedIncreaseInit;
+    public static ConfigOption<float> TotemOfDesignAttackSpeedIncreaseStack;
+    public static ConfigOption<float> TotemOfDesignDamageIncreaseInit;
+    public static ConfigOption<float> TotemOfDesignDamageIncreaseStack;
+
+    public static ConfigOption<float> TotemOfDesignMovementDecreaseInit;
+    public static ConfigOption<float> TotemOfDesignMovementDecreaseStack;
+    public static ConfigOption<float> TotemOfDesignCooldownIncreaseInit;
+    public static ConfigOption<float> TotemOfDesignCooldownIncreaseStack;
+    public static ConfigOption<float> TotemOfDesignDamageDecreaseInit;
+    public static ConfigOption<float> TotemOfDesignDamageDecreaseStack;
     public override string ItemName => "Totem of Design";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_TOTEM_OF_DESIGN";
+    public override string ItemLangTokenName => "TOTEM_OF_DESIGN";
 
     public override string ItemPickupDesc => "Buffs on you increase health regeneration, attack speed and damage. Debuffs on enemies decrease movement speed, cooldown reduction and damage.";
 
@@ -34,7 +46,15 @@ public class TotemOfDesign : Item<TotemOfDesign>
         $"• Increase <style=cIsUtility>cooldowns</style> by <style=cIsUtility>{TotemOfDesignCooldownIncreaseInit * 100}%</style> <color=#7CFDEA>(+{TotemOfDesignCooldownIncreaseStack * 100}% per debuff)</color>.\r\n" +
         $"• Decrease <style=cIsDamage>damage</style> by <style=cIsDamage>{TotemOfDesignDamageDecreaseInit * 100}%</style> <color=#7CFDEA>(+{TotemOfDesignDamageDecreaseStack * 100}% per debuff)</color>.";
 
-    public override string ItemLore => $"Test";
+    public override string ItemLore => $"Have I ever told you why I love Design?\r\n\r\n" +
+        $"Unlike the other compounds, Design does not have its own form. It is the creator's own skills and vision that give it form. In this regard, Design is the most abstract compound that also tells the most about the contraption and its maker.\r\n\r\n" +
+        $"But how would an abundance of Design even work? After our last experiment, I got to thinking.\r\n\r\n" +
+        $"This is exhilarating, brother. It is a challenge to our abilities.\r\n\r\n" +
+        $"I gather a modest amount of Mass, Blood and Soul. After all, material is needed to build, and for Design to exist.\r\n\r\n" +
+        $"I decided on a small likeness of a humanoid creature. It represents the apex of intelligence, and infinite possibility.\r\n\r\n" +
+        $"Its purpose? To find faults and strengths in other Designs. Those will always exist, and this contraption will always detect them.\r\n\r\n" +
+        $"This will be a reminder that greater heights always exist. Dormancy is death.\r\n\r\n" +
+        $"The last contraption was a gift to you. This one... will be a gift to myself.";
 
     public override ItemTierDef ItemTierDef => TierPrototype.instance.ItemTierDef;
 
@@ -48,7 +68,7 @@ public class TotemOfDesign : Item<TotemOfDesign>
 
     public override void Hooks()
     {
-        On.RoR2.GlobalEventManager.OnHitEnemy += TotemOfDesignApplyDebuff;
+        On.RoR2.GlobalEventManager.ProcessHitEnemy += TotemOfDesignApplyDebuff;
         On.RoR2.CharacterBody.OnInventoryChanged += TotemOfDesignApplyBuff;
         IL.RoR2.CharacterBody.RecalculateStats += TotemOfDesignStatModifications;
         On.RoR2.GenericSkill.CalculateFinalRechargeInterval += TotemOfDesignIncreaseCooldownCeiling;
@@ -164,7 +184,7 @@ public class TotemOfDesign : Item<TotemOfDesign>
         orig(self);
     }
 
-    private void TotemOfDesignApplyDebuff(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+    private void TotemOfDesignApplyDebuff(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
         if (damageInfo.procCoefficient > 0 && NetworkServer.active && !damageInfo.rejected)
         {
@@ -217,21 +237,4 @@ public class TotemOfDesign : Item<TotemOfDesign>
         TotemOfDesignDamageDecreaseInit = config.ActiveBind("Item: " + ItemName, "Damage decrease per debuff with one " + ItemName, 0.15f, "How much should damage be decreased by per debuff with one " + ItemName + "? (0.15 = 15%)");
         TotemOfDesignDamageDecreaseStack = config.ActiveBind("Item: " + ItemName, "Damage decrease per debuff per stack after one " + ItemName, 0.15f, "How much should damage be decreased by per debuff per stack of " + ItemName + " after one? (0.15 = 15%)");
     }
-
-
-    public static ConfigOption<float> TotemOfDesignRegenIncreaseInit;
-    public static ConfigOption<float> TotemOfDesignRegenIncreaseStack;
-    public static ConfigOption<float> TotemOfDesignAttackSpeedIncreaseInit;
-    public static ConfigOption<float> TotemOfDesignAttackSpeedIncreaseStack;
-    public static ConfigOption<float> TotemOfDesignDamageIncreaseInit;
-    public static ConfigOption<float> TotemOfDesignDamageIncreaseStack;
-
-    public static ConfigOption<float> TotemOfDesignMovementDecreaseInit;
-    public static ConfigOption<float> TotemOfDesignMovementDecreaseStack;
-    public static ConfigOption<float> TotemOfDesignCooldownIncreaseInit;
-    public static ConfigOption<float> TotemOfDesignCooldownIncreaseStack;
-    public static ConfigOption<float> TotemOfDesignDamageDecreaseInit;
-    public static ConfigOption<float> TotemOfDesignDamageDecreaseStack;
-
-
 }

@@ -1,7 +1,9 @@
 ﻿using BepInEx.Configuration;
+using MonoMod.Cil;
 using R2API;
 using RoR2;
 using RoR2.ExpansionManagement;
+using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +34,8 @@ public abstract class Equipment
     public abstract string EquipmentPickupDesc { get; }
     public abstract string EquipmentFullDescription { get; }
     public abstract string EquipmentLore { get; }
-    public abstract float Cooldown { get; }
+
+    public static ConfigOption<float> Cooldown;
 
     public virtual GameObject EquipmentModel { get; } = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
     public virtual Sprite EquipmentIcon { get; } = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
@@ -41,7 +44,13 @@ public abstract class Equipment
 
     public virtual bool AppearsInMultiPlayer { get; } = true;
 
+    public static ConfigOption<bool> IsEnabled;
+
+    public bool EnableCheck;
+
     public virtual bool CanDrop { get; } = true;
+
+    public virtual float DropOnDeathChance { get; } = 0f;
 
     public virtual bool EnigmaCompatible { get; } = true;
 
@@ -49,37 +58,50 @@ public abstract class Equipment
 
     public virtual bool IsLunar { get; } = false;
 
+    public virtual bool IsPrototype { get; } = false;
+
+
+    public GameObject PrototypeVFX;
+
     public virtual BuffDef PassiveBuffDef { get; set; } = null;
 
     public EquipmentDef EquipmentDef;
+
+    public GameObject DropletDisplayPrefab;
+
     public virtual ExpansionDef RequiredExpansion { get; set; } = null;
     protected virtual ItemDisplayRuleDict displayRules { get; set; } = null;
 
-    public abstract void Init();
+    public virtual void Init(ConfigFile config)
+    {
+        IsEnabled = config.ActiveBind("Equipment: " + EquipmentName, "Should this be enabled?", true, "If false, this equipment will not appear in the game.");
+        EnableCheck = IsEnabled;
+    }
 
     public abstract ItemDisplayRuleDict CreateItemDisplayRules();
 
     protected void CreateLang()
     {
-        LanguageAPI.Add("EQUIPMENT_" + EquipmentLangTokenName + "_NAME", EquipmentName);
-        LanguageAPI.Add("EQUIPMENT_" + EquipmentLangTokenName + "_PICKUP", EquipmentPickupDesc);
-        LanguageAPI.Add("EQUIPMENT_" + EquipmentLangTokenName + "_DESCRIPTION", EquipmentFullDescription);
-        LanguageAPI.Add("EQUIPMENT_" + EquipmentLangTokenName + "_LORE", EquipmentLore);
+        LanguageAPI.Add("SECONDMOONMOD_EQUIPMENT_" + EquipmentLangTokenName + "_NAME", EquipmentName);
+        LanguageAPI.Add("SECONDMOONMOD_EQUIPMENT_" + EquipmentLangTokenName + "_PICKUP", EquipmentPickupDesc);
+        LanguageAPI.Add("SECONDMOONMOD_EQUIPMENT_" + EquipmentLangTokenName + "_DESCRIPTION", EquipmentFullDescription);
+        LanguageAPI.Add("SECONDMOONMOD_EQUIPMENT_" + EquipmentLangTokenName + "_LORE", EquipmentLore);
     }
 
     protected void CreateEquipment()
     {
         EquipmentDef = ScriptableObject.CreateInstance<EquipmentDef>();
-        EquipmentDef.name = "EQUIPMENT_" + EquipmentLangTokenName;
-        EquipmentDef.nameToken = "EQUIPMENT_" + EquipmentLangTokenName + "_NAME";
-        EquipmentDef.pickupToken = "EQUIPMENT_" + EquipmentLangTokenName + "_PICKUP";
-        EquipmentDef.descriptionToken = "EQUIPMENT_" + EquipmentLangTokenName + "_DESCRIPTION";
-        EquipmentDef.loreToken = "EQUIPMENT_" + EquipmentLangTokenName + "_LORE";
+        EquipmentDef.name = "SECONDMOONMOD_EQUIPMENT_" + EquipmentLangTokenName;
+        EquipmentDef.nameToken = "SECONDMOONMOD_EQUIPMENT_" + EquipmentLangTokenName + "_NAME";
+        EquipmentDef.pickupToken = "SECONDMOONMOD_EQUIPMENT_" + EquipmentLangTokenName + "_PICKUP";
+        EquipmentDef.descriptionToken = "SECONDMOONMOD_EQUIPMENT_" + EquipmentLangTokenName + "_DESCRIPTION";
+        EquipmentDef.loreToken = "SECONDMOONMOD_EQUIPMENT_" + EquipmentLangTokenName + "_LORE";
         EquipmentDef.pickupModelPrefab = EquipmentModel;
         EquipmentDef.pickupIconSprite = EquipmentIcon;
         EquipmentDef.appearsInSinglePlayer = AppearsInSinglePlayer;
         EquipmentDef.appearsInMultiPlayer = AppearsInMultiPlayer;
         EquipmentDef.canDrop = CanDrop;
+        EquipmentDef.dropOnDeathChance = DropOnDeathChance;
         EquipmentDef.cooldown = Cooldown;
         EquipmentDef.enigmaCompatible = EnigmaCompatible;
         EquipmentDef.isBoss = IsBoss;
@@ -96,7 +118,7 @@ public abstract class Equipment
         }
     }
 
-    protected bool PerformEquipmentAction(On.RoR2.EquipmentSlot.orig_PerformEquipmentAction orig, RoR2.EquipmentSlot self, EquipmentDef equipmentDef)
+    protected bool PerformEquipmentAction(On.RoR2.EquipmentSlot.orig_PerformEquipmentAction orig, EquipmentSlot self, EquipmentDef equipmentDef)
     {
         if (equipmentDef == EquipmentDef)
         {
@@ -109,9 +131,8 @@ public abstract class Equipment
     }
 
     protected abstract bool ActivateEquipment(EquipmentSlot slot);
-    public abstract void Hooks();
+    public virtual void Hooks() { }
 
-    //Targeting Support
     public virtual bool UseTargeting { get; } = false;
     public GameObject TargetingIndicatorPrefabBase = null;
     public enum TargetingType
@@ -121,7 +142,6 @@ public abstract class Equipment
     }
     public virtual TargetingType TargetingTypeEnum { get; } = TargetingType.Enemies;
 
-    //Based on MysticItem's targeting code.
     protected void UpdateTargeting(On.RoR2.EquipmentSlot.orig_Update orig, EquipmentSlot self)
     {
         orig(self);
@@ -139,10 +159,10 @@ public abstract class Equipment
             {
                 switch (TargetingTypeEnum)
                 {
-                    case (TargetingType.Enemies):
+                    case TargetingType.Enemies:
                         targetingComponent.ConfigureTargetFinderForEnemies(self);
                         break;
-                    case (TargetingType.Friendlies):
+                    case TargetingType.Friendlies:
                         targetingComponent.ConfigureTargetFinderForFriendlies(self);
                         break;
                 }

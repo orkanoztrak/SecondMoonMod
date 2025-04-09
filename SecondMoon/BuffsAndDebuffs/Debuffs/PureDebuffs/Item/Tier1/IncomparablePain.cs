@@ -19,6 +19,8 @@ public class IncomparablePain : Buff<IncomparablePain>
 
     public override bool IsDebuff => true;
 
+    public override bool IgnoreGrowthNectar => true;
+
     public override void Hooks()
     {
         RecalculateStatsAPI.GetStatCoefficients += ReduceArmor;

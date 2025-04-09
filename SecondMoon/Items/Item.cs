@@ -70,10 +70,10 @@ public abstract class Item
 
     protected void CreateLang()
     {
-        LanguageAPI.Add("ITEM_" + ItemLangTokenName + "_NAME", ItemName);
-        LanguageAPI.Add("ITEM_" + ItemLangTokenName + "_PICKUP", ItemPickupDesc);
-        LanguageAPI.Add("ITEM_" + ItemLangTokenName + "_DESCRIPTION", ItemFullDesc);
-        LanguageAPI.Add("ITEM_" + ItemLangTokenName + "_LORE", ItemLore);
+        LanguageAPI.Add("SECONDMOONMOD_ITEM_" + ItemLangTokenName + "_NAME", ItemName);
+        LanguageAPI.Add("SECONDMOONMOD_ITEM_" + ItemLangTokenName + "_PICKUP", ItemPickupDesc);
+        LanguageAPI.Add("SECONDMOONMOD_ITEM_" + ItemLangTokenName + "_DESCRIPTION", ItemFullDesc);
+        LanguageAPI.Add("SECONDMOONMOD_ITEM_" + ItemLangTokenName + "_LORE", ItemLore);
     }
 
     public abstract ItemDisplayRuleDict CreateItemDisplayRules();
@@ -81,11 +81,11 @@ public abstract class Item
     protected void CreateItem()
     {
         ItemDef = ScriptableObject.CreateInstance<ItemDef>();
-        ItemDef.name = "ITEM_" + ItemLangTokenName;
-        ItemDef.nameToken = "ITEM_" + ItemLangTokenName + "_NAME";
-        ItemDef.pickupToken = "ITEM_" + ItemLangTokenName + "_PICKUP";
-        ItemDef.descriptionToken = "ITEM_" + ItemLangTokenName + "_DESCRIPTION";
-        ItemDef.loreToken = "ITEM_" + ItemLangTokenName + "_LORE";
+        ItemDef.name = "SECONDMOONMOD_ITEM_" + ItemLangTokenName;
+        ItemDef.nameToken = "SECONDMOONMOD_ITEM_" + ItemLangTokenName + "_NAME";
+        ItemDef.pickupToken = "SECONDMOONMOD_ITEM_" + ItemLangTokenName + "_PICKUP";
+        ItemDef.descriptionToken = "SECONDMOONMOD_ITEM_" + ItemLangTokenName + "_DESCRIPTION";
+        ItemDef.loreToken = "SECONDMOONMOD_ITEM_" + ItemLangTokenName + "_LORE";
         ItemDef.pickupModelPrefab = ItemModel;
         ItemDef.pickupIconSprite = ItemIcon;
         ItemDef.hidden = false;

@@ -10,6 +10,7 @@ using UnityEngine.Networking;
 using EntityStates;
 using SecondMoon.MyEntityStates.Items.Prototype;
 using SecondMoon.BuffsAndDebuffs.Buffs.Item.Prototype;
+using SecondMoon.Utils;
 
 namespace SecondMoon.Items.Prototype.FlailOfMass;
 
@@ -28,9 +29,10 @@ public class FlailOfMassBodyBehavior : BaseItemBodyBehavior
         ConstructController();
         FlailOfMassControllerObject.GetComponent<NetworkedBodyAttachment>().AttachToGameObjectAndSpawn(body.gameObject);
     }
+
     private void ConstructController()
     {
-        var controller = Utils.Utils.CreateBlankPrefab("FlailOfMassController", true);
+        var controller = GeneralUtils.CreateBlankPrefab("FlailOfMassController", true);
         controller.GetComponent<NetworkIdentity>().localPlayerAuthority = true;
 
         NetworkedBodyAttachment networkedBodyAttachment = controller.AddComponent<NetworkedBodyAttachment>();
@@ -51,7 +53,7 @@ public class FlailOfMassBodyBehavior : BaseItemBodyBehavior
 
     private void OnDisable()
     {
-        if ((bool)FlailOfMassControllerObject)
+        if (FlailOfMassControllerObject)
         {
             Destroy(FlailOfMassControllerObject);
             FlailOfMassControllerObject = null;

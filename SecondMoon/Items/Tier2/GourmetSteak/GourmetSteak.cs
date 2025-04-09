@@ -1,6 +1,8 @@
 ﻿using BepInEx.Configuration;
+using MonoMod.Cil;
 using R2API;
 using RoR2;
+using SecondMoon.BuffsAndDebuffs.Buffs.Item.Prototype;
 using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
@@ -19,14 +21,15 @@ public class GourmetSteak : Item<GourmetSteak>
 
     public override string ItemName => "Gourmet Steak";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_GOURMET_STEAK";
+    public override string ItemLangTokenName => "GOURMET_STEAK";
 
     public override string ItemPickupDesc => $"Increase your maximum health and your one-shot protection threshold.";
 
-    public override string ItemFullDesc => $"Increases <style=cIsHealing>maximum health</style> by <style=cIsHealing>{GourmetSteakHealthInit * 100}%</style> <style=cStack>(+{GourmetSteakHealthStack * 100}% per stack)</style>" +
-        $" and <style=cIsHealth>one-shot protection threshold</style> by <style=cIsHealth>{GourmetSteakOSPThresholdIncreaseInit * 100}%</style> <style=cStack>(+{GourmetSteakOSPThresholdIncreaseStack * 100}% per stack)</style>.";
+    public override string ItemFullDesc => $"Gain <style=cIsHealing>{GourmetSteakHealthInit * 100}%</style> <style=cStack>(+{GourmetSteakHealthStack * 100}% per stack)</style> <style=cIsHealing>maximum health</style>" +
+        $" and increase <style=cIsHealth>one-shot protection threshold</style> by <style=cIsHealth>{GourmetSteakOSPThresholdIncreaseInit * 100}%</style> <style=cStack>(+{GourmetSteakOSPThresholdIncreaseStack * 100}% per stack)</style>.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "Everyone is invited! This weekend, Lord Holden is hosting the biggest ball of the year, maybe even decade, maybe even century! Exotic dancers, the most lavish of gourmet dishes, and a night you will never forget!\r\n\r\n" +
+        "I repeat, everyone is invited!";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier2Def.asset").WaitForCompletion();
 
@@ -40,8 +43,33 @@ public class GourmetSteak : Item<GourmetSteak>
 
     public override void Hooks()
     {
-        On.RoR2.CharacterBody.RecalculateStats += GourmetSteakIncreaseOSPThreshold;
+        IL.RoR2.CharacterBody.RecalculateStats += GourmetSteakIncreaseOSPThreshold;
         RecalculateStatsAPI.GetStatCoefficients += GourmetSteakIncreaseHealth;
+    }
+
+    private void GourmetSteakIncreaseOSPThreshold(ILContext il)
+    {
+        var cursor = new ILCursor(il);
+        if (cursor.TryGotoNext(x => x.MatchLdarg(0),
+            x => x.MatchLdarg(0),
+            x => x.MatchCallOrCallvirt<CharacterBody>("get_maxShield"),
+            x => x.MatchLdarg(0),
+            x => x.MatchCallOrCallvirt<CharacterBody>("get_cursePenalty")))
+        {
+            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Action<CharacterBody>>((body) =>
+            {
+                if (body)
+                {
+                    var stackCount = GetCount(body);
+                    if (stackCount > 0)
+                    {
+                        var limitedStacks = stackCount > GourmetSteakOSPThresholdIncreaseLimit ? GourmetSteakOSPThresholdIncreaseLimit : stackCount;
+                        body.oneShotProtectionFraction *= 1 + (GourmetSteakOSPThresholdIncreaseInit + (limitedStacks - 1) * GourmetSteakOSPThresholdIncreaseStack);
+                    }
+                }
+            });
+        }
     }
 
     private void GourmetSteakIncreaseHealth(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
@@ -52,17 +80,6 @@ public class GourmetSteak : Item<GourmetSteak>
             args.healthMultAdd += GourmetSteakHealthInit + (stackCount - 1) * GourmetSteakHealthStack;
         }
 
-    }
-
-    private void GourmetSteakIncreaseOSPThreshold(On.RoR2.CharacterBody.orig_RecalculateStats orig, RoR2.CharacterBody self)
-    {
-        orig(self);
-        var stackCount = GetCount(self);
-        if (stackCount > 0)
-        {
-            var limitedStacks = stackCount > GourmetSteakOSPThresholdIncreaseLimit ? GourmetSteakOSPThresholdIncreaseLimit : stackCount;
-            self.oneShotProtectionFraction *= 1 + (GourmetSteakOSPThresholdIncreaseInit + (limitedStacks - 1) * GourmetSteakOSPThresholdIncreaseStack);
-        }
     }
 
     public override void Init(ConfigFile config)

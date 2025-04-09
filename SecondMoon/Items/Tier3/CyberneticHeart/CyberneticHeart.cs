@@ -17,14 +17,19 @@ public class CyberneticHeart : Item<CyberneticHeart>
 
     public override string ItemName => "Cybernetic Heart";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_CYBERNETIC_HEART";
+    public override string ItemLangTokenName => "CYBERNETIC_HEART";
 
     public override string ItemPickupDesc => "Gain a recharging shield. Your healing restores shields as well.";
 
     public override string ItemFullDesc => $"Gain a shield equal to <style=cIsHealing>{CyberneticHeartShieldInit * 100}%</style> <style=cStack>(+{CyberneticHeartShieldStack * 100}% per stack)</style> of your maximum health. " +
         $"Your <style=cIsHealing>healing</style> restores an equal amount of <style=cIsHealing>shields</style>.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "-What more must I do for you to trust me!?\r\n\r\n" +
+        "-I want nothing from you. Trust, once broken, can't be put back together. Even if you gave me your entire heart, bared open for all to see, I would not trust you.\r\n\r\n" +
+        "-You hold that heart in your palm, and yet you do not trust that it beats. I have given you my all. What more can I possibly do?\r\n\r\n" +
+        "-It is a deceptive heart that you have given me. It is not a real thing. All that you have \"given\" me is your selfish efforts to win mine.\r\n\r\n" +
+        "-What, so all my efforts will go to waste? All that I have done? Is causing me pain all that you want?\r\n\r\n" +
+        "-I do not owe you forgiveness. All that you have done, you have done in the delusion of me forgiving you for them. I have never made such a promise.";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
 

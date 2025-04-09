@@ -3,7 +3,6 @@ using MonoMod.Cil;
 using R2API;
 using RoR2;
 using RoR2.Orbs;
-using SecondMoon.AttackTypes.Orbs.Item.Prototype.GravityFlask;
 using SecondMoon.Items.ItemTiers.TierPrototype;
 using SecondMoon.Utils;
 using System;
@@ -53,7 +52,7 @@ public class GravityFlask : Item<GravityFlask>
     public static ConfigOption<float> GravityFlaskBonusBoostStack;
     public override string ItemName => "Gravity Flask";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_GRAVITY_FLASK";
+    public override string ItemLangTokenName => "GRAVITY_FLASK";
 
     public override string ItemPickupDesc => "Gather items of different categories to get boosts according to the category. Hover over the item in your inventory to see the currently active boosts.";
 
@@ -65,7 +64,7 @@ public class GravityFlask : Item<GravityFlask>
         $"•{GravityFlaskFinalThreshold}: Hits smite enemies for <style=cIsDamage>{GravityFlaskProcDamageInit * 100}%</style> <style=cStack>(+{GravityFlaskProcDamageStack * 100}% per stack)</style> TOTAL damage, with a proc coefficient of <style=cIsDamage>{GravityFlaskProcCoefficient}</style>.\r\n\r\n" +
         $"<style=cIsHealing>Healing:</style>\r\n" +
         $"•{GravityFlaskFirstThreshold}: Gain <style=cIsHealing>{GravityFlaskHealthInit * 100}%</style> <style=cStack>(+{GravityFlaskHealthStack * 100}% per stack)</style> maximum health.\r\n" +
-        $"•{GravityFlaskSecondThreshold}: Heal from <style=cIsDamage>incoming damage</style> for <style=cIsHealing>{GravityFlaskHealInit}</style> <style=cStack>(+{GravityFlaskHealStack}% per stack)</style>.\r\n" +
+        $"•{GravityFlaskSecondThreshold}: Heal from <style=cIsDamage>incoming damage</style> for <style=cIsHealing>{GravityFlaskHealInit}</style> <style=cStack>(+{GravityFlaskHealStack} per stack)</style>.\r\n" +
         $"•{GravityFlaskThirdThreshold}: <style=cIsHealing>Heal +{GravityFlaskHealBoostInit * 100}%</style> <style=cStack>(+{GravityFlaskHealBoostStack * 100}% per stack)</style> more.\r\n" +
         $"•{GravityFlaskFinalThreshold}: <style=cIsDamage>Any damage you take</style> is reduced by <style=cIsDamage>{GravityFlaskDamageReductionInit * 100}%</style> <style=cStack>(+{GravityFlaskDamageReductionStack * 100}% per stack)</style>.\r\n\r\n" +
         $"<style=cIsUtility>Utility:</style>\r\n" +
@@ -74,7 +73,12 @@ public class GravityFlask : Item<GravityFlask>
         $"•{GravityFlaskThirdThreshold}: <style=cIsUtility>Reduce skill cooldowns</style> by <style=cIsUtility>{GravityFlaskCooldownReductionInit * 100}%</style> <style=cStack>(+{GravityFlaskCooldownReductionStack * 100}% per stack)</style>.\r\n" +
         $"•{GravityFlaskFinalThreshold}: Increase <color=#7CFDEA>non-{GravityFlaskFinalThreshold}-item bonuses</color> granted by this by <color=#7CFDEA>{GravityFlaskBonusBoostInit * 100}%</color> <style=cStack>(+{GravityFlaskBonusBoostStack * 100}% per stack)</style>.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "What do you think is the most important thing that separates inanimate objects from men?\r\n\r\n" +
+        "Ask a million different people, and you might get a million different answers. But for me, it's the ability to give things purpose. Indeed, this ability is quite overlooked, but perhaps the most indisputable separator - we are what gives these inanimate objects meaning. They simply cannot find their own use by themselves.\r\n\r\n" +
+        "Look deeper into this, and wondrous possibilities open up - take, for instance, this flask I'm holding. Many will immediately recognize that such an object is designed to contain, and most will assume it is designed to contain liquids. That is because this is what mankind has come to expect of this kind of object, with this kind of shape.\r\n\r\n" +
+        "Now imagine a scenario, millennia in the future where none of us are alive anymore, that our species is extinct. If another lifeform, possessing sentience and logic, were to visit our now desolate planets and see a flask of our descendants' making, similar to this or not, what would they think of it? Would they again assume that this object is designed to contain, let alone liquids? Or would their culture, their past, their lifestyle, suggest another use, perhaps unusual or even unknown to us of today? What would they think of our use of this flask, should any evidence of it remain?\r\n\r\n" +
+        "I find this kind of discourse magical. Even from something as simple as a flask, we can derive endless possibilities, yet unfulfilled. Perhaps branching out even further due to paths taken by predecessors, going beyond infinity. It is then our duty, to shed light on as many paths as we can during our time here. Because if we hesitate to do that, we will not only betray ourselves, but also those that come after us.\r\n\r\n" +
+        "- Harold Xavier Benthams, Inventor of Hyper-Gravity Machines";
 
     public override ItemTierDef ItemTierDef => TierPrototype.instance.ItemTierDef;
 
@@ -90,10 +94,10 @@ public class GravityFlask : Item<GravityFlask>
     {
         On.RoR2.CharacterBody.OnInventoryChanged += AddItemBehavior;
         RecalculateStatsAPI.GetStatCoefficients += GravityFlaskBuffStats;
-        On.RoR2.HealthComponent.TakeDamage += GravityFlaskSetDamageTaken;
-        On.RoR2.HealthComponent.TakeDamage += GravityFlaskHealOnDamaged;
+        IL.RoR2.HealthComponent.TakeDamageProcess += GravityFlaskSetDamageTaken;
+        On.RoR2.HealthComponent.TakeDamageProcess += GravityFlaskHealOnDamaged;
         On.RoR2.HealthComponent.Heal += GravityFlaskIncreaseHeals;
-        On.RoR2.GlobalEventManager.OnHitEnemy += GravityFlaskSmite;
+        On.RoR2.GlobalEventManager.ProcessHitEnemy += GravityFlaskSmite;
         On.RoR2.CharacterMaster.GiveMoney += GravityFlaskMoreGold;
     }
 
@@ -117,7 +121,7 @@ public class GravityFlask : Item<GravityFlask>
         orig(self, newAmount);
     }
 
-    private void GravityFlaskHealOnDamaged(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
+    private void GravityFlaskHealOnDamaged(On.RoR2.HealthComponent.orig_TakeDamageProcess orig, HealthComponent self, DamageInfo damageInfo)
     {
         orig(self, damageInfo);
         if (damageInfo.damage > 0)
@@ -140,7 +144,7 @@ public class GravityFlask : Item<GravityFlask>
         }
     }
 
-    private void GravityFlaskSmite(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+    private void GravityFlaskSmite(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
         if (damageInfo.attacker && damageInfo.procCoefficient > 0)
         {
@@ -190,7 +194,7 @@ public class GravityFlask : Item<GravityFlask>
                                     damageColorIndex = smiteOrb.damageColorIndex
                                 };
                                 orig(self, newDamageInfo, victim);
-                                GlobalEventManager.instance.OnHitAll(newDamageInfo, victim);
+                                GlobalEventManager.instance.OnHitAllProcess(newDamageInfo, victim);
                             }
                         }
                     }
@@ -220,24 +224,43 @@ public class GravityFlask : Item<GravityFlask>
         return orig(self, boostedAmount, procChainMask, nonRegen);
     }
 
-    private void GravityFlaskSetDamageTaken(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
+    private void GravityFlaskSetDamageTaken(ILContext il)
     {
-        var newDamageInfo = damageInfo;
-        var body = self.body;
-        if (body)
+        var damageIndex = 7;
+        var flagIndex = 5;
+        var cursor = new ILCursor(il);
+        if (cursor.TryGotoNext(x => x.MatchLdarg(0),
+                               x => x.MatchLdfld(typeof(HealthComponent), nameof(HealthComponent.body)),
+                               x => x.MatchLdsfld(typeof(RoR2Content.Buffs), nameof(RoR2Content.Buffs.DeathMark))))
         {
-            var stackCount = GetCount(body);
-            if (stackCount > 0)
+            if (cursor.TryGotoNext(MoveType.After, x => x.MatchLdloc(flagIndex)))
             {
-                var tracker = body.gameObject.GetComponent<GravityFlaskBehavior>();
-                if (tracker)
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc, damageIndex);
+                cursor.EmitDelegate<Func<HealthComponent, float, float>>((self, num) =>
                 {
-                    var coeff = tracker.GravityFlaskHealingTracker >= GravityFlaskFinalThreshold ? GravityFlaskDamageReductionInit * (float)Math.Pow(GravityFlaskDamageReductionStack, stackCount - 1) : 1;
-                    newDamageInfo.damage *= coeff;
-                }
+                    if (self)
+                    {
+                        var body = self.body;
+                        if (body)
+                        {
+                            var stackCount = GetCount(body);
+                            if (stackCount > 0)
+                            {
+                                var tracker = body.gameObject.GetComponent<GravityFlaskBehavior>();
+                                if (tracker)
+                                {
+                                    var coeff = tracker.GravityFlaskHealingTracker >= GravityFlaskFinalThreshold ? GravityFlaskDamageReductionInit * (float)Math.Pow(GravityFlaskDamageReductionStack, stackCount - 1) : 1;
+                                    num *= coeff;
+                                }
+                            }
+                        }
+                    }
+                    return num;
+                });
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Stloc, damageIndex);
             }
         }
-        orig(self, newDamageInfo);
     }
 
     private void GravityFlaskBuffStats(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
@@ -270,10 +293,12 @@ public class GravityFlask : Item<GravityFlask>
         }
     }
 
-    [Server]
     private void AddItemBehavior(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
     {
-        self.AddItemBehavior<GravityFlaskBehavior>(self.inventory.GetItemCount(instance.ItemDef));
+        if (NetworkServer.active)
+        {
+            self.AddItemBehavior<GravityFlaskBehavior>(self.inventory.GetItemCount(instance.ItemDef));
+        }
         orig(self);
     }
 

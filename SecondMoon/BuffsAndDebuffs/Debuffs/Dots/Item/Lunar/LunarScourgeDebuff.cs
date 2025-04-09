@@ -14,6 +14,10 @@ internal class LunarScourgeDebuff : Buff<LunarScourgeDebuff>
 
     public override Color BuffColor => new Color32(0, 0, 255, 255);
 
+    public override bool IgnoreGrowthNectar => true;
+
+    public override bool IsDOT => true;
+
     public override void Init()
     {
         CreateBuff();

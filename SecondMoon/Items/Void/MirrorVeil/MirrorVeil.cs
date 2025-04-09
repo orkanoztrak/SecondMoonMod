@@ -19,7 +19,7 @@ public class MirrorVeil : Item<MirrorVeil>
     public static ConfigOption<float> MirrorVeilInvisProcChance;
     public override string ItemName => "Mirror Veil";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_STEALTHKITVOID";
+    public override string ItemLangTokenName => "STEALTHKITVOID";
 
     public override string ItemPickupDesc => "Chance on hit to gain invisibility. <style=cIsVoid>Corrupts all Old War Stealthkits</style>.";
 
@@ -43,10 +43,10 @@ public class MirrorVeil : Item<MirrorVeil>
 
     public override void Hooks()
     {
-        On.RoR2.GlobalEventManager.OnHitEnemy += MirrorVeilProcInvis;
+        On.RoR2.GlobalEventManager.ProcessHitEnemy += MirrorVeilProcInvis;
     }
 
-    private void MirrorVeilProcInvis(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+    private void MirrorVeilProcInvis(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
         if (damageInfo.attacker && damageInfo.procCoefficient > 0 && NetworkServer.active && !damageInfo.rejected)
         {

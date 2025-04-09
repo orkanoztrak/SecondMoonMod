@@ -21,14 +21,20 @@ public class WantedPoster : Item<WantedPoster>
 
     public override string ItemName => "Wanted Poster";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_WANTED_POSTER";
+    public override string ItemLangTokenName => "WANTED_POSTER";
 
     public override string ItemPickupDesc => $"Deal extra damage to bosses and get bonus gold from killing them.";
 
-    public override string ItemFullDesc => $"Deal an additional <style=cIsDamage>{WantedPosterBossDamageInit}%</style> damage <style=cStack>(+{WantedPosterBossDamageStack}% per stack)</style> to bosses. " +
-        $"They give an additional <style=cIsUtility>{WantedPosterBossGoldInit}%</style> <style=cStack>(+{WantedPosterBossGoldStack}% per stack)</style> <style=cIsUtility>gold</style> upon death.";
+    public override string ItemFullDesc => $"Deal an additional <style=cIsDamage>{WantedPosterBossDamageInit * 100}%</style> damage <style=cStack>(+{WantedPosterBossDamageStack * 100}% per stack)</style> to bosses. " +
+        $"They give an additional <style=cIsUtility>{WantedPosterBossGoldInit * 100}%</style> <style=cStack>(+{WantedPosterBossGoldStack * 100}% per stack)</style> <style=cIsUtility>gold</style> upon death.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "!WANTED!\r\n\r\n" +
+        "DEAD OR ALIVE\r\n\r\n" +
+        "Reward will be paid upon the return of\r\n\r\n" +
+        "<style=cMono>[REDACTED]\r\n\r\n</style>" +
+        "For the crimes of <style=cMono>THIEVERY, EXTORTION, ARMED ROBBERY, ASSAULT, MANSLAUGHTER, MURDER\r\n\r\n</style>" +
+        "Considered extremely dangerous.\r\n\r\n" +
+        "Known to travel alone.\r\n";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier1Def.asset").WaitForCompletion();
     public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Utility, ItemTag.AIBlacklist, ItemTag.OnKillEffect];
@@ -41,7 +47,7 @@ public class WantedPoster : Item<WantedPoster>
     public override void Hooks()
     {
         On.RoR2.DeathRewards.OnKilledServer += WantedPosterBonusBossGold;
-        IL.RoR2.HealthComponent.TakeDamage += WantedPosterBonusBossDamage;
+        IL.RoR2.HealthComponent.TakeDamageProcess += WantedPosterBonusBossDamage;
     }
 
     private void WantedPosterBonusBossGold(On.RoR2.DeathRewards.orig_OnKilledServer orig, DeathRewards self, DamageReport damageReport)
@@ -64,31 +70,35 @@ public class WantedPoster : Item<WantedPoster>
 
     private void WantedPosterBonusBossDamage(ILContext il)
     {
+        var apCountIndex = 42;
+        var stackCount = 0;
         var cursor = new ILCursor(il);
-        cursor.GotoNext(
-            MoveType.After,
-            x => x.MatchLdloc(32));
-        int stackCount = 0;
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_1);
-        cursor.EmitDelegate<Func<int, DamageInfo, int>>((apCount, damageInfo) =>
+        if (cursor.TryGotoNext(x => x.MatchCallOrCallvirt<CharacterBody>("get_isBoss")))
         {
-            stackCount = GetCount(damageInfo.attacker?.GetComponent<CharacterBody>());
-            return apCount + stackCount;
-        });
-        cursor.GotoNext(
-            MoveType.After,
-            x => x.MatchLdloc(32),
-            x => x.MatchConvR4(),
-            x => x.MatchMul(),
-            x => x.MatchAdd());
-        cursor.EmitDelegate<Func<float, float>>(accumulator =>
-        {
-            if (stackCount > 0)
+            if (cursor.TryGotoNext(MoveType.After, x => x.MatchLdloc(apCountIndex)))
             {
-                return accumulator + WantedPosterBossDamageInit + (stackCount - 1) * WantedPosterBossDamageStack;
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_1);
+                cursor.EmitDelegate<Func<int, DamageInfo, int>>((apCount, damageInfo) =>
+                {
+                    stackCount = GetCount(damageInfo.attacker?.GetComponent<CharacterBody>());
+                    return apCount + stackCount;
+                });
+                if (cursor.TryGotoNext(MoveType.After, x => x.MatchLdloc(apCountIndex),
+                                                       x => x.MatchConvR4(),
+                                                       x => x.MatchMul(),
+                                                       x => x.MatchAdd()))
+                {
+                    cursor.EmitDelegate<Func<float, float>>(accumulator =>
+                    {
+                        if (stackCount > 0)
+                        {
+                            return accumulator + WantedPosterBossDamageInit + (stackCount - 1) * WantedPosterBossDamageStack;
+                        }
+                        return accumulator;
+                    });
+                }
             }
-            return accumulator;
-        });
+        }
     }
 
     public override void Init(ConfigFile config)

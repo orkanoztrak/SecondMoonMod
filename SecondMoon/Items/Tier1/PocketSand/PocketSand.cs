@@ -21,14 +21,23 @@ public class PocketSand : Item<PocketSand>
 
     public override string ItemName => "Pocket Sand";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_POCKET_SAND";
+    public override string ItemLangTokenName => "POCKET_SAND";
 
     public override string ItemPickupDesc => $"Slow down enemies above {PocketSandHealthThreshold * 100}% health and reduce their attack speed.";
 
     public override string ItemFullDesc => $"Enemies above <style=cIsUtility>{PocketSandHealthThreshold * 100}% health</style> have their <style=cIsUtility>movement speed</style> and <style=cIsDamage>attack speed</style> " +
         $"reduced by <style=cIsUtility>{PocketSandReduction * 100}</style> for <style=cIsUtility>{PocketSandTimerInit}s</style> <style=cStack>(+{PocketSandTimerStack}s per stack)</style>.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "<style=cMono>Welcome to DataScraper (v3.1.53 – beta branch)\r\n$ Scraping memory... done.\r\n$ Resolving... done.\r\n$ Combing for relevant data... done.\r\nComplete!\r\nOutputting local audio transcriptions...\r\n\r\n</style>" +
+        "Hey, ma!\r\n\r\n" +
+        "Today we watched a documentary in history class... about ancient warriors in Rome.\r\n\r\n" +
+        "Gladiators, I think they called them.\r\n\r\n" +
+        "It was so cool! These guys would live their whole lives fighting each other and beasts like lions and bears!! I saw a guy throw sand at another's face and then beat him!\r\n\r\n" +
+        "It's also kinda scary though. Y'know. When you don't win?\r\n\r\n" +
+        "Anyway, history is so cool! I think I want to be a historian when I grow up!\r\n\r\n" +
+        "Can we go to the museum this weekend, ma? Please?\r\n\r\n" +
+        "Talk to you when I get home!\r\n\r\n" +
+        "Love ya!";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier1Def.asset").WaitForCompletion();
 
@@ -42,26 +51,36 @@ public class PocketSand : Item<PocketSand>
 
     public override void Hooks()
     {
-        IL.RoR2.HealthComponent.TakeDamage += ThrowPocketSand;
+        IL.RoR2.HealthComponent.TakeDamageProcess += ThrowPocketSand;
     }
 
     private void ThrowPocketSand(ILContext il)
     {
+        var combinedHealthIndex = 4;
+        var characterMasterIndex = 1;
         var cursor = new ILCursor(il);
-        cursor.GotoNext(x => x.MatchStloc(19));
-        cursor.Index -= 4;
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc_0);
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_1);
-        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
-        cursor.EmitDelegate<Action<CharacterMaster, DamageInfo, HealthComponent>>((attacker, damageInfo, healthComponent) =>
+        if (cursor.TryGotoNext(x => x.MatchLdloc(combinedHealthIndex),
+                               x => x.MatchLdarg(0),
+                               x => x.MatchCallOrCallvirt<HealthComponent>("get_fullCombinedHealth"),
+                               x => x.MatchLdcR4(0.9f)))
         {
-            var stackCount = GetCount(attacker);
-            if (stackCount > 0)
+            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc, combinedHealthIndex);
+            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc, characterMasterIndex);
+            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_1);
+            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Action<float, CharacterMaster, DamageInfo, HealthComponent>>((combinedHealth, attacker, damageInfo, healthComponent) =>
             {
-                var victim = healthComponent.GetComponent<CharacterBody>();
-                victim.AddTimedBuffAuthority(PocketSandDebuff.instance.BuffDef.buffIndex, PocketSandTimerInit + ((stackCount - 1) * PocketSandTimerStack));
-            }
-        });
+                if (combinedHealth >= healthComponent.fullCombinedHealth * PocketSandHealthThreshold)
+                {
+                    var stackCount = GetCount(attacker);
+                    if (stackCount > 0)
+                    {
+                        var victim = healthComponent.GetComponent<CharacterBody>();
+                        victim.AddTimedBuffAuthority(PocketSandDebuff.instance.BuffDef.buffIndex, PocketSandTimerInit + ((stackCount - 1) * PocketSandTimerStack));
+                    }
+                }
+            });
+        }
     }
 
     public override void Init(ConfigFile config)

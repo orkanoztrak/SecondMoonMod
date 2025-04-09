@@ -18,7 +18,7 @@ public class BlissfulVisageBodyBehavior : BaseItemBodyBehavior
 {
     private static readonly float timeBetweenGhostResummons = BlissfulVisage.BlissfulVisageGhostCooldown;
 
-    private float ghostResummonCooldown;
+    public float ghostResummonCooldown;
 
 
     [ItemDefAssociation(useOnServer = true, useOnClient = false)]
@@ -27,25 +27,9 @@ public class BlissfulVisageBodyBehavior : BaseItemBodyBehavior
         return BlissfulVisage.instance.ItemDef;
     }
 
-    private void OnEnable()
-    {
-        On.RoR2.GlobalEventManager.OnCharacterDeath += BlissfulVisageReduceGhostTimerOnKill;
-    }
-
-    private void BlissfulVisageReduceGhostTimerOnKill(On.RoR2.GlobalEventManager.orig_OnCharacterDeath orig, GlobalEventManager self, DamageReport damageReport)
-    {
-        if (damageReport?.attackerBody == body)
-        {
-            ghostResummonCooldown -= BlissfulVisage.BlissfulVisageReduceTimerOnKillInit + ((stack - 1) * BlissfulVisage.BlissfulVisageReduceTimerOnKillStack);
-        }
-        orig(self, damageReport);
-    }
-
     private void FixedUpdate()
     {
         if (!NetworkServer.active) return;
-
-        int num = stack;
         CharacterMaster bodyMaster = body.master;
         if (!bodyMaster)
         {
@@ -59,29 +43,14 @@ public class BlissfulVisageBodyBehavior : BaseItemBodyBehavior
         }
     }
 
-    [Server]
     private static void BlissfulVisageTryToSummonVoidGhost(CharacterBody ownerBody)
     {
-        if (!NetworkServer.active)
-        {
-            Debug.LogWarning("[Server] function 'SecondMoon.Items.Void.BlissfulVisage.BlissfulVisageBodyBehavior.TryToSummonVoidGhost(CharacterBody ownerBody)' called on client");
-            return;
-        }
-        if (!ownerBody)
-        {
-            return;
-        }
+        if (!NetworkServer.active) return;
+        if (!ownerBody) return;
         GameObject bodyPrefab = BodyCatalog.FindBodyPrefab(ownerBody);
-        if (!bodyPrefab)
-        {
-            return;
-        }
+        if (!bodyPrefab) return;
         CharacterMaster characterMaster = MasterCatalog.allAiMasters.FirstOrDefault((CharacterMaster master) => master.bodyPrefab == bodyPrefab);
-        if (!characterMaster)
-        {
-            return;
-        }
-
+        if (!characterMaster) return;
         MasterSummon obj = new MasterSummon
         {
             masterPrefab = characterMaster.gameObject,
@@ -97,10 +66,7 @@ public class BlissfulVisageBodyBehavior : BaseItemBodyBehavior
         obj.loadout = ownerBody.master.loadout;
 
         CharacterMaster characterMaster2 = obj.Perform();
-        if (!characterMaster2)
-        {
-            return;
-        }
+        if (!characterMaster2) return;
 
         CharacterBody body = characterMaster2.GetBody();
         if ((bool)body)

@@ -2,7 +2,6 @@
 using RoR2.Orbs;
 using R2API;
 using RoR2;
-using SecondMoon.AttackTypes.Orbs.Item.Tier3.LightningRing;
 using SecondMoon.Items.Prototype.FlailOfMass;
 using SecondMoon.Utils;
 using System;
@@ -10,6 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 
 namespace SecondMoon.Items.Tier3.LightningRing;
 
@@ -25,7 +25,7 @@ public class LightningRing : Item<LightningRing>
 
     public override string ItemName => "Lightning Band";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_LIGHTNING_RING";
+    public override string ItemLangTokenName => "LIGHTNING_RING";
 
     public override string ItemPickupDesc => "Weak hits launch chain lightning.";
 
@@ -33,7 +33,8 @@ public class LightningRing : Item<LightningRing>
         $"dealing <style=cIsDamage>{LightningRingDamageInit * 100}%</style> <style=cStack>(+{LightningRingDamageStack * 100}% per stack)</style> TOTAL damage. " +
         $"The lightning also chains to <style=cIsDamage>{LightningRingTargetCountInit}</style> <style=cStack>(+{LightningRingTargetCountStack} per stack)</style> enemies within <style=cIsDamage>{LightningRingRadiusInit}m</style> <style=cStack>(+{LightningRingRadiusStack}m per stack)</style> of the target for the same amount.";
 
-    public override string ItemLore => $"Test";
+    public override string ItemLore => $"\"As passion becomes memory and memory becomes passion,\r\nAs clouds and oceans wither and darken,\r\nMy fervor and patience fall silent,\r\nAs I fade, alongside them.\"\r\n\r\n" +
+        $"-The Syzygy of Io and Europa, Final Verse";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
 
@@ -47,12 +48,12 @@ public class LightningRing : Item<LightningRing>
 
     public override void Hooks()
     {
-        On.RoR2.GlobalEventManager.OnHitEnemy += LightningRingLaunchChainLightning;
+        On.RoR2.GlobalEventManager.ProcessHitEnemy += LightningRingLaunchChainLightning;
     }
 
-    private void LightningRingLaunchChainLightning(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+    private void LightningRingLaunchChainLightning(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
-        if (damageInfo.attacker && damageInfo.procCoefficient > 0)
+        if (damageInfo.attacker && damageInfo.procCoefficient > 0 && NetworkServer.active && !damageInfo.rejected)
         {
             var attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
             var victimComponent = victim.GetComponent<HealthComponent>();
@@ -81,8 +82,9 @@ public class LightningRing : Item<LightningRing>
                             origin = damageInfo.position
                         }, transmit: true);
 
-                        List<HurtBox> targets = Utils.Utils.FindCountHurtboxesInRangeAroundTarget(LightningRingTargetCountInit + ((stackCount - 1) * LightningRingTargetCountStack), LightningRingRadiusInit + ((stackCount - 1) * LightningRingRadiusStack), attackerBody.teamComponent.teamIndex, victim.transform.position, victim);
-                        foreach(HurtBox target in targets)
+                        List<HurtBox> targets = GeneralUtils.FindCountHurtboxesInRangeAroundTarget(LightningRingTargetCountInit + ((stackCount - 1) * LightningRingTargetCountStack), LightningRingRadiusInit + ((stackCount - 1) * LightningRingRadiusStack), attackerBody.teamComponent.teamIndex, victim.transform.position, victim);
+
+                        foreach (HurtBox target in targets)
                         {
                             if (target)
                             {

@@ -49,7 +49,7 @@ public class BirthdayBalloonFloat : BirthdayBalloonBase
             Vector3 velocity = bodyMotor.velocity;
             if (velocity.y < 0f - maxFallSpeed)
             {
-                velocity.y = Mathf.MoveTowards(velocity.y, maxFallSpeed, Time.deltaTime * accelerationY);
+                velocity.y = Mathf.MoveTowards(velocity.y, maxFallSpeed, Time.fixedDeltaTime * accelerationY);
             }
             bodyMotor.velocity = velocity;
 

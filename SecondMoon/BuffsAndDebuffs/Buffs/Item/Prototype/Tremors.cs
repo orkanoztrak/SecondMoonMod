@@ -2,7 +2,9 @@
 using RoR2.Projectile;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.UIElements;
 using static SecondMoon.Items.Prototype.TremorKnuckles.TremorKnuckles;
+using static UnityEngine.ParticleSystem.PlaybackState;
 
 namespace SecondMoon.BuffsAndDebuffs.Buffs.Item.Prototype;
 
@@ -16,10 +18,10 @@ public class Tremors : Buff<Tremors>
 
     public override void Hooks()
     {
-        On.RoR2.GlobalEventManager.OnHitAll += TremorsBombs;
+        On.RoR2.GlobalEventManager.OnHitAllProcess += TremorsBombs;
     }
 
-    private void TremorsBombs(On.RoR2.GlobalEventManager.orig_OnHitAll orig, GlobalEventManager self, DamageInfo damageInfo, GameObject hitObject)
+    private void TremorsBombs(On.RoR2.GlobalEventManager.orig_OnHitAllProcess orig, GlobalEventManager self, DamageInfo damageInfo, GameObject hitObject)
     {
         if (damageInfo.attacker && damageInfo.procCoefficient > 0)
         {
@@ -29,7 +31,20 @@ public class Tremors : Buff<Tremors>
                 if (attackerBody.HasBuff(BuffDef))
                 {
                     var damage = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, TremorKnucklesBombDamage);
-                    ProjectileManager.instance.FireProjectile(LegacyResourcesAPI.Load<GameObject>("Prefabs/Projectiles/LightningStake"), damageInfo.position, Quaternion.identity, damageInfo.attacker, damage, 0, damageInfo.crit, DamageColorIndex.Item);
+                    ProjectileManager.instance.FireProjectile(new FireProjectileInfo
+                    {
+                        projectilePrefab = LegacyResourcesAPI.Load<GameObject>("Prefabs/Projectiles/LightningStake"),
+                        position = damageInfo.position,
+                        rotation = Quaternion.identity,
+                        owner = damageInfo.attacker,
+                        damage = damage,
+                        force = 0f,
+                        crit = damageInfo.crit,
+                        damageColorIndex = DamageColorIndex.Item,
+                        target = null,
+                        speedOverride = -1f,
+                        damageTypeOverride = default
+                    });
                 }
             }
         }

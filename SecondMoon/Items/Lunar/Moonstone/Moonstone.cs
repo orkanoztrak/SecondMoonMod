@@ -23,14 +23,15 @@ public class Moonstone : Item<Moonstone>
 
     public override string ItemName => "Moonstone";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_PEARL_LUNAR";
+    public override string ItemLangTokenName => "PEARL_LUNAR";
 
     public override string ItemPickupDesc => $"Grants cooldown reduction and attack speed to <color=#FF7F7F>EVERYONE.</color>";
 
     public override string ItemFullDesc => $"Gain <style=cIsUtility>{MoonstoneCooldownReductionInit * 100}% <style=cStack>(+{MoonstoneCooldownReductionStack * 100}% per stack)</style> cooldown reduction</style> " +
         $"and <style=cIsDamage>{MoonstoneAttackSpeedInit * 100}% <style=cStack>(+{MoonstoneAttackSpeedStack * 100}% per stack)</style> attack speed</style><color=#FF7F7F>(enemies also benefit from these).</color>";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "He would obviously not sit idly as I spread my influence.\r\n\r\n" +
+        "What he fails to realize, however, is that I offer greater power and riches than he ever could. Observe, my servants, as I convert his paltry effort at a gift into something that can turn the tides.";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/LunarTierDef.asset").WaitForCompletion();
 

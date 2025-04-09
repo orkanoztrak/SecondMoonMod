@@ -1,15 +1,16 @@
 ﻿using BepInEx.Configuration;
 using R2API;
 using RoR2;
-using SecondMoon.AttackTypes.Orbs.Item.Prototype.GravityFlask;
 using SecondMoon.BuffsAndDebuffs.Buffs.Item.Prototype;
 using SecondMoon.Items.ItemTiers.TierPrototype;
 using SecondMoon.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 using static SecondMoon.Items.Prototype.GravityFlask.GravityFlask;
 
 namespace SecondMoon.Items.Prototype.BloodInfusedCore;
@@ -25,7 +26,7 @@ public class BloodInfusedCore : Item<BloodInfusedCore>
 
     public override string ItemName => "Blood-Infused Core";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_BLOOD_INFUSED_CORE";
+    public override string ItemLangTokenName => "BLOOD_INFUSED_CORE";
 
     public override string ItemPickupDesc => "Heal on hit. Healing for a certain amount cleanses all debuffs and boosts movement speed, attack speed and damage.";
 
@@ -34,7 +35,14 @@ public class BloodInfusedCore : Item<BloodInfusedCore>
         $"and gain the <color=#7CFDEA>Blood Frenzy</color> buff which increases <style=cIsUtility>movement speed</style>, <style=cIsDamage>attack speed</style> and <style=cIsDamage>damage</style> by <color=#7CFDEA>{BloodInfusedCoreBloodFrenzyBoost * 100}%</color> " +
         $"for <color=#7CFDEA>{BloodInfusedCoreBloodFrenzyDuration}s</color>, during which you cannot store <color=#7CFDEA>Blood Frenzy</color>.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "Blood is difficult to work with, brother.\r\n\r\n" +
+        "It is heat, passion, and violence. It is alive. Because of this, it can fall prey to its desires unless guided.\r\n\r\n" +
+        "No creature, be it vermin or a god, is immune to this. Perhaps the color, the amount or the consistency is different, but the same Blood runs through us all regardless.\r\n\r\n" +
+        "And it is even more dangerous in mortal hands.\r\n\r\n" +
+        "We know what Blood is capable of. We know how to temper it and wield it properly. Thanks to that, we know ourselves better than them.\r\n\r\n" +
+        "In contrast, their reach extends only to clumsily shaping Mass with their faulty Designs. This blinds them from understanding each other, and they then wage petty wars out of frustration.\r\n\r\n" +
+        "The very image of Blood running wild.\r\n\r\n" +
+        "I trust the you that trusts mortals, brother, but to be honest, I do not see what you see in them. They are unstable. Inelegant. Archaic. They have all the traits I dislike. Yet for someone as great as you to find worth in them...";
 
     public override ItemTierDef ItemTierDef => TierPrototype.instance.ItemTierDef;
 
@@ -49,13 +57,38 @@ public class BloodInfusedCore : Item<BloodInfusedCore>
     public override void Hooks()
     {
         On.RoR2.CharacterBody.OnInventoryChanged += AddItemBehavior;
-        On.RoR2.GlobalEventManager.OnHitEnemy += BloodInfusedCoreHealOnHit;
+        On.RoR2.GlobalEventManager.ProcessHitEnemy += BloodInfusedCoreHealOnHit;
+        On.RoR2.HealthComponent.SendHeal += UpdateBloodFrenzyPool;
     }
 
-    private void BloodInfusedCoreHealOnHit(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+    private void UpdateBloodFrenzyPool(On.RoR2.HealthComponent.orig_SendHeal orig, GameObject target, float amount, bool isCrit)
     {
-        orig(self, damageInfo, victim);
-        if (damageInfo.procCoefficient > 0 && damageInfo.attacker)
+        var characterBody = target.GetComponent<CharacterBody>();
+        if (characterBody)
+        {
+            var stackCount = GetCount(characterBody);
+            var behavior = target.GetComponent<BloodInfusedCoreBehavior>();
+            if (behavior && !characterBody.HasBuff(BloodFrenzy.instance.BuffDef) && stackCount > 0)
+            {
+                var component = characterBody.healthComponent;
+                if (component)
+                {
+                    behavior.BloodFrenzyPoolTracker += amount;
+                    if (behavior.BloodFrenzyPoolTracker >= component.fullCombinedHealth * BloodInfusedCoreBloodFrenzyThreshold)
+                    {
+                        behavior.BloodFrenzyPoolTracker = 0;
+                        Util.CleanseBody(characterBody, true, false, true, true, true, true);
+                        characterBody.AddTimedBuffAuthority(BloodFrenzy.instance.BuffDef.buffIndex, BloodInfusedCoreBloodFrenzyDuration);
+                    }
+                }
+            }
+        }
+        orig(target, amount, isCrit);
+    }
+
+    private void BloodInfusedCoreHealOnHit(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+    {
+        if (damageInfo.attacker && damageInfo.procCoefficient > 0 && NetworkServer.active && !damageInfo.rejected)
         {
             var attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
             if (attackerBody)
@@ -71,6 +104,7 @@ public class BloodInfusedCore : Item<BloodInfusedCore>
                 }
             }
         }
+        orig(self, damageInfo, victim);
     }
 
     private void AddItemBehavior(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
@@ -96,7 +130,7 @@ public class BloodInfusedCore : Item<BloodInfusedCore>
         BloodInfusedCoreHealOnHitInit = config.ActiveBind("Item " + ItemName, "Heal on hit with one " + ItemName, 0.025f, "What % of combined health should be healed on hit with one " + ItemName + "? (0.025 = 2.5%)");
         BloodInfusedCoreHealOnHitStack = config.ActiveBind("Item " + ItemName, "Heal on hit with per stack after one " + ItemName, 0.025f, "What % of combined health should be healed on hit per stack of " + ItemName + " after one? (0.025 = 2.5%)");
         BloodInfusedCoreBloodFrenzyThreshold = config.ActiveBind("Item " + ItemName, "Blood Frenzy proc health threshold", 0.25f, "After healing what % of combined health should Blood Frenzy activate? (0.25 = 25%)");
-        BloodInfusedCoreBloodFrenzyDuration = config.ActiveBind("Item " + ItemName, "Blood Frenzy duration", 4f, "How many seconds should Blood Frenzy last?");
+        BloodInfusedCoreBloodFrenzyDuration = config.ActiveBind("Item " + ItemName, "Blood Frenzy duration", 5f, "How many seconds should Blood Frenzy last?");
         BloodInfusedCoreBloodFrenzyBoost = config.ActiveBind("Item: " + ItemName, "Blood frenzy boost percent", 0.25f, "How much should Blood Frenzy increase movement speed, attack speed and damage by? (0.25 = 25%)");
     }
 
@@ -111,43 +145,12 @@ public class BloodInfusedCore : Item<BloodInfusedCore>
         private void OnEnable()
         {
             BloodFrenzyPoolTracker = 0;
-            if (body)
-            {
-                if (body.healthComponent)
-                {
-                    On.RoR2.HealthComponent.SendHeal += UpdateBloodFrenzyPool;
-                }
-            }
-        }
-
-        private void UpdateBloodFrenzyPool(On.RoR2.HealthComponent.orig_SendHeal orig, GameObject target, float amount, bool isCrit)
-        {
-            var characterBody = target.GetComponent<CharacterBody>();
-            if (characterBody)
-            {
-                if (characterBody.Equals(body) && !body.HasBuff(BloodFrenzy.instance.BuffDef))
-                {
-                    var component = body.healthComponent;
-                    if (component && stack > 0)
-                    {
-                        BloodFrenzyPoolTracker += amount;
-                        if (BloodFrenzyPoolTracker >= component.fullCombinedHealth * BloodInfusedCoreBloodFrenzyThreshold)
-                        {
-                            BloodFrenzyPoolTracker = 0;
-                            Util.CleanseBody(body, true, false, true, true, true, true);
-                            body.AddTimedBuffAuthority(BloodFrenzy.instance.BuffDef.buffIndex, BloodInfusedCoreBloodFrenzyDuration);
-                        }
-                    }
-                }
-            }
-            orig(target, amount, isCrit);
         }
 
         private void OnDisable()
         {
             if (body && enabled)
             {
-                On.RoR2.HealthComponent.SendHeal -= UpdateBloodFrenzyPool;
                 if (body.HasBuff(BloodFrenzy.instance.BuffDef.buffIndex))
                 {
                     body.RemoveBuff(BloodFrenzy.instance.BuffDef.buffIndex);

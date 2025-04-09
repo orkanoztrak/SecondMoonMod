@@ -5,6 +5,9 @@ using System.Text;
 using static RoR2.ItemTierDef;
 using UnityEngine;
 using R2API;
+using SecondMoon.Items.ItemTiers.VoidTierPrototype;
+using SecondMoon.Items.ItemTiers.TierPrototype;
+using UnityEngine.AddressableAssets;
 
 namespace SecondMoon.Items.ItemTiers;
 
@@ -36,9 +39,11 @@ public abstract class Tier
 
     public abstract PickupRules PickupRules { get; }
 
-    public abstract GameObject HighlightPrefab { get; }
+    public  abstract GameObject HighlightPrefab { get; }
 
-    public abstract GameObject DropletDisplayPrefab { get; }
+    public GameObject DropletDisplayPrefab;
+
+    public GameObject PickupDisplayVFX;
 
     public ItemTierDef ItemTierDef;
 
@@ -60,6 +65,5 @@ public abstract class Tier
         ItemTierDef.tier = ItemTier.AssignedAtRuntime;
         ContentAddition.AddItemTierDef(ItemTierDef);
     }
-
     public virtual void Hooks() { }
 }

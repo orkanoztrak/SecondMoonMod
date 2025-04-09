@@ -21,6 +21,8 @@ public class Linty : Buff<Linty>
 
     public override bool IsDebuff => true;
 
+    public override bool IgnoreGrowthNectar => true;
+
     public override void Init()
     {
         CreateBuff();
@@ -74,12 +76,9 @@ public class Linty : Buff<Linty>
                                 }
                                 if (debuffs > 0)
                                 {
-                                    Debug.Log("Unchanged gold: " + self.goldReward);
                                     rewardMultiplier += rewardMultiplier * (debuffs - 1);
                                     var gold = self.goldReward * (1 + rewardMultiplier);
                                     self.goldReward = (uint)gold;
-                                    Debug.Log("Reward multiplier: " + (1 + rewardMultiplier));
-                                    Debug.Log("Boosted gold: " + self.goldReward + ". Victim had " + debuffs + " debuffs on it at the time of death.");
                                 }
                             }
                         }

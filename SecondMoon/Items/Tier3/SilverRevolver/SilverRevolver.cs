@@ -19,15 +19,22 @@ public class SilverRevolver : Item<SilverRevolver>
 
     public override string ItemName => "Silver Revolver";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_SILVER_REVOLVER";
+    public override string ItemLangTokenName => "SILVER_REVOLVER";
 
     public override string ItemPickupDesc => "You always critically strike against Elite monsters, and critical strikes lower cooldowns.";
 
     public override string ItemFullDesc => $"Gain <style=cIsDamage>{SilverRevolverInitialCritChance}% critical chance</style>. " +
-        $"You always <style=cIsDamage>critically strike</style> against Elite monsters. " +
+        $"You always <style=cIsDamage>critically strike</style> against elites. " +
         $"<style=cIsDamage>Critical strikes</style> <style=cIsUtility>reduce skill cooldowns by {SilverRevolverCDRInit}s</style> <style=cStack>(+{SilverRevolverCDRStack}s per stack)</style>.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "Item Log: 62774\r\n\r\n" +
+        "Identification: Silver Revolver\r\n\r\n" +
+        "Notes:\r\n\r\n" +
+        "Ancient firearm found in one of the dig sites down south.\r\n\r\n" +
+        "The archaeology team believe with almost certainty that it was used in the second civil war. The design fits the time period too.\r\n\r\n" +
+        "Alongside the usual detritus of passing time, we found traces of gunpowder and marks left by bullets leaving the chamber, so it was most likely a practical piece, rather than ceremonial.\r\n\r\n" +
+        "No other equivalent from its time period have yet been found, so storage safety is PARAMOUNT.\r\n\r\n" +
+        "Only to be handled by the archaeology team. Don't let the guides touch; especially Jeremy.";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
 
@@ -41,12 +48,12 @@ public class SilverRevolver : Item<SilverRevolver>
 
     public override void Hooks()
     {
-        On.RoR2.HealthComponent.TakeDamage += SilverRevolverAlwaysCritsOnElite;
+        On.RoR2.HealthComponent.TakeDamageProcess += SilverRevolverAlwaysCritsOnElite;
         RecalculateStatsAPI.GetStatCoefficients += SilverRevolverInitBuffCrit;
-        On.RoR2.GlobalEventManager.OnHitEnemy += SilverRevolverReduceCooldowns;
+        On.RoR2.GlobalEventManager.ProcessHitEnemy += SilverRevolverReduceCooldowns;
     }
 
-    private void SilverRevolverReduceCooldowns(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+    private void SilverRevolverReduceCooldowns(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
         if (damageInfo.crit)
         {
@@ -80,7 +87,7 @@ public class SilverRevolver : Item<SilverRevolver>
         }
     }
 
-    private void SilverRevolverAlwaysCritsOnElite(On.RoR2.HealthComponent.orig_TakeDamage orig, RoR2.HealthComponent self, RoR2.DamageInfo damageInfo)
+    private void SilverRevolverAlwaysCritsOnElite(On.RoR2.HealthComponent.orig_TakeDamageProcess orig, HealthComponent self, DamageInfo damageInfo)
     {
         if (self.body && damageInfo.attacker)
         {
@@ -90,8 +97,7 @@ public class SilverRevolver : Item<SilverRevolver>
             }
             else
             {
-                var newDamageInfo = damageInfo;
-                var body = newDamageInfo.attacker.GetComponent<CharacterBody>();
+                var body = damageInfo.attacker.GetComponent<CharacterBody>();
                 if (body)
                 {
                     var stackCount = GetCount(body);
@@ -100,7 +106,7 @@ public class SilverRevolver : Item<SilverRevolver>
                         damageInfo.crit = true;
                     }
                 }
-                orig(self, newDamageInfo);
+                orig(self, damageInfo);
             }
         }
         else

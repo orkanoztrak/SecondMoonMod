@@ -24,7 +24,7 @@ public class Popperbloom : Item<Popperbloom>
 
     public override string ItemName => "Popperbloom";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_STICKYBOMBVOID";
+    public override string ItemLangTokenName => "STICKYBOMBVOID";
 
     public override string ItemPickupDesc => "Chance on hit to apply an exploding status effect that is strengthened by health bonuses. <style=cIsVoid>Corrupts all Sticky Bombs</style>.";
 
@@ -49,10 +49,10 @@ public class Popperbloom : Item<Popperbloom>
 
     public override void Hooks()
     {
-        On.RoR2.GlobalEventManager.OnHitEnemy += PopperbloomApplyTotalPopperseeds;
+        On.RoR2.GlobalEventManager.ProcessHitEnemy += PopperbloomApplyTotalPopperseeds;
     }
 
-    private void PopperbloomApplyTotalPopperseeds(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, RoR2.GlobalEventManager self, RoR2.DamageInfo damageInfo, GameObject victim)
+    private void PopperbloomApplyTotalPopperseeds(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, RoR2.GlobalEventManager self, RoR2.DamageInfo damageInfo, GameObject victim)
     {
         if (damageInfo.attacker && damageInfo.procCoefficient > 0 && NetworkServer.active && !damageInfo.rejected)
         {

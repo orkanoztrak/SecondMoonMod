@@ -21,7 +21,7 @@ internal class PossessedToyScythe : Item<PossessedToyScythe>
 
     public override string ItemName => "Possessed Toy Scythe";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_POSSESSED_TOY_SCYTHE";
+    public override string ItemLangTokenName => "POSSESSED_TOY_SCYTHE";
 
     public override string ItemPickupDesc => "Your non-critical hits have a chance to deal extra damage based on target health.";
 
@@ -43,10 +43,10 @@ internal class PossessedToyScythe : Item<PossessedToyScythe>
 
     public override void Hooks()
     {
-        On.RoR2.GlobalEventManager.OnHitEnemy += PossessedToyScytheReap;
+        On.RoR2.GlobalEventManager.ProcessHitEnemy += PossessedToyScytheReap;
     }
 
-    private void PossessedToyScytheReap(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+    private void PossessedToyScytheReap(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
         orig(self, damageInfo, victim);
         if (!damageInfo.crit && damageInfo.procCoefficient > 0)

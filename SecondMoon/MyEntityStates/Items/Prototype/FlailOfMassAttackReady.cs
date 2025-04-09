@@ -1,6 +1,5 @@
 ﻿using RoR2;
 using RoR2.Orbs;
-using SecondMoon.AttackTypes.Orbs.Item.Prototype.FlailOfMass;
 using SecondMoon.BuffsAndDebuffs.Buffs.Item.Prototype;
 using SecondMoon.Items.Prototype.FlailOfMass;
 using System;

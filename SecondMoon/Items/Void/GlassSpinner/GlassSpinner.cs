@@ -19,7 +19,7 @@ public class GlassSpinner : Item<GlassSpinner>
 
     public override string ItemName => "Glass Spinner";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_NEARBYDAMAGEBONUSVOID";
+    public override string ItemLangTokenName => "NEARBYDAMAGEBONUSVOID";
 
     public override string ItemPickupDesc => "Deal bonus damage to enemies at a distance. <style=cIsVoid>Corrupts all Focus Crystals</style>.";
 
@@ -41,20 +41,23 @@ public class GlassSpinner : Item<GlassSpinner>
 
     public override void Hooks()
     {
-        IL.RoR2.HealthComponent.TakeDamage += GlassSpinnerModifyDamage;
+        IL.RoR2.HealthComponent.TakeDamageProcess += GlassSpinnerModifyDamage;
     }
 
     private void GlassSpinnerModifyDamage(ILContext il)
     {
+        var characterMasterIndex = 1;
+        var damageIndex = 7;
+        var watchCountIndex = 35;
         var cursor = new ILCursor(il);
-        if (cursor.TryGotoNext(x => x.MatchLdloc(0),
+        if (cursor.TryGotoNext(MoveType.After, x => x.MatchLdloc(characterMasterIndex),
                                x => x.MatchCallvirt<CharacterMaster>("get_inventory"),
                                x => x.MatchLdsfld(typeof(DLC1Content.Items), nameof(DLC1Content.Items.FragileDamageBonus))))
         {
-            if (cursor.TryGotoNext(MoveType.After, x => x.MatchStloc(25)))
+            if (cursor.TryGotoNext(x => x.MatchStloc(watchCountIndex)))
             {
                 cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_1);
-                cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc, 6);
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc, damageIndex);
                 cursor.EmitDelegate<Func<DamageInfo, float, float>>((info, num) =>
                 {
                     if (info.attacker)
@@ -77,7 +80,7 @@ public class GlassSpinner : Item<GlassSpinner>
                     }
                     return num;
                 });
-                cursor.Emit(Mono.Cecil.Cil.OpCodes.Stloc, 6);
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Stloc, damageIndex);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using R2API;
+﻿using MonoMod.Cil;
+using R2API;
 using RoR2;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,9 @@ public abstract class Buff
     public virtual bool CanStack { get; } = true;
     public virtual EliteDef EliteDef { get; } = null;
     public virtual bool IsDebuff { get; } = false;
+    public virtual bool IsDOT { get; } = false;
+    public virtual bool IgnoreGrowthNectar { get; } = false;
+    public virtual BuffDef.Flags Flags { get; } = BuffDef.Flags.NONE;
     public virtual bool IsCooldown { get; } = false;
     public virtual bool IsHidden { get; } = false;
     public virtual NetworkSoundEventDef StartSfx { get; } = null;
@@ -41,11 +45,82 @@ public abstract class Buff
         BuffDef.canStack = CanStack;
         BuffDef.eliteDef = EliteDef;
         BuffDef.isDebuff = IsDebuff;
+        BuffDef.isDOT = IsDOT;
+        BuffDef.flags = Flags;
+        BuffDef.ignoreGrowthNectar = IgnoreGrowthNectar;
         BuffDef.isCooldown = IsCooldown;
         BuffDef.isHidden = IsHidden;
         BuffDef.startSfx = StartSfx;
         ContentAddition.AddBuffDef(BuffDef);
+        if (EliteDef)
+        {
+            IL.RoR2.CharacterModel.UpdateOverlayStates += AddEquipmentlessEliteCheck;
+            IL.RoR2.CharacterModel.UpdateOverlays += AddEquipmentlessEliteCheck2;
+        }
     }
+
+    private void AddEquipmentlessEliteCheck(ILContext il)
+    {
+        var cursor = new ILCursor(il);
+        if (cursor.TryGotoNext(MoveType.After, x => x.MatchStfld(typeof(CharacterModel), nameof(CharacterModel.myEliteIndex))))
+        {
+            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Action<CharacterModel>>((model) =>
+            {
+                if (model)
+                {
+                    if (model.body)
+                    {
+                        if (model.body.HasBuff(BuffDef))
+                        {
+                            model.myEliteIndex = EliteDef.eliteIndex;
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    private void AddEquipmentlessEliteCheck2(ILContext il)
+    {
+        var cursor = new ILCursor(il);
+        if (cursor.TryGotoNext(MoveType.After, x => x.MatchStfld(typeof(CharacterModel), nameof(CharacterModel.myEliteIndex))))
+        {
+            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Action<CharacterModel>>((model) =>
+            {
+                if (model)
+                {
+                    if (model.body)
+                    {
+                        if (model.body.HasBuff(BuffDef))
+                        {
+                            model.myEliteIndex = EliteDef.eliteIndex;
+                        }
+                    }
+                }
+            });
+            if (cursor.TryGotoNext(MoveType.After, x => x.MatchStfld(typeof(CharacterModel), nameof(CharacterModel.shaderEliteRampIndex))))
+            {
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
+                cursor.EmitDelegate<Action<CharacterModel>>((model) =>
+                {
+                    if (model)
+                    {
+                        if (model.body)
+                        {
+                            if (model.body.HasBuff(BuffDef))
+                            {
+                                model.shaderEliteRampIndex = EliteDef.shaderEliteRampIndex;
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+
     public abstract void Init();
     public virtual void Hooks() { }
 }

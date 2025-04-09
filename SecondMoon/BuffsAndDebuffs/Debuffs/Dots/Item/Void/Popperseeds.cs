@@ -1,9 +1,6 @@
 ﻿using MonoMod.Cil;
 using RoR2;
-using SecondMoon.Items.Tier2.HexDagger;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using static RoR2.DotController;
@@ -36,45 +33,45 @@ public class Popperseeds : DOT<Popperseeds>
         x => x.MatchCallOrCallvirt<DotController>("AddPendingDamageEntry")))
         {
             target = cursor.MarkLabel();
-        }
-
-        if (cursor.TryGotoPrev(MoveType.After,
+            if (cursor.TryGotoPrev(MoveType.After,
             x => x.MatchStfld<DotStack>("timer")))
-        {
-            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc_3);
-            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
-            cursor.EmitDelegate<Func<DotStack, DotController, bool>>((dotStack, dotController) =>
             {
-                done = false;
-                if (dotStack.dotIndex == instance.DotIndex)
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc_3);
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
+                cursor.EmitDelegate<Func<DotStack, DotController, bool>>((dotStack, dotController) =>
                 {
-                    EffectManager.SpawnEffect(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/ExplodeOnDeathVoid/ExplodeOnDeathVoidExplosionEffect.prefab").WaitForCompletion(), new EffectData
+                    done = false;
+                    if (dotStack.dotIndex == instance.DotIndex)
                     {
-                        origin = dotController.victimObject.transform.position,
-                        scale = PopperseedsRadius,
-                    }, true);
+                        EffectManager.SpawnEffect(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/ExplodeOnDeathVoid/ExplodeOnDeathVoidExplosionEffect.prefab").WaitForCompletion(), new EffectData
+                        {
+                            origin = dotController.victimObject.transform.position,
+                            scale = PopperseedsRadius,
+                        }, true);
 
-                    BlastAttack pop = new BlastAttack
-                    {
-                        procCoefficient = 0,
-                        attacker = dotStack.attackerObject,
-                        teamIndex = dotStack.attackerTeam,
-                        baseDamage = dotStack.damage,
-                        baseForce = 0,
-                        falloffModel = BlastAttack.FalloffModel.None,
-                        crit = false,
-                        radius = PopperseedsRadius,
-                        position = dotController.victimObject.transform.position,
-                        damageType = DamageType.DoT | DamageType.AOE,
-                        damageColorIndex = DamageColorIndex.Void,
-                        attackerFiltering = AttackerFiltering.NeverHitSelf
-                    };
-                    pop.Fire();
-                    done = true;
-                }
-                return done;
-            });
-            cursor.Emit(Mono.Cecil.Cil.OpCodes.Brtrue, target);
+                        BlastAttack pop = new BlastAttack
+                        {
+                            procCoefficient = 0,
+                            attacker = dotStack.attackerObject,
+                            teamIndex = dotStack.attackerTeam,
+                            baseDamage = dotStack.damage,
+                            baseForce = 0,
+                            falloffModel = BlastAttack.FalloffModel.None,
+                            crit = false,
+                            radius = PopperseedsRadius,
+                            position = dotController.victimObject.transform.position,
+                            damageType = DamageType.DoT | DamageType.AOE,
+                            damageColorIndex = DamageColorIndex.Void,
+                            attackerFiltering = AttackerFiltering.NeverHitSelf
+                        };
+                        pop.Fire();
+                        done = true;
+                    }
+                    return done;
+                });
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Brtrue, target);
+            }
+
         }
     }
 

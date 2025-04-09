@@ -24,14 +24,16 @@ public class UniversalKey : Item<UniversalKey>
     public static ConfigOption<int> UniversalKeyInteractableCountStack;
     public override string ItemName => "Universal Key";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_UNIVERSAL_KEY";
+    public override string ItemLangTokenName => "UNIVERSAL_KEY";
 
-    public override string ItemPickupDesc => "The first interactable in a stage is fully refunded and used twice!";
+    public override string ItemPickupDesc => "The cost of the first interactable in a stage is fully refunded and it\'s used twice!";
 
-    public override string ItemFullDesc => $"The first <style=cIsUtility>{UniversalKeyInteractableCountInit}</style> <style=cStack>(+{UniversalKeyInteractableCountStack} per stack)</style> <style=cIsUtility>interactables</style> in a stage " +
+    public override string ItemFullDesc => $"The cost of the first <style=cIsUtility>{UniversalKeyInteractableCountInit}</style> <style=cStack>(+{UniversalKeyInteractableCountStack} per stack)</style> <style=cIsUtility>interactables</style> in a stage " +
         $"are fully refunded and trigger twice. Not limited to chests!";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "Order: Weird [REDACTED] Key\r\nTracking Number: 01******\r\nEstimated Delivery: 01/01/2101\r\nShipping Method: High Priority/Fragile\r\nShipping Address: California, North America, Earth\r\nShipping Details:\r\n\r\n" +
+        "Don't be fooled by its appearance, man. Looks like a toy, I know, but it certainly isn't. Changes size and shape, unlocks any door, hacks into any computer, hell, Carlos swore he woke up better the next day after he, uh, stuck it in his mouth. Puked out a bucket afterwards, don't know if it was because of the booze or this thing.\r\n\r\n" +
+        "Martha gave me hell after last time. So, I leave the figuring-out of whatever this is to you nutjobs.";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
 
@@ -79,10 +81,10 @@ public class UniversalKey : Item<UniversalKey>
         }
     }
 
-    [Server]
     private void UniversalKeyDuplicateDropFromDelayedShop(On.RoR2.ShopTerminalBehavior.orig_DropPickup orig, ShopTerminalBehavior self)
     {
         orig(self);
+        if (!NetworkServer.active) return;
         var interactable = self.gameObject;
         if (interactable.GetComponent<PurchaseInteraction>())
         {
@@ -157,24 +159,26 @@ public class UniversalKey : Item<UniversalKey>
         }
     }
 
-    [Server]
     private void UniversalKeyDuplicateRewardFromBarrels(On.RoR2.BarrelInteraction.orig_OnInteractionBegin orig, BarrelInteraction self, Interactor activator)
     {
-        UniversalKeyPurchaseCounters.TryGetValue(activator.GetComponent<CharacterBody>().master, out var tuple);
-        var counter = tuple.Item1;
-        if (counter > 0)
+        if (NetworkServer.active)
         {
-            var interactable = self.gameObject;
-            if (self.GetInteractability(activator) == Interactability.Available)
+            UniversalKeyPurchaseCounters.TryGetValue(activator.GetComponent<CharacterBody>().master, out var tuple);
+            var counter = tuple.Item1;
+            if (counter > 0)
             {
-                var body = activator.GetComponent<CharacterBody>();
-                var stackCount = body.inventory.GetItemCount(ItemDef.itemIndex);
-                if (stackCount > 0)
+                var interactable = self.gameObject;
+                if (self.GetInteractability(activator) == Interactability.Available)
                 {
-                    counter--;
-                    UniversalKeyPurchaseCounters[body.master] = (counter, interactable, true);
-                    orig(self, activator);
-                    self.Networkopened = false;
+                    var body = activator.GetComponent<CharacterBody>();
+                    var stackCount = body.inventory.GetItemCount(ItemDef.itemIndex);
+                    if (stackCount > 0)
+                    {
+                        counter--;
+                        UniversalKeyPurchaseCounters[body.master] = (counter, interactable, true);
+                        orig(self, activator);
+                        self.Networkopened = false;
+                    }
                 }
             }
         }
@@ -192,7 +196,7 @@ public class UniversalKey : Item<UniversalKey>
             {
                 var body = activator.GetComponent<CharacterBody>();
                 bool activated = false;
-                var cachedCostType = self.costType;
+                var cachedCost = self.cost;
                 var stackCount = GetCount(body);
                 var interactableType = self.gameObject;
                 PickupIndex cachedTerminalPickup = PickupIndex.none;
@@ -217,7 +221,7 @@ public class UniversalKey : Item<UniversalKey>
                     }
                     if (isAdaptiveChest)
                     {
-                        if (cachedCostType != CostTypeIndex.None)
+                        if (cachedCost > 0)
                         {
                             activated = true;
                         }
@@ -252,7 +256,7 @@ public class UniversalKey : Item<UniversalKey>
                     if (activated)
                     {
                         counter--;
-                        self.costType = CostTypeIndex.None;
+                        self.cost = 0;
                         UniversalKeyPurchaseCounters[body.master] = (counter, interactableType, true);
                     }
                 }
@@ -275,7 +279,7 @@ public class UniversalKey : Item<UniversalKey>
                         }
                     }
                     orig(self, activator);
-                    self.costType = cachedCostType;
+                    self.cost = cachedCost;
                     if (isChanceShrine)
                     {
                         isChanceShrine.failureChance = cachedFailure;

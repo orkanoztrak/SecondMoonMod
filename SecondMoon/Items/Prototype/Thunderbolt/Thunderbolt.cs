@@ -1,5 +1,6 @@
 ﻿using BepInEx.Configuration;
 using Facepunch.Steamworks;
+using MonoMod.Cil;
 using R2API;
 using RoR2;
 using RoR2.Projectile;
@@ -25,17 +26,27 @@ public class Thunderbolt : Item<Thunderbolt>
 
     public override string ItemName => "Thunderbolt";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_THUNDERBOLT";
+    public override string ItemLangTokenName => "THUNDERBOLT";
 
     public override string ItemPickupDesc => "Increase attack speed. Your attack speed increases also translate to movement speed, cooldown reduction and projectile speed.";
 
     public override string ItemFullDesc => $"Increases <style=cIsDamage>attack speed</style> by <style=cIsDamage>{ThunderboltASInit * 100}%</style> <style=cStack>(+{ThunderboltASStack * 100}% per stack)</style>. " +
-        $"<color=#7CFDEA>Your attack speed increase percentage also translates into the following</color>:\r\n\r\n" +
+        $"<color=#7CFDEA>Your attack speed increase percentage also translates into the following:</color>\r\n\r\n" +
         $"• Increase <style=cIsUtility>movement speed</style> by <color=#7CFDEA>{ThunderboltASToMS * 100}%</color> of it. \r\n" +
         $"• Increase <style=cIsUtility>cooldown reduction</style> by <color=#7CFDEA>{(1f - 1f / (1f + (0.25f * 0.5f))) * ThunderboltASToCD * 400 * ThunderboltCDMultiplier}%</color> of it. \r\n" +
         $"• Increase <style=cIsDamage>projectile speed</style> by <color=#7CFDEA>{ThunderboltASToProjectileSpeed * 100}%</color> of it for projectiles without targets.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "<style=cMono>FIELDTECH Image-To-Text Translator (v2.5.10b)\r\n# Awaiting input... done.\r\n# Reading image for text... done.\r\n# Transcribing data... done.\r\n# Translating text... done. [25 exceptions raised]\r\nComplete: outputting results.\r\n\r\n</style>" +
+        "Wow.\r\n\r\n" +
+        "We're really in trouble now! We have to put that book back, the Elder is going to kill us!\r\n\r\n" +
+        "Doesn't all of this excite you? [The hero] is the coolest, yes, but the one they called-\r\n\r\n" +
+        "Don't mention [his] name! All of the other kids that did - they never returned... I'm scared...\r\n\r\n" +
+        "Why are you being such a wimp? There's nobody around that can hear us. Nothing's gonna happen, trust me.\r\n\r\n" +
+        "Okay...\r\n\r\n" +
+        "Really though. Look at these! They moved faster than lightning, striking down their foolish enemies before they even knew what hit them. I wanna be like them! [The brothers], faster and stronger than anyone else.\r\n\r\n" +
+        "It almost looks unfair. I mean, how do you even beat something that's so fast? I kinda feel sorry for their enemies.\r\n\r\n" +
+        "That's why \"Speed is war\". [He] knew that. So cool..!\r\n\r\n" +
+        "<style=cMono>Translation Errors:</style>\r\n# [The Hero] could not be fully translated.\r\n# [His] could not be fully translated.\r\n# [The Brothers] could not be fully translated.\r\n# [He] could not be fully translated.";
 
     public override ItemTierDef ItemTierDef => TierPrototype.instance.ItemTierDef;
     public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Utility];
@@ -47,8 +58,32 @@ public class Thunderbolt : Item<Thunderbolt>
 
     public override void Hooks()
     {
-        On.RoR2.CharacterBody.RecalculateStats += ThunderboltAttackSpeedAndTranslate;
+        IL.RoR2.CharacterBody.RecalculateStats += ThunderboltAttackSpeedAndTranslate;
         On.RoR2.Projectile.ProjectileController.Start += ThunderboltFasterProjectiles;
+    }
+
+    private void ThunderboltAttackSpeedAndTranslate(ILContext il)
+    {
+        var cursor = new ILCursor(il);
+        if (cursor.TryGotoNext(x => x.MatchLdarg(0),
+            x => x.MatchLdarg(0),
+            x => x.MatchCallOrCallvirt<CharacterBody>("get_maxShield"),
+            x => x.MatchLdarg(0),
+            x => x.MatchCallOrCallvirt<CharacterBody>("get_cursePenalty")))
+        {
+            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Action<CharacterBody>>((body) =>
+            {
+                if (body)
+                {
+                    var stackCount = GetCount(body);
+                    if (stackCount > 0)
+                    {
+                        body.attackSpeed *= 1 + (ThunderboltASInit + (stackCount - 1) * ThunderboltASStack);
+                    }
+                }
+            });
+        }
     }
 
     private void ThunderboltFasterProjectiles(On.RoR2.Projectile.ProjectileController.orig_Start orig, RoR2.Projectile.ProjectileController self)

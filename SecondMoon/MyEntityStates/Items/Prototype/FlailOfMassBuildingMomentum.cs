@@ -34,8 +34,10 @@ public class FlailOfMassBuildingMomentum : FlailOfMassBase
             }
             if (body.isSprinting)
             {
+                float unchangedCombinedHealth = body.baseMaxHealth + body.levelMaxHealth * (body.level - 1) + (body.baseMaxShield + body.levelMaxShield * (body.level - 1));
+                float finalBuildRate = buildRate / (body.moveSpeed * body.healthComponent.fullCombinedHealth / unchangedCombinedHealth);
                 sprintTimer += Time.fixedDeltaTime;
-                if (sprintTimer >= buildRate / body.moveSpeed && body.moveSpeed > 0f)
+                if (sprintTimer >= finalBuildRate && body.moveSpeed > 0f)
                 {
                     sprintTimer = 0f;
                     decayTimer = 0f;

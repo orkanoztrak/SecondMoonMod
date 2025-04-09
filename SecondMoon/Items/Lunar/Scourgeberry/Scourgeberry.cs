@@ -24,14 +24,20 @@ public class Scourgeberry : Item<Scourgeberry>
     public static ConfigOption<float> ScourgeberryLunarScourgeDuration;
     public override string ItemName => "Scourgeberry";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_SCOURGEBERRY";
+    public override string ItemLangTokenName => "SCOURGEBERRY";
 
     public override string ItemPickupDesc => "Turn your hits with proc coefficient into a damage over time effect that is stronger.";
 
     public override string ItemFullDesc => $"<color=#FF7F7F>Hits with proc coefficient deal <style=cIsDamage>0</style> damage. </color>" +
         $"Hits apply <color=#0000FF>Lunar Scourge</color> for <style=cIsDamage>{ScourgeberryLunarScourgeDmgInit * 100}%</style> <style=cStack>(+{ScourgeberryLunarScourgeDmgStack * 100}% per stack)</style> of the TOTAL damage they would deal over <style=cIsDamage>{ScourgeberryLunarScourgeDuration}s</style> <style=cStack>(2× per stack)</style>.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "<style=cMono>FIELDTECH Image-To-Text Translator (v2.5.10b)\r\n# Awaiting input... done.\r\n# Reading image for text... done.\r\n# Transcribing data... done.\r\n# Translating text... done. [8 exceptions raised]\r\nComplete: outputting results.\r\n\r\n</style>" +
+        "Down below the mountain range, when you follow the little creek that flows from the easy slopes on the east, is a valley.\r\n\r\n" +
+        "The elders call it the \"Forbidden Valley\". You wouldn't get where the name comes from by the looks of it. The creek keeps flowing, slower than before thanks to the barely apparent slope, zig zagging through the fields of beautiful purple flowers as far as the eye can see.\r\n\r\n" +
+        "The name comes from the small bushes of berries one can find nestled among the flower beds. Blood red berries grow from those bushes, and they do naught but bring misfortune to those who deign to taste of them. They are said to have been planted by the [Elder Brother] to bring pain to the creations of his betrayer sibling.\r\n\r\n" +
+        "That's why from a young age, our tribe is taught to never go to the valley below the mountains. Yet sometimes I find myself wondering; what lies beyond the valley? What amazing things can be beyond such a place?\r\n\r\n" +
+        "I have made my mind. Tomorrow night, while everyone is asleep, I will escape. I will escape and discover this world for all that it has to offer. I will see the creations of [the Brothers] with my own eyes.\r\n\r\n" +
+        "<style=cMono>Translation Errors:</style>\r\n# [Elder Brother] could not be fully translated.\r\n# [The Brothers] could not be fully translated.";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/LunarTierDef.asset").WaitForCompletion();
 
@@ -45,11 +51,11 @@ public class Scourgeberry : Item<Scourgeberry>
 
     public override void Hooks()
     {
-        IL.RoR2.HealthComponent.TakeDamage += NoDamage;
-        On.RoR2.GlobalEventManager.OnHitEnemy += ScourgeberryApplyTotalLunarScourge;
+        IL.RoR2.HealthComponent.TakeDamageProcess += NoDamage;
+        On.RoR2.GlobalEventManager.ProcessHitEnemy += ScourgeberryApplyTotalLunarScourge;
     }
 
-    private void ScourgeberryApplyTotalLunarScourge(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+    private void ScourgeberryApplyTotalLunarScourge(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
         if (damageInfo.attacker && damageInfo.procCoefficient > 0 && NetworkServer.active && !damageInfo.rejected)
         {
@@ -87,13 +93,18 @@ public class Scourgeberry : Item<Scourgeberry>
 
     private void NoDamage(ILContext il)
     {
+        int damageIndex = 7;
+        int flag2index = 6;
         var cursor = new ILCursor(il);
-        if (cursor.TryGotoNext(MoveType.After, x => x.MatchStloc(42)))
-        {
+        if (cursor.TryGotoNext(MoveType.After, x => x.MatchStloc(flag2index)))
+        { // done in order to skip blocks like Safer Spaces, they shouldn't proc on a 0 damage hit
+            var cache = 0f;
+            var cacheCheck = false;
             cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_1);
-            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc, 6);
-            cursor.EmitDelegate<Func<DamageInfo, float, float>>((damageInfo, damage) =>
+            cursor.EmitDelegate<Action<DamageInfo>>((damageInfo) =>
             {
+                cacheCheck = false;
+                cache = damageInfo.damage;
                 if (damageInfo.procCoefficient > 0)
                 {
                     var attacker = damageInfo.attacker;
@@ -105,14 +116,24 @@ public class Scourgeberry : Item<Scourgeberry>
                             var stackCount = GetCount(attackerBody);
                             if (stackCount > 0)
                             {
-                                return 0;
+                                cacheCheck = true;
+                                damageInfo.damage = 0;
                             }
                         }
                     }
                 }
-                return damage;
             });
-            cursor.Emit(Mono.Cecil.Cil.OpCodes.Stloc, 6);
+            if (cursor.TryGotoNext(MoveType.After, x => x.MatchStloc(damageIndex)))
+            { // done in order to make sure procs are correctly calculated, we need the original damageInfo to stay unchanged
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_1);
+                cursor.EmitDelegate<Action<DamageInfo>>((damageInfo) =>
+                {
+                    if (cacheCheck)
+                    {
+                        damageInfo.damage = cache;
+                    }
+                });
+            }
         }
     }
 
@@ -129,8 +150,8 @@ public class Scourgeberry : Item<Scourgeberry>
     }
     private void CreateConfig(ConfigFile config)
     {
-        ScourgeberryLunarScourgeDmgInit = config.ActiveBind("Item: " + ItemName, "Lunar Scourge multiplier with one " + ItemName, 2f, "What % of TOTAL damage should Lunar Scourge do with one " + ItemName + "? (2 = 200%)");
-        ScourgeberryLunarScourgeDmgStack = config.ActiveBind("Item: " + ItemName, "Lunar Scourge multiplier per stack after one " + ItemName, 1f, "What % of TOTAL damage should be added to Lunar Scourge per stack of " + ItemName + " after one? (1 = 100%)");
-        ScourgeberryLunarScourgeDuration = config.ActiveBind("Item: " + ItemName, "Lunar Scourge duration with one " + ItemName, 3f, "Lunar Scourge lasts this many seconds with one " + ItemName + ". Each stack after doubles the duration. This should be a value divisible by " + (double)LunarScourge.instance.Interval + ".");
+        ScourgeberryLunarScourgeDmgInit = config.ActiveBind("Item: " + ItemName, LunarScourge.instance.AssociatedBuffName + " multiplier with one " + ItemName, 2f, "What % of TOTAL damage should " + LunarScourge.instance.AssociatedBuffName + " do with one " + ItemName + "? (2 = 200%)");
+        ScourgeberryLunarScourgeDmgStack = config.ActiveBind("Item: " + ItemName, LunarScourge.instance.AssociatedBuffName + " multiplier per stack after one " + ItemName, 1f, "What % of TOTAL damage should be added to " + LunarScourge.instance.AssociatedBuffName +" per stack of " + ItemName + " after one? (1 = 100%)");
+        ScourgeberryLunarScourgeDuration = config.ActiveBind("Item: " + ItemName, LunarScourge.instance.AssociatedBuffName + " duration with one " + ItemName, 3f, LunarScourge.instance.AssociatedBuffName + " lasts this many seconds with one " + ItemName + ". Each stack after doubles the duration. This should be a value divisible by " + (double)LunarScourge.instance.Interval + ".");
     }
 }

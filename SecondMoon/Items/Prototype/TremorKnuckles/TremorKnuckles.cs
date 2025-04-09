@@ -1,10 +1,12 @@
 ﻿using BepInEx.Configuration;
+using MonoMod.Cil;
 using R2API;
 using RoR2;
 using SecondMoon.BuffsAndDebuffs.Buffs.Item.Prototype;
 using SecondMoon.Items.ItemTiers.TierPrototype;
 using SecondMoon.Utils;
 using System;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 namespace SecondMoon.Items.Prototype.TremorKnuckles;
@@ -18,7 +20,7 @@ public class TremorKnuckles : Item<TremorKnuckles>
     public static ConfigOption<float> TremorKnucklesBombDamage;
     public override string ItemName => "Tremor Knuckles";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_TREMOR_KNUCKLES";
+    public override string ItemLangTokenName => "TREMOR_KNUCKLES";
 
     public override string ItemPickupDesc => "Continued Primary skill use boosts damage and applies bombs on hit, until you use a non-Primary combat skill.";
 
@@ -27,7 +29,9 @@ public class TremorKnuckles : Item<TremorKnuckles>
         $"Each stack of <color=#7CFDEA>Tremors</color> increases <style=cIsDamage>base damage</style> by <style=cIsDamage>{TremorKnucklesDamageBuffPerThresholdInit * 100}%</style> <style=cStack>(+{TremorKnucklesDamageBuffPerThresholdStack * 100}% per stack)</style>. " +
         $"Your attacks apply sticky bombs on hit that deal <style=cIsDamage>{TremorKnucklesBombDamage * 100}%</style> TOTAL damage while you have <color=#7CFDEA>Tremors</color>.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "I don't like the phrase \"blind rage\". It implies that the rage itself is out of control or misguided, where in reality it just reflects the weakness of the mind of the one that is enraged. Rage should never be fully discarded, it exists as a reminder that we shouldn't take a beating, physically or mentally, lying down - getting angry means we have seen something that violates our sense of how things ought to be.\r\n\r\n" +
+        "The truly strong know how to wield and direct their rage. Because when you control it and not the other way around, rage can become the ultimate source of focus, allowing you to single-mindedly work towards righting that wrong which made you angry in the first place. When you reach this point, the zenith upon which lies the perfect balance between rage and calm, you not only gain the greatest strength, but also discover your truest self.\r\n\r\n" +
+        "- Elizabeth Briggs, Master of the Second Temple";
 
     public override ItemTierDef ItemTierDef => TierPrototype.instance.ItemTierDef;
 
@@ -42,20 +46,34 @@ public class TremorKnuckles : Item<TremorKnuckles>
     public override void Hooks()
     {
         On.RoR2.CharacterBody.OnInventoryChanged += AddItemBehavior;
-        On.RoR2.CharacterBody.RecalculateStats += TremorKnucklesDamageBoost;
+        IL.RoR2.CharacterBody.RecalculateStats += TremorKnucklesDamageBoost;
     }
 
-    private void TremorKnucklesDamageBoost(On.RoR2.CharacterBody.orig_RecalculateStats orig, CharacterBody self)
+    private void TremorKnucklesDamageBoost(ILContext il)
     {
-        orig(self);
-        var stackCount = GetCount(self);
-        if (stackCount > 0)
+        var cursor = new ILCursor(il);
+        if (cursor.TryGotoNext(x => x.MatchLdarg(0),
+            x => x.MatchLdarg(0),
+            x => x.MatchCallOrCallvirt<CharacterBody>("get_maxShield"),
+            x => x.MatchLdarg(0),
+            x => x.MatchCallOrCallvirt<CharacterBody>("get_cursePenalty")))
         {
-            var buffCount = self.GetBuffCount(Tremors.instance.BuffDef.buffIndex);
-            if (buffCount > 0)
+            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Action<CharacterBody>>((body) =>
             {
-                self.damage *= 1 + ((TremorKnucklesDamageBuffPerThresholdInit + ((stackCount - 1) * TremorKnucklesDamageBuffPerThresholdStack)) * buffCount);
-            }
+                if (body)
+                {
+                    var stackCount = GetCount(body);
+                    if (stackCount > 0)
+                    {
+                        var buffCount = body.GetBuffCount(Tremors.instance.BuffDef.buffIndex);
+                        if (buffCount > 0)
+                        {
+                            body.damage *= 1 + ((TremorKnucklesDamageBuffPerThresholdInit + ((stackCount - 1) * TremorKnucklesDamageBuffPerThresholdStack)) * buffCount);
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -76,6 +94,7 @@ public class TremorKnuckles : Item<TremorKnuckles>
             Hooks();
         }
     }
+
     private void CreateConfig(ConfigFile config)
     {
         TremorKnucklesRequiredPrimaryUses = config.ActiveBind("Item: " + ItemName, "Required Primary uses for a Tremors buff", 3, "After this many Primary uses, gain a stack of Tremors.");

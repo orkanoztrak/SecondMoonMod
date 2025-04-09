@@ -21,7 +21,7 @@ public class PlasticBrick : Item<PlasticBrick>
     public static ConfigOption<float> PlasticBrickDebuffDuration;
     public override string ItemName => "Plastic Brick";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_PLASTIC_BRICK";
+    public override string ItemLangTokenName => "PLASTIC_BRICK";
 
     public override string ItemPickupDesc => "Your non-critical hits have a chance to reduce armor.";
 
@@ -29,7 +29,13 @@ public class PlasticBrick : Item<PlasticBrick>
         $"to reduce <style=cIsDamage>armor</style> by <style=cIsDamage>{PlasticBrickArmorReduction}</style> for <style=cIsDamage>{PlasticBrickDebuffDuration}s</style>. " +
         $"Chance increases with <style=cIsDamage>critical chance</style> to try to ensure the overall odds stay the same.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "Sometimes I think I raised you too fast.\r\n\r\n" +
+        "I still remember your tiny hands grasping for the plastic bricks. You wanted to build something that none of us could understand. A shape of your own dreaming. While we wanted to build something out of you.\r\n\r\n" +
+        "Sometimes I feel like my ambition clouded my love for you.\r\n\r\n" +
+        "I always thought about how great of a man you would become once you had grown up, and time passed so fast because of that. And now that you have grown, all I want to do is somehow make you small once more and hold you in my arms again.\r\n\r\n" +
+        "Sometimes I believe I could have been a better mother.\r\n\r\n" +
+        "Although there is no guideline to being one, I sure wish somebody had written one. You would tell me that you have no regrets, and that I had done the best job I could, and that you couldn't have asked for a better mother, as you have done so many times. But sometimes I believe otherwise.\r\n\r\n" +
+        "Even still, one thing I am all the time is proud of you. I always have been, and always will be.";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier1Def.asset").WaitForCompletion();
 
@@ -43,10 +49,10 @@ public class PlasticBrick : Item<PlasticBrick>
 
     public override void Hooks()
     {
-        On.RoR2.GlobalEventManager.OnHitEnemy += PlasticBrickReduceArmor;
+        On.RoR2.GlobalEventManager.ProcessHitEnemy += PlasticBrickReduceArmor;
     }
 
-    private void PlasticBrickReduceArmor(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+    private void PlasticBrickReduceArmor(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
         if (!damageInfo.crit && damageInfo.procCoefficient > 0 && NetworkServer.active && !damageInfo.rejected)
         {

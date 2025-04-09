@@ -1,4 +1,7 @@
-﻿using System;
+﻿using MonoMod.Cil;
+using RoR2;
+using SecondMoon.Items.Tier3.Boulderball;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -19,7 +22,32 @@ public class BloodFrenzy : Buff<BloodFrenzy>
 
     public override void Hooks()
     {
-        On.RoR2.CharacterBody.RecalculateStats += BloodFrenzyBuffStats;
+        IL.RoR2.CharacterBody.RecalculateStats += BloodFrenzyBuffStats;
+    }
+
+    private void BloodFrenzyBuffStats(ILContext il)
+    {
+        var cursor = new ILCursor(il);
+        if (cursor.TryGotoNext(x => x.MatchLdarg(0),
+            x => x.MatchLdarg(0),
+            x => x.MatchCallOrCallvirt<CharacterBody>("get_maxShield"),
+            x => x.MatchLdarg(0),
+            x => x.MatchCallOrCallvirt<CharacterBody>("get_cursePenalty")))
+        {
+            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Action<CharacterBody>>((body) =>
+            {
+                if (body)
+                {
+                    if (body.HasBuff(BuffDef))
+                    {
+                        body.moveSpeed *= 1 + BloodInfusedCoreBloodFrenzyBoost;
+                        body.attackSpeed *= 1 + BloodInfusedCoreBloodFrenzyBoost;
+                        body.damage *= 1 + BloodInfusedCoreBloodFrenzyBoost;
+                    }
+                }
+            });
+        }
     }
 
     private void BloodFrenzyBuffStats(On.RoR2.CharacterBody.orig_RecalculateStats orig, RoR2.CharacterBody self)

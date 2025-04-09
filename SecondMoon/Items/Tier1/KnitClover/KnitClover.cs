@@ -19,7 +19,7 @@ public class KnitClover : Item<KnitClover>
 
     public override string ItemName => "Knit Clover";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_KNIT_CLOVER";
+    public override string ItemLangTokenName => "KNIT_CLOVER";
 
     public override string ItemPickupDesc => "Your non-critical hits have a chance to have a higher proc coefficient.";
 
@@ -27,7 +27,19 @@ public class KnitClover : Item<KnitClover>
         $"to have their <style=cIsUtility>proc coefficient</style> increased by <style=cIsUtility>{KnitCloverProcCoefficientBoost * 100f}%</style>. " + 
         $"Chance increases with <style=cIsDamage>critical chance</style> to try to ensure the overall odds stay the same.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "Two outlaws sat around a campfire.\r\n\r\n" +
+        "They didn't know one another. They just happened upon each other by chance.\r\n\r\n" +
+        "One was a man, the other a woman. The man was holding a cup of coffee in his hand, taking rare but rich sips from it. The woman was looking at a trinket knitted for her by her niece.\r\n\r\n" +
+        "City lights gleamed in the distance as the two mercenaries sat, silently.\r\n\r\n" +
+        "The man was observing the woman, and she knew. He did little to hide it.\r\n\r\n" +
+        "\"How lucky for you to have met me here.\" He had said an hour before and she had told him she had never needed luck. She didn't.\r\n\r\n" +
+        "They kept sitting silently.\r\n\r\n" +
+        "She took a bite out of a rabbit she had been roasting on the fire.\r\n\r\n" +
+        "He was still studying her. She knew something was up.\r\n\r\n" +
+        "His finger twitched.\r\n\r\n" +
+        "She drew her revolver, she shot.\r\n\r\n" +
+        "He was dead, she was alive.\r\n\r\n" +
+        "After all, she had never needed luck.";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier1Def.asset").WaitForCompletion();
 
@@ -41,10 +53,10 @@ public class KnitClover : Item<KnitClover>
 
     public override void Hooks()
     {
-        On.RoR2.HealthComponent.TakeDamage += KnitCloverLuck;
+        On.RoR2.HealthComponent.TakeDamageProcess += KnitCloverLuck;
     }
 
-    private void KnitCloverLuck(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
+    private void KnitCloverLuck(On.RoR2.HealthComponent.orig_TakeDamageProcess orig, HealthComponent self, DamageInfo damageInfo)
     {
         if (!damageInfo.crit && damageInfo.procCoefficient > 0f && damageInfo.attacker)
         {

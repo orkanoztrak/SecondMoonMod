@@ -14,6 +14,10 @@ public class PopperseedsDebuff : Buff<PopperseedsDebuff>
 
     public override Color BuffColor => new Color32(255, 0, 100, 255);
 
+    public override bool IgnoreGrowthNectar => true;
+
+    public override bool IsDOT => true;
+
     public override void Init()
     {
         CreateBuff();

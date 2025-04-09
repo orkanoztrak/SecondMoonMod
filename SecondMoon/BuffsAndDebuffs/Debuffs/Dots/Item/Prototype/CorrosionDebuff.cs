@@ -13,6 +13,10 @@ public class CorrosionDebuff : Buff<CorrosionDebuff>
 
     public override Color BuffColor => new Color32(150, 150, 0, 255);
 
+    public override bool IgnoreGrowthNectar => true;
+
+    public override bool IsDOT => true;
+
     public override void Init()
     {
         CreateBuff();

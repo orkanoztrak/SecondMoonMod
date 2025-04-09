@@ -21,6 +21,8 @@ public class PocketSandDebuff : Buff<PocketSandDebuff>
 
     public override bool IsDebuff => true;
 
+    public override bool IgnoreGrowthNectar => true;
+
     public override void Hooks()
     {
         RecalculateStatsAPI.GetStatCoefficients += PocketSandEffect;

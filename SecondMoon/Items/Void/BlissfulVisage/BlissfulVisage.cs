@@ -5,6 +5,7 @@ using RoR2.ExpansionManagement;
 using RoR2.Skills;
 using SecondMoon.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
@@ -25,13 +26,22 @@ public class BlissfulVisage : Item<BlissfulVisage>
 
     public override string ItemName => "Blissful Visage";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_GHOSTONKILLVOID";
+    public override string ItemLangTokenName => "GHOSTONKILLVOID";
 
     public override string ItemPickupDesc => $"Periodically summon a <style=cIsVoid>corrupted</style> ghost of yourself - kills reduce this timer. <style=cIsVoid>Corrupts all Happiest Masks</style>.";
 
     public override string ItemFullDesc => $"Every <style=cIsUtility>{BlissfulVisageGhostCooldown}s</style>, summon a <style=cIsVoid>corrupted</style> ghost of yourself that inherits your items. Kills reduce this timer by <style=cIsDamage>{BlissfulVisageReduceTimerOnKillInit}s</style> <style=cStack>(+{BlissfulVisageReduceTimerOnKillStack}s per stack)</style>. Lasts <style=cIsDamage>{BlissfulVisageSuicideTimer}s</style>. <style=cIsVoid>Corrupts all Happiest Masks</style>.";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "<style=cMono>//--AUT?O-TR??AN?SCRI?PTI??ON FR??OM H???ER?E? --//\r\n\r\n</style>" +
+        "”...uoy llet I ,tenalp sihT“ .nugtohs sih dedaol eh sa htaerb sih rednu desruc nam ehT\r\n\r\n" +
+        ".wolg yldlrowrehto na htiw wolg ot nageb shtuom riehT .moor eht otni pets reilrae dellik dah eh snairumeL eht was dna denrut nam eht ,daerd fo esnes a htiW ”?...uoy era tahW“\r\n\r\n" +
+        ".nam eht ta yltcerid gnitniop – regnif sih desiar reidlos eht ,ylwolS .devom ydob pmil s’reidlos ehT\r\n\r\n" +
+        "”--ydaerla tser a ti evig os ,selteeB ot txen pu gnikaw fo derit m’I !ksam eht revo dnah dias I ?!em raeh uoy nac ,yeH“ .sekahs hguor wef a mih gnivig ,teef sih ot reidlos eht detsioh dna detnurg nam ehT .esnopser oN\r\n\r\n" +
+        "”.revo ti kroF .daed eht htiw gniyalp nuf hguone dah ev’ew ,thgirlA“\r\n\r\n" +
+        ".reidlos eht tas renroc eht ni dna ,ffo erew sthgil ehT .nepo rood eht demmals nam eht ,pmI na fo tsohg eht hguorht gnippetS .hguone saw hguone tuB\r\n\r\n" +
+        ".etam-moor yltsohg a gnivah ot demotsucca nworg dah kcolb siht ni srebmem werc eht fo tsom taht ecalpnommoc os emoceb dah sihT .nam eht morf ecnalg dnoces a gninrae ylerab ,mih yb llah eht nwod deklaw yad taht reilrae dellik dah eh snairumeL ehT .skcarrab eht sdrawot llah eht nwod degdurt nam ehT ”.ti fo erac ekat ll’I“\r\n\r\n" +
+        " .nirg yppah yllufniap a htiw denroda ,ksam elpmis a – thgiL tcatnoC eht draoba neeb evah ot thguoht tcafitra na derevocer dah - reidlos elpmis a – srebmem werc eht fo eno ,noitidepxe enituor a retfA .dehgis nam ehT\r\n\r\n" +
+        "”.kcab era stsohg eht ,riS“";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/DLC1/Common/VoidTier3Def.asset").WaitForCompletion();
 
@@ -47,8 +57,27 @@ public class BlissfulVisage : Item<BlissfulVisage>
 
     public override void Hooks()
     {
-
+        On.RoR2.GlobalEventManager.OnCharacterDeath += BlissfulVisageReduceGhostTimerOnKill;
     }
+
+    private void BlissfulVisageReduceGhostTimerOnKill(On.RoR2.GlobalEventManager.orig_OnCharacterDeath orig, GlobalEventManager self, DamageReport damageReport)
+    {
+        if (damageReport != null)
+        {
+            var body = damageReport.attackerBody;
+            if (body) 
+            {
+                var stackCount = GetCount(body);
+                var component = body.gameObject.GetComponent<BlissfulVisageBodyBehavior>();
+                if (stackCount > 0 && component)
+                {
+                    component.ghostResummonCooldown -= BlissfulVisageReduceTimerOnKillInit + ((stackCount - 1) * BlissfulVisageReduceTimerOnKillStack);
+                }
+            }
+        }
+        orig(self, damageReport);
+    }
+
 
     public override void Init(ConfigFile config)
     {
@@ -58,6 +87,7 @@ public class BlissfulVisage : Item<BlissfulVisage>
             CreateConfig(config);
             CreateLang();
             CreateItem();
+            Hooks();
         }
     }
 
@@ -74,7 +104,7 @@ public class BlissfulVisageSuicideComponent : Item<BlissfulVisageSuicideComponen
 {
     public override string ItemName => "BlissfulVisageSuicideComponent";
 
-    public override string ItemLangTokenName => "SECONDMOONMOD_GHOSTONKILLVOID_SUICIDE";
+    public override string ItemLangTokenName => "GHOSTONKILLVOID_SUICIDE";
 
     public override string ItemPickupDesc => "";
 
@@ -84,7 +114,7 @@ public class BlissfulVisageSuicideComponent : Item<BlissfulVisageSuicideComponen
 
     public override ItemTierDef ItemTierDef => null;
 
-    public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Utility, ItemTag.CannotCopy];
+    public override ItemTag[] Category => [ItemTag.CannotCopy];
 
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
@@ -97,9 +127,9 @@ public class BlissfulVisageSuicideComponent : Item<BlissfulVisageSuicideComponen
         On.RoR2.CharacterBody.OnInventoryChanged += BlissfulVisageAddSuicideItemBehavior;
     }
 
-    [Server]
     private void BlissfulVisageAddSuicideItemBehavior(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
     {
+        if (!NetworkServer.active) return;
         self.AddItemBehavior<BlissfulVisageSuicideComponentBehavior>(self.inventory.GetItemCount(instance.ItemDef));
         orig(self);
     }
@@ -107,9 +137,12 @@ public class BlissfulVisageSuicideComponent : Item<BlissfulVisageSuicideComponen
     public override void Init(ConfigFile config)
     {
         EnableCheck = BlissfulVisage.instance.EnableCheck;
-        CreateLang();
-        CreateItem();
-        Hooks();
+        if (EnableCheck)
+        {
+            CreateLang();
+            CreateItem();
+            Hooks();
+        }
     }
 
     public class BlissfulVisageSuicideComponentBehavior : CharacterBody.ItemBehavior
@@ -127,7 +160,7 @@ public class BlissfulVisageSuicideComponent : Item<BlissfulVisageSuicideComponen
 
         private void FixedUpdate()
         {
-            suicideTimer -= Time.deltaTime;
+            suicideTimer -= Time.fixedDeltaTime;
             if (suicideTimer <= 0)
             {
                 if (body.HasBuff(DLC1Content.Buffs.EliteVoid))
