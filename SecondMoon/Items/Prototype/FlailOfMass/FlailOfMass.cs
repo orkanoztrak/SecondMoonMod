@@ -52,8 +52,8 @@ public class FlailOfMass : Item<FlailOfMass>
 
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
-        displayRules = new ItemDisplayRuleDict(null);
-        return displayRules;
+        DisplayRules = new ItemDisplayRuleDict(null);
+        return DisplayRules;
     }
 
     public override void Hooks()

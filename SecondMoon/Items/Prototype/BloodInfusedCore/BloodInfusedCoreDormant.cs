@@ -21,10 +21,11 @@ public class BloodInfusedCoreDormant : Item<BloodInfusedCoreDormant>
 
     public override ItemTag[] Category => [];
 
+    public override ItemIndex ActivateIntoPrototypeItem => BloodInfusedCore.instance.ItemDef.itemIndex;
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
-        displayRules = new ItemDisplayRuleDict(null);
-        return displayRules;
+        DisplayRules = new ItemDisplayRuleDict(null);
+        return DisplayRules;
     }
 
     public override void Hooks()

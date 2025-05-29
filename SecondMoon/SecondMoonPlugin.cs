@@ -29,7 +29,6 @@ using SecondMoon.Equipment;
 using SecondMoon.Interactables;
 using SecondMoon.Items.Void.TwistedRegrets;
 using SecondMoon.Equipment.RadiantHelm;
-using static SecondMoon.Utils.PickupNotificationGenericPickupPatch;
 using R2API.Networking.Interfaces;
 using R2API.Networking;
 using SecondMoon.Items.ItemTiers.TierPrototypeDormant;
@@ -80,6 +79,8 @@ namespace SecondMoon
         public static List<Item> VoidItemList = [];
         public static ExpansionDef DLC1;
         public static ExpansionDef DLC2;
+
+
         public void Awake()
         {
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("SecondMoon.secondmoon_assets"))
@@ -227,7 +228,9 @@ namespace SecondMoon
             On.RoR2.UI.LogBook.LogBookController.BuildPickupEntries += AddPrototypes;
             IL.RoR2.EquipmentDef.CreatePickupDef += EquipmentDef_CreatePickupDef;
             On.RoR2.CharacterBody.RecalculateStats += FinalModificationsToStats;
+
         }
+
 
         public void GenerateExpansionDef()
         {

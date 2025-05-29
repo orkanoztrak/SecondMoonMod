@@ -60,7 +60,11 @@ public abstract class Item
 
     public virtual bool Unlockable { get; set; } = true;
     public virtual ExpansionDef RequiredExpansion { get; set; } = null;
-    protected virtual ItemDisplayRuleDict displayRules { get; set; } = null;
+    protected virtual ItemDisplayRuleDict DisplayRules { get; set; } = null;
+
+    public virtual ItemIndex ActivateIntoPrototypeItem { get; set; } = ItemIndex.None;
+
+    public virtual EquipmentIndex ActivateIntoPrototypeEquipment { get; set; } = EquipmentIndex.None;
 
     public virtual void Init(ConfigFile config)
     {

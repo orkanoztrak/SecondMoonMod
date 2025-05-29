@@ -22,10 +22,12 @@ public class RadiantHelmDormant : Item<RadiantHelmDormant>
 
     public override ItemTag[] Category => [];
 
+    public override EquipmentIndex ActivateIntoPrototypeEquipment => RadiantHelm.instance.EquipmentDef.equipmentIndex;
+
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
-        displayRules = new ItemDisplayRuleDict(null);
-        return displayRules;
+        DisplayRules = new ItemDisplayRuleDict(null);
+        return DisplayRules;
     }
 
     public override void Hooks()

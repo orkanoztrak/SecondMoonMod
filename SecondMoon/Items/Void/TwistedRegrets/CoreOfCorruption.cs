@@ -14,7 +14,7 @@ public class CoreOfCorruption : Item<CoreOfCorruption>
 
     public override string ItemLangTokenName => "TWISTED_REGRETS_DORMANT";
 
-    public override string ItemPickupDesc => "Provides no benefit. <color=#7CFDEA>Awaken this item to reveal its true power...</color><style=cIsVoid>but it won't be easy.</style>";
+    public override string ItemPickupDesc => "Provides no benefit. <color=#7CFDEA>Awaken this item to reveal its true power...</color><style=cIsVoid>but beware of corrupted enemies.</style>";
 
     public override string ItemFullDesc => $"Any enemy spawned has a <style=cIsVoid>{TwistedRegrets.CoreOfCorruptionVoidCorruptionChanceInit}%</style> <style=cStack>(+{TwistedRegrets.CoreOfCorruptionVoidCorruptionChanceStack}% per stack across the team)</style> chance to gain <style=cIsVoid>Void elite</style> powers. These enemies will also keep their original powers, if any. " +
         $"Can be given to the <color=#7CFDEA>Awakening Shrine</color> to add <style=cIsVoid>Void elite</style> powers to its boss and set its reward to <color=#7CFDEA>{TwistedRegrets.instance.ItemName}</color>.";
@@ -25,10 +25,11 @@ public class CoreOfCorruption : Item<CoreOfCorruption>
 
     public override ItemTag[] Category => [];
 
+    public override ItemIndex ActivateIntoPrototypeItem => TwistedRegrets.instance.ItemDef.itemIndex;
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
-        displayRules = new ItemDisplayRuleDict(null);
-        return displayRules;
+        DisplayRules = new ItemDisplayRuleDict(null);
+        return DisplayRules;
     }
 
     public override void Hooks()

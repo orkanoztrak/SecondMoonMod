@@ -40,8 +40,8 @@ public class WantedPoster : Item<WantedPoster>
     public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Utility, ItemTag.AIBlacklist, ItemTag.OnKillEffect];
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
-        displayRules = new ItemDisplayRuleDict(null);
-        return displayRules;
+        DisplayRules = new ItemDisplayRuleDict(null);
+        return DisplayRules;
     }
 
     public override void Hooks()

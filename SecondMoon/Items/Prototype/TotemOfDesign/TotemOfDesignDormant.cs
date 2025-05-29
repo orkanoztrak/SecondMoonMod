@@ -21,10 +21,12 @@ public class TotemOfDesignDormant : Item<TotemOfDesignDormant>
 
     public override ItemTag[] Category => [];
 
+    public override ItemIndex ActivateIntoPrototypeItem => TotemOfDesign.instance.ItemDef.itemIndex;
+
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
-        displayRules = new ItemDisplayRuleDict(null);
-        return displayRules;
+        DisplayRules = new ItemDisplayRuleDict(null);
+        return DisplayRules;
     }
 
     public override void Hooks()

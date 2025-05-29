@@ -14,7 +14,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 using static RoR2.ColorCatalog;
 
-namespace SecondMoon.Interactables.Purchase.TakesItem;
+namespace SecondMoon.Interactables.Purchase.TakesItem.TwistingWell;
 
 public class TwistingWell : Interactable
 {
@@ -89,7 +89,7 @@ public class TwistingWell : Interactable
     {
         if (!NetworkServer.active) return;
         if (stage.sceneDef.nameToken != "MAP_BAZAAR_TITLE") return;
-        PrefabInstance = GameObject.Instantiate(InteractableBodyModelPrefab, new Vector3(-74f, -25.65001f, -42.92929f), Quaternion.Euler(2.476025f, 100f, 355.9525f));
+        PrefabInstance = UnityEngine.Object.Instantiate(InteractableBodyModelPrefab, new Vector3(-74f, -25.65001f, -42.92929f), Quaternion.Euler(2.476025f, 100f, 355.9525f));
         NetworkServer.Spawn(PrefabInstance);
     }
 
@@ -209,18 +209,6 @@ public class TwistingWell : Interactable
         list.Add(PearlCost);
     }
 
-    private void SetSomeModelMats()
-    {
-        //helfire range for foam, turn off liquid mesh
-        var foamRenderer = InteractableModel.transform.Find("mdlTwistingWell").Find("Foam").gameObject.GetComponent<MeshRenderer>();
-        foamRenderer.material = Addressables.LoadAssetAsync<Material>("RoR2/Base/BurnNearby/matHelfireRangeIndicator.mat").WaitForCompletion();
-
-        //change swirls
-        var swirls = InteractableModel.transform.Find("mdlTwistingWell").Find("Swirls").gameObject.GetComponent<ParticleSystem>();
-        var swirlsRenderer = InteractableModel.transform.Find("mdlTwistingWell").Find("Swirls").gameObject.GetComponent<ParticleSystemRenderer>();
-        swirlsRenderer.material = Addressables.LoadAssetAsync<Material>("RoR2/DLC2/Chef/matBoostedSearFireballFlame.mat").WaitForCompletion();
-    }
-
     private void ConstructInteractable()
     {
         SetSomeModelMats();
@@ -287,7 +275,19 @@ public class TwistingWell : Interactable
 
         var lunarCostDef = CostTypeCatalog.GetCostTypeDef(CostTypeIndex.LunarItemOrEquipment);
 
-        PrefabAPI.RegisterNetworkPrefab(InteractableBodyModelPrefab);
+        InteractableBodyModelPrefab.RegisterNetworkPrefab();
+
+        void SetSomeModelMats()
+        {
+            //helfire range for foam, turn off liquid mesh
+            var foamRenderer = InteractableModel.transform.Find("mdlTwistingWell").Find("Foam").gameObject.GetComponent<MeshRenderer>();
+            foamRenderer.material = Addressables.LoadAssetAsync<Material>("RoR2/Base/BurnNearby/matHelfireRangeIndicator.mat").WaitForCompletion();
+
+            //change swirls
+            var swirls = InteractableModel.transform.Find("mdlTwistingWell").Find("Swirls").gameObject.GetComponent<ParticleSystem>();
+            var swirlsRenderer = InteractableModel.transform.Find("mdlTwistingWell").Find("Swirls").gameObject.GetComponent<ParticleSystemRenderer>();
+            swirlsRenderer.material = Addressables.LoadAssetAsync<Material>("RoR2/DLC2/Chef/matBoostedSearFireballFlame.mat").WaitForCompletion();
+        }
     }
 
     public class TwistingWellIrradiantPearlTracker : MonoBehaviour

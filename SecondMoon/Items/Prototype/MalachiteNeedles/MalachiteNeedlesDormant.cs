@@ -21,10 +21,13 @@ public class MalachiteNeedlesDormant : Item<MalachiteNeedlesDormant>
 
     public override ItemTag[] Category => [];
 
+    public override ItemIndex ActivateIntoPrototypeItem => MalachiteNeedles.instance.ItemDef.itemIndex;
+
+
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
-        displayRules = new ItemDisplayRuleDict(null);
-        return displayRules;
+        DisplayRules = new ItemDisplayRuleDict(null);
+        return DisplayRules;
     }
 
     public override void Hooks()

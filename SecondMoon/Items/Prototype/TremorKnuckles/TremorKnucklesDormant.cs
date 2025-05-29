@@ -21,10 +21,12 @@ public class TremorKnucklesDormant : Item<TremorKnucklesDormant>
 
     public override ItemTag[] Category => [];
 
+    public override ItemIndex ActivateIntoPrototypeItem => TremorKnuckles.instance.ItemDef.itemIndex;
+
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
-        displayRules = new ItemDisplayRuleDict(null);
-        return displayRules;
+        DisplayRules = new ItemDisplayRuleDict(null);
+        return DisplayRules;
     }
 
     public override void Hooks()
