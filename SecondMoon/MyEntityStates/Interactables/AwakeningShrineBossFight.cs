@@ -6,5 +6,9 @@ namespace SecondMoon.MyEntityStates.Interactables;
 
 public class AwakeningShrineBossFight : AwakeningShrineBaseState
 {
+    public override void OnEnter()
+    {
+        base.OnEnter();
 
+    }
 }
