@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SecondMoon.MyEntityStates.Interactables;
 
-public class AwakeningShrinePrepareBossSpawn : AwakeningShrineBaseState
+public class AwakeningShrineWindupBeforeBossSpawn : AwakeningShrineBaseState
 {
     private float duration;
     private float stopwatch;

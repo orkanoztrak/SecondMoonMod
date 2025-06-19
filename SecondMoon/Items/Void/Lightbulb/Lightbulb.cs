@@ -48,7 +48,7 @@ public class Lightbulb : Item<Lightbulb>
 
     private void LightbulbBoostShields(ILContext il)
     {
-        var maxShieldIndex = 72;
+        var maxShieldIndex = 74;
         var cursor = new ILCursor(il);
         if (cursor.TryGotoNext(x => x.MatchLdarg(0),
             x => x.MatchLdsfld(typeof(RoR2Content.Buffs), nameof(RoR2Content.Buffs.EngiShield))))

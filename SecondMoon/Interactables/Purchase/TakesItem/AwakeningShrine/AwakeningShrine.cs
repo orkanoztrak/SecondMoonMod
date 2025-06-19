@@ -50,6 +50,12 @@ public class AwakeningShrine : Interactable<AwakeningShrine>
     {
         RoR2Application.onLoad += ConstructInteractable;
         On.RoR2.PickupPickerController.GetInteractability += PickupPickerController_GetInteractability;
+        BossGroup.onBossGroupDefeatedServer += GuardianEliteDropPrototype;
+    }
+
+    private void GuardianEliteDropPrototype(BossGroup group)
+    {
+        
     }
 
     private Interactability PickupPickerController_GetInteractability(On.RoR2.PickupPickerController.orig_GetInteractability orig, PickupPickerController self, Interactor activator)
@@ -104,8 +110,6 @@ public class AwakeningShrine : Interactable<AwakeningShrine>
         info.DescriptionToken = $"INTERACTABLE_{InteractableLangToken}_INSPECT";
         info.TitleToken = $"INTERACTABLE_{InteractableLangToken}_TITLE";
         inspect.Info = info;
-
-
 
         static void InitializePrototypeConversionPairs()
         {

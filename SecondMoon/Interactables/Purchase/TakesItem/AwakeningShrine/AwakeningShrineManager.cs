@@ -1,8 +1,10 @@
-﻿using RoR2;
+﻿using R2API;
+using RoR2;
 using SecondMoon.MyEntityStates.Interactables;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace SecondMoon.Interactables.Purchase.TakesItem.AwakeningShrine;
@@ -11,13 +13,17 @@ public class AwakeningShrineManager : NetworkBehaviour
 {
     public PickupPickerController pickupPickerController;
 
-    private Interactor interactor;
+    public CharacterMaster bossMaster;
 
-    public CombatDirector bossDirector;
+    public Interactor interactor;
 
     public EntityStateMachine mainStateMachine;
 
-    public CharacterMaster bossMaster;
+    private CombatDirector bossDirector;
+
+    private BossGroup bossGroup;
+
+    private CombatSquad combatSquad;
 
     private Xoroshiro128Plus bossRng;
 
@@ -30,6 +36,9 @@ public class AwakeningShrineManager : NetworkBehaviour
     public void Awake()
     {
         bossDirector = GetComponent<CombatDirector>();
+        bossDirector.monsterCredit += (int)(600f * Mathf.Pow(Run.instance.compensatedDifficultyCoefficient, 0.5f));
+        bossGroup = GetComponent<BossGroup>();
+        combatSquad = GetComponent<CombatSquad>();
         bossRng = new Xoroshiro128Plus(Run.instance.seed);
         mainStateMachine = GetComponent<EntityStateMachine>();
         int i = 0;
@@ -65,9 +74,18 @@ public class AwakeningShrineManager : NetworkBehaviour
                 {
                     if (body.master.inventory.GetItemCount(pickupDef.itemIndex) > 0)
                     {
+                        dormantToAwaken = pickupDef.pickupIndex;
                         body.master.inventory.RemoveItem(pickupDef.itemIndex);
-                        bossMaster = availableBossesOnStage.Evaluate(bossRng.nextNormalizedFloat).spawnCard.prefab.GetComponent<CharacterMaster>();
-                        mainStateMachine.SetNextState(new AwakeningShrinePrepareBossSpawn());
+                        /*bossDirector.enabled = true;
+                        bossDirector.currentSpawnTarget = interactor.gameObject;
+                        var currentDirectorCard = availableBossesOnStage.Evaluate(bossRng.nextNormalizedFloat);
+                        var bossCard = currentDirectorCard.spawnCard as CharacterSpawnCard;
+                        bossCard.noElites = true;
+                        bossMaster = bossCard.prefab.GetComponent<CharacterMaster>();
+                        bossDirector.OverrideCurrentMonsterCard(currentDirectorCard);
+                        bossCard.noElites = false;
+                        bossDirector.monsterSpawnTimer -= 600f;*/
+                        mainStateMachine.SetNextState(new AwakeningShrineWindupBeforeBossSpawn());
                     }
                 }
             }
@@ -113,5 +131,18 @@ public class AwakeningShrineManager : NetworkBehaviour
             }
             pickupPickerController.SetOptionsServer(options.ToArray());
         }
+    }
+
+    public void SetupBossSpawn(Interactor interactor)
+    {
+        bossDirector.currentSpawnTarget = interactor.gameObject;
+        var currentDirectorCard = availableBossesOnStage.Evaluate(bossRng.nextNormalizedFloat);
+        var bossCard = currentDirectorCard.spawnCard as CharacterSpawnCard;
+        bossCard.noElites = true;
+        bossMaster = bossCard.prefab.GetComponent<CharacterMaster>();
+        bossDirector.OverrideCurrentMonsterCard(currentDirectorCard);
+        bossCard.noElites = false;
+        bossDirector.monsterSpawnTimer = 0;
+        bossDirector.enabled = true;
     }
 }

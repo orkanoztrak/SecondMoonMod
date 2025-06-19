@@ -9,6 +9,12 @@ public class AwakeningShrineBossFight : AwakeningShrineBaseState
     public override void OnEnter()
     {
         base.OnEnter();
+        manager.SetupBossSpawn(manager.interactor);
+    }
+
+    public override void FixedUpdate()
+    {
+        base.FixedUpdate();
 
     }
 }

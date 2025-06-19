@@ -32,7 +32,7 @@ public class LostBarrier : Buff<LostBarrier>
     private void PopBarrier(ILContext il)
     {
         var flag2Index = 6;
-        var arrayIndex = 24;
+        var arrayIndex = 26;
         var cursor = new ILCursor(il);
         if (cursor.TryGotoNext(x => x.MatchStloc(flag2Index))) //matching the bypass block flag
         {

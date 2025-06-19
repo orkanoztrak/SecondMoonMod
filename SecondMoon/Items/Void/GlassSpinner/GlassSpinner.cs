@@ -48,7 +48,7 @@ public class GlassSpinner : Item<GlassSpinner>
     {
         var characterMasterIndex = 1;
         var damageIndex = 7;
-        var watchCountIndex = 35;
+        var watchCountIndex = 37;
         var cursor = new ILCursor(il);
         if (cursor.TryGotoNext(MoveType.After, x => x.MatchLdloc(characterMasterIndex),
                                x => x.MatchCallvirt<CharacterMaster>("get_inventory"),

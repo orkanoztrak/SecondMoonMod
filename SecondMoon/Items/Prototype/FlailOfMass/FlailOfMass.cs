@@ -132,10 +132,10 @@ public class FlailOfMass : Item<FlailOfMass>
 
     private void FlailOfMassIgnoreSlowsAndBoostHealthAndShieldGains(ILContext il)
     {
-        int movementTrackerIndex = 84;
-        int speedTrackerIndex = 85;
-        int slowTrackerIndex = 86;
-        int buffCountIndex = 65;
+        int movementTrackerIndex = 86;
+        int speedTrackerIndex = 87;
+        int slowTrackerIndex = 88;
+        int buffCountIndex = 66;
 
         var cursor = new ILCursor(il);
 

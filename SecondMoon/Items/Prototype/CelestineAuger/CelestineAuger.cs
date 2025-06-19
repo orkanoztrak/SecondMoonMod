@@ -137,8 +137,8 @@ public class CelestineAuger : Item<CelestineAuger>
 
     private void CelestineAugerBuffCCCD(ILContext il)
     {
-        var critToCritDmgIndex = 47;
-        var critIndex = 98;
+        var critToCritDmgIndex = 46;
+        var critIndex = 101;
         var cursor = new ILCursor(il);
         if (cursor.TryGotoNext(x => x.MatchLdloc(critToCritDmgIndex)))
         {
