@@ -1,5 +1,7 @@
 ﻿using BepInEx.Configuration;
 using RoR2;
+using SecondMoon.MyEntityStates.Interactables;
+using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -55,7 +57,14 @@ public class AwakeningShrine : Interactable<AwakeningShrine>
 
     private void GuardianEliteDropPrototype(BossGroup group)
     {
-        
+        var manager = AwakeningShrineManager.FindForBossGroup(group);
+        if (manager)
+        {
+            if (manager.mainStateMachine.state is AwakeningShrineBossFight)
+            {
+                manager.mainStateMachine.SetNextState(new AwakeningShrineDropReward());
+            }
+        }
     }
 
     private Interactability PickupPickerController_GetInteractability(On.RoR2.PickupPickerController.orig_GetInteractability orig, PickupPickerController self, Interactor activator)
@@ -104,12 +113,22 @@ public class AwakeningShrine : Interactable<AwakeningShrine>
         var pingInfoProvider = InteractableBodyModelPrefab.AddComponent<PingInfoProvider>();
         pingInfoProvider.pingIconOverride = AwakeningShrineSprite;
 
+        var manager = InteractableBodyModelPrefab.AddComponent<AwakeningShrineManager>();
+
         var inspect = ScriptableObject.CreateInstance<InspectDef>();
         var info = new RoR2.UI.InspectInfo();
         info.Visual = AwakeningShrineSprite;
         info.DescriptionToken = $"INTERACTABLE_{InteractableLangToken}_INSPECT";
         info.TitleToken = $"INTERACTABLE_{InteractableLangToken}_TITLE";
         inspect.Info = info;
+
+        var ppc = InteractableBodyModelPrefab.AddComponent<PickupPickerController>();
+        //ppc.panelPrefab
+        ppc.onPickupSelected = new PickupPickerController.PickupIndexUnityEvent();
+        ppc.onPickupSelected.AddPersistentListener(manager.HandleSelection);
+        ppc.onServerInteractionBegin = new GenericInteraction.InteractorUnityEvent();
+        ppc.onServerInteractionBegin.AddPersistentListener(manager.HandleInteraction);
+        ppc.cutoffDistance = 10f;
 
         static void InitializePrototypeConversionPairs()
         {

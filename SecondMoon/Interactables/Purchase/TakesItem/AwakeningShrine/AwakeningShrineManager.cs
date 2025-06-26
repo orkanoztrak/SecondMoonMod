@@ -19,6 +19,8 @@ public class AwakeningShrineManager : NetworkBehaviour
 
     public EntityStateMachine mainStateMachine;
 
+    private static readonly List<AwakeningShrineManager> instancesList = new List<AwakeningShrineManager>();
+
     private CombatDirector bossDirector;
 
     private BossGroup bossGroup;
@@ -36,7 +38,6 @@ public class AwakeningShrineManager : NetworkBehaviour
     public void Awake()
     {
         bossDirector = GetComponent<CombatDirector>();
-        bossDirector.monsterCredit += (int)(600f * Mathf.Pow(Run.instance.compensatedDifficultyCoefficient, 0.5f));
         bossGroup = GetComponent<BossGroup>();
         combatSquad = GetComponent<CombatSquad>();
         bossRng = new Xoroshiro128Plus(Run.instance.seed);
@@ -53,6 +54,16 @@ public class AwakeningShrineManager : NetworkBehaviour
                 availableBossesOnStage.AddChoice(choice);
             }
         }
+    }
+
+    public void OnEnable()
+    {
+        instancesList.Add(this);
+    }
+
+    public void OnDisable()
+    {
+        instancesList.Remove(this);
     }
 
     public void HandleSelection(int selection)
@@ -76,15 +87,6 @@ public class AwakeningShrineManager : NetworkBehaviour
                     {
                         dormantToAwaken = pickupDef.pickupIndex;
                         body.master.inventory.RemoveItem(pickupDef.itemIndex);
-                        /*bossDirector.enabled = true;
-                        bossDirector.currentSpawnTarget = interactor.gameObject;
-                        var currentDirectorCard = availableBossesOnStage.Evaluate(bossRng.nextNormalizedFloat);
-                        var bossCard = currentDirectorCard.spawnCard as CharacterSpawnCard;
-                        bossCard.noElites = true;
-                        bossMaster = bossCard.prefab.GetComponent<CharacterMaster>();
-                        bossDirector.OverrideCurrentMonsterCard(currentDirectorCard);
-                        bossCard.noElites = false;
-                        bossDirector.monsterSpawnTimer -= 600f;*/
                         mainStateMachine.SetNextState(new AwakeningShrineWindupBeforeBossSpawn());
                     }
                 }
@@ -135,6 +137,8 @@ public class AwakeningShrineManager : NetworkBehaviour
 
     public void SetupBossSpawn(Interactor interactor)
     {
+        bossDirector.monsterCredit = 0;
+        bossDirector.monsterCredit += (int)(600f * Mathf.Pow(Run.instance.compensatedDifficultyCoefficient, 0.5f));
         bossDirector.currentSpawnTarget = interactor.gameObject;
         var currentDirectorCard = availableBossesOnStage.Evaluate(bossRng.nextNormalizedFloat);
         var bossCard = currentDirectorCard.spawnCard as CharacterSpawnCard;
@@ -144,5 +148,17 @@ public class AwakeningShrineManager : NetworkBehaviour
         bossCard.noElites = false;
         bossDirector.monsterSpawnTimer = 0;
         bossDirector.enabled = true;
+    }
+
+    public static AwakeningShrineManager FindForBossGroup(BossGroup bossGroup)
+    {
+        foreach (var manager in instancesList)
+        {
+            if (manager.bossGroup == bossGroup)
+            {
+                return manager;
+            }
+        }
+        return null;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RoR2;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,9 +13,8 @@ public class AwakeningShrineBossFight : AwakeningShrineBaseState
         manager.SetupBossSpawn(manager.interactor);
     }
 
-    public override void FixedUpdate()
+    public override Interactability GetInteractability(Interactor activator)
     {
-        base.FixedUpdate();
-
+        return Interactability.ConditionsNotMet;
     }
 }

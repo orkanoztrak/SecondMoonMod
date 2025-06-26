@@ -1,28 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using BepInEx.Configuration;
+﻿using BepInEx.Configuration;
 using HarmonyLib;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using Newtonsoft.Json.Utilities;
 using R2API;
+using R2API.Networking;
+using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2.UI;
-using SecondMoon.Items.ItemTiers.TierPrototype;
-using SecondMoon.Items.ItemTiers.VoidTierPrototype;
-using SecondMoon.Items.ItemTiers;
-using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.UI;
 using SecondMoon.Equipment.BladeOfPetrichor;
 using SecondMoon.Equipment.RadiantHelm;
-using R2API.Networking.Interfaces;
-using R2API.Networking;
+using SecondMoon.Items.ItemTiers;
+using SecondMoon.Items.ItemTiers.TierPrototype;
+using SecondMoon.Items.ItemTiers.VoidTierPrototype;
 using SecondMoon.Items.Void.TwistedRegrets;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Networking;
+using UnityEngine.UI;
 using static SecondMoon.Utils.PickupNotificationGenericPickupPatch;
-using Newtonsoft.Json.Utilities;
 namespace SecondMoon.Utils;
 
 public static class GeneralUtils
@@ -303,6 +304,43 @@ public static class ContagiousPrototypeManager
             }
         }
         return -1;
+    }
+
+    //stolen from ShrineOfRepair
+    public static void AddPersistentListener(this UnityEvent<MPButton, PickupDef> unityEvent, UnityAction<MPButton, PickupDef> action)
+    {
+        unityEvent.m_PersistentCalls.AddListener(new PersistentCall
+        {
+            m_Target = action.Target as UnityEngine.Object,
+            m_TargetAssemblyTypeName = UnityEventTools.TidyAssemblyTypeName(action.Method.DeclaringType.AssemblyQualifiedName),
+            m_MethodName = action.Method.Name,
+            m_CallState = UnityEventCallState.RuntimeOnly,
+            m_Mode = PersistentListenerMode.EventDefined,
+        });
+    }
+
+    public static void AddPersistentListener(this UnityEvent<int> unityEvent, UnityAction<int> action)
+    {
+        unityEvent.m_PersistentCalls.AddListener(new PersistentCall
+        {
+            m_Target = action.Target as UnityEngine.Object,
+            m_TargetAssemblyTypeName = UnityEventTools.TidyAssemblyTypeName(action.Method.DeclaringType.AssemblyQualifiedName),
+            m_MethodName = action.Method.Name,
+            m_CallState = UnityEventCallState.RuntimeOnly,
+            m_Mode = PersistentListenerMode.EventDefined,
+        });
+    }
+
+    public static void AddPersistentListener(this UnityEvent<Interactor> unityEvent, UnityAction<Interactor> action)
+    {
+        unityEvent.m_PersistentCalls.AddListener(new PersistentCall
+        {
+            m_Target = action.Target as UnityEngine.Object,
+            m_TargetAssemblyTypeName = UnityEventTools.TidyAssemblyTypeName(action.Method.DeclaringType.AssemblyQualifiedName),
+            m_MethodName = action.Method.Name,
+            m_CallState = UnityEventCallState.RuntimeOnly,
+            m_Mode = PersistentListenerMode.EventDefined,
+        });
     }
 }
 
