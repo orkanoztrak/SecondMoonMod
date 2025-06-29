@@ -60,9 +60,10 @@ public class AwakeningShrine : Interactable<AwakeningShrine>
         var manager = AwakeningShrineManager.FindForBossGroup(group);
         if (manager)
         {
-            if (manager.mainStateMachine.state is AwakeningShrineBossFight)
+            var esm = manager.gameObject.GetComponent<EntityStateMachine>();
+            if (esm.state is AwakeningShrineBossFight)
             {
-                manager.mainStateMachine.SetNextState(new AwakeningShrineDropReward());
+                esm.SetNextState(new AwakeningShrineDropReward());
             }
         }
     }
@@ -114,6 +115,7 @@ public class AwakeningShrine : Interactable<AwakeningShrine>
         pingInfoProvider.pingIconOverride = AwakeningShrineSprite;
 
         var manager = InteractableBodyModelPrefab.AddComponent<AwakeningShrineManager>();
+        manager.shrine = InteractableBodyModelPrefab;
 
         var inspect = ScriptableObject.CreateInstance<InspectDef>();
         var info = new RoR2.UI.InspectInfo();

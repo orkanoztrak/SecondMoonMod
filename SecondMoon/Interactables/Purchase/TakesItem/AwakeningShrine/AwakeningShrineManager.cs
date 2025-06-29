@@ -11,13 +11,13 @@ namespace SecondMoon.Interactables.Purchase.TakesItem.AwakeningShrine;
 
 public class AwakeningShrineManager : NetworkBehaviour
 {
+    public GameObject shrine;
+
     public PickupPickerController pickupPickerController;
 
     public CharacterMaster bossMaster;
 
     public Interactor interactor;
-
-    public EntityStateMachine mainStateMachine;
 
     private static readonly List<AwakeningShrineManager> instancesList = new List<AwakeningShrineManager>();
 
@@ -41,7 +41,6 @@ public class AwakeningShrineManager : NetworkBehaviour
         bossGroup = GetComponent<BossGroup>();
         combatSquad = GetComponent<CombatSquad>();
         bossRng = new Xoroshiro128Plus(Run.instance.seed);
-        mainStateMachine = GetComponent<EntityStateMachine>();
         int i = 0;
         for (int count = availableMonstersOnStage.Count; i < count; i++)
         {
@@ -87,7 +86,7 @@ public class AwakeningShrineManager : NetworkBehaviour
                     {
                         dormantToAwaken = pickupDef.pickupIndex;
                         body.master.inventory.RemoveItem(pickupDef.itemIndex);
-                        mainStateMachine.SetNextState(new AwakeningShrineWindupBeforeBossSpawn());
+                        shrine.GetComponent<EntityStateMachine>()?.SetNextState(new AwakeningShrineWindupBeforeBossSpawn());
                     }
                 }
             }
@@ -160,5 +159,16 @@ public class AwakeningShrineManager : NetworkBehaviour
             }
         }
         return null;
+    }
+
+    public static void DropItem(AwakeningShrineManager manager, Vector3 pivot, Vector3 velocity)
+    {
+        if (manager)
+        {
+            if (manager.dormantToAwaken != PickupIndex.none)
+            {
+                PickupDropletController.CreatePickupDroplet(manager.dormantToAwaken, pivot, velocity);
+            }
+        }
     }
 }

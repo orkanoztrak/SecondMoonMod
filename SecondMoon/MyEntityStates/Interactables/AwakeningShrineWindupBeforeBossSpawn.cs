@@ -32,9 +32,4 @@ public class AwakeningShrineWindupBeforeBossSpawn : AwakeningShrineBaseState
             outer.SetNextState(new AwakeningShrineBossFight());
         }
     }
-
-    public override Interactability GetInteractability(Interactor activator)
-    {
-        return Interactability.ConditionsNotMet;
-    }
 }

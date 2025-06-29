@@ -14,7 +14,7 @@ public class AwakeningShrineBaseState : BaseState
     public override void OnEnter()
     {
         base.OnEnter();
-        manager = GetComponent<AwakeningShrineManager>();
+        manager = outer.gameObject.GetComponent<AwakeningShrineManager>();
     }
 
     public virtual Interactability GetInteractability(Interactor activator)

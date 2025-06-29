@@ -12,9 +12,4 @@ public class AwakeningShrineBossFight : AwakeningShrineBaseState
         base.OnEnter();
         manager.SetupBossSpawn(manager.interactor);
     }
-
-    public override Interactability GetInteractability(Interactor activator)
-    {
-        return Interactability.ConditionsNotMet;
-    }
 }
