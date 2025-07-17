@@ -14,16 +14,16 @@ public class Hydra : Item<Hydra>
 {
     public static ConfigOption<int> HydraAdditionalHitCountInit;
     public static ConfigOption<int> HydraAdditionalHitCountStack;
-
+    public static ConfigOption<float> HydraAdditionalHitProcCoefficientMult;
     public static ConfigOption<float> HydraAdditionalHitDamage;
-
+    public static DamageAPI.ModdedDamageType HydraOrbLoopPrevention;
     public override string ItemName => "Hydra";
 
     public override string ItemLangTokenName => "HYDRA";
 
     public override string ItemPickupDesc => "Your skills launch additional hits with reduced damage.";
 
-    public override string ItemFullDesc => $"Your skills hit <color=#7CFDEA>{HydraAdditionalHitCountInit} (+{HydraAdditionalHitCountStack} per stack) extra times</color>. These hits deal <style=cIsDamage>{HydraAdditionalHitDamage * 100}%</style> TOTAL damage.";
+    public override string ItemFullDesc => $"Your skills hit <color=#7CFDEA>{HydraAdditionalHitCountInit} (+{HydraAdditionalHitCountStack} per stack) extra times</color>. These hits deal <style=cIsDamage>{HydraAdditionalHitDamage * 100}%</style> TOTAL damage, with <style=cIsDamage>{HydraAdditionalHitProcCoefficientMult * 100}%</style> of the original hit's proc coefficient.";
 
     public override string ItemLore => "When Mithrix went away, his brother hurried to the well. Without regard for his own safety, he stuck his hand into it. Thorp! Out he pulled a worm, but it, along with his hand, was brutally deformed. Still, he wouldn't cry.\r\n\r\n" +
         "Even though his hand healed after, the unfortunate creature was left unable to grow, forcibly conjoined by the gravitational force and mangled. Alone it would surely die, but he was not going to let that happen. You see, he loved worms.";
@@ -51,7 +51,7 @@ public class Hydra : Item<Hydra>
 
     private void HydraMultiHits(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
-        if (damageInfo.attacker && damageInfo.procCoefficient > 0 && damageInfo.damageType.IsDamageSourceSkillBased)
+        if (damageInfo.attacker && damageInfo.procCoefficient > 0 && damageInfo.damageType.IsDamageSourceSkillBased && !damageInfo.HasModdedDamageType(HydraOrbLoopPrevention))
         {
             var attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
             if (attackerBody)
@@ -72,7 +72,7 @@ public class Hydra : Item<Hydra>
                             teamIndex = teamComponent ? teamComponent.teamIndex : TeamIndex.Neutral,
                             attacker = damageInfo.attacker,
                             inflictor = damageInfo.inflictor,
-                            procCoefficient = damageInfo.procCoefficient,
+                            procCoefficient = damageInfo.procCoefficient * HydraAdditionalHitProcCoefficientMult,
                             damageColorIndex = damageInfo.damageColorIndex,
                             procChainMask = damageInfo.procChainMask,
                             damageType = damageInfo.damageType 
@@ -85,7 +85,6 @@ public class Hydra : Item<Hydra>
                         {
                             hydraOrb.orbVariant = HydraOrb.OrbVariant.Lightning;
                         }
-                        hydraOrb.damageType.damageSource &= ~DamageSource.SkillMask;
                         HurtBox mainHurtBox2 = victimBody?.mainHurtBox;
                         if ((bool)mainHurtBox2)
                         {
@@ -106,6 +105,7 @@ public class Hydra : Item<Hydra>
         {
             CreateConfig(config);
             OrbAPI.AddOrb(typeof(HydraOrb));
+            HydraOrbLoopPrevention = DamageAPI.ReserveDamageType();
             CreateLang();
             CreateFireOrb();
             CreateLightningOrb();
@@ -180,7 +180,7 @@ public class Hydra : Item<Hydra>
     {
         HydraAdditionalHitCountInit = config.ActiveBind("Item: " + ItemName, "Number of extra hits with one " + ItemName, 2, "This many extra hits are launched with one " + ItemName + ".");
         HydraAdditionalHitCountStack = config.ActiveBind("Item: " + ItemName, "Number of extra per stack after one " + ItemName, 1, "This many extra hits are launched per stack of " + ItemName + " after one.");
-
-        HydraAdditionalHitDamage = config.ActiveBind("Item: " + ItemName, "Damage dealt by extra hits", 0.33f, "What % of TOTAL damage should the extra hits from skills do? (0.33 = 33%)");
+        HydraAdditionalHitProcCoefficientMult = config.ActiveBind("Item: " + ItemName, "Multiplier applied to the proc coefficient of the original hit", 0.5f, "The additional hits have proc coefficient equal to that of the original hit, multiplied by this value.");
+        HydraAdditionalHitDamage = config.ActiveBind("Item: " + ItemName, "Damage dealt by extra hits", 0.5f, "What % of TOTAL damage should the extra hits from skills do? (0.5 = 50%)");
     }
 }

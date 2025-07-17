@@ -3,6 +3,7 @@ using MonoMod.Cil;
 using R2API;
 using RoR2;
 using SecondMoon.BuffsAndDebuffs.Buffs.Item.Void;
+using SecondMoon.EquipmentlessElites.Lost;
 using SecondMoon.Items.ItemTiers.TierPrototype;
 using SecondMoon.Items.ItemTiers.VoidTierPrototype;
 using SecondMoon.Utils;
@@ -28,10 +29,12 @@ public class TwistedRegrets : Item<TwistedRegrets>
 
     public static ConfigOption<float> TwistedRegretsLostMovement;
 
-    public static ConfigOption<float> TwistedRegretsLostBarrierDummyDamage;
-    public static ConfigOption<float> TwistedRegretsLostBarrierCooldown;
-
     public static ConfigOption<float> TwistedRegretsLostOrbDamage;
+    public static ConfigOption<float> TwistedRegretsLostOrbCollapseChance;
+
+    public static ConfigOption<int> TwistedRegretsLostOrbCountBase;
+    public static ConfigOption<int> TwistedRegretsLostOrbCountScaling;
+    public static ConfigOption<float> TwistedRegretsLostOrbCountIncreaseThreshold;
 
     public override string ItemName => "Twisted Regrets";
 
@@ -43,17 +46,13 @@ public class TwistedRegrets : Item<TwistedRegrets>
         $"<color=#7CFDEA>Lost elites</color> have the following effects applied to them:\r\n" +
         $"•Split your <style=cIsHealing>combined health pool</style> equally into <style=cIsHealing>health and shields</style>, then increase both by <style=cIsHealing>{TwistedRegretsLostHealthAndShieldBoost * 100}%</style>. Your <style=cIsHealth>one-shot protection</style> is now calculated for <style=cIsHealing>health and shields</style> separately.\r\n" +
         $"•Increase <style=cIsUtility>movement speed</style> by <style=cIsUtility>{TwistedRegretsLostMovement * 100}%</style> and gain the ability to <style=cIsUtility>sprint in all directions</style>. Your skills become <style=cIsUtility>agile</style>. <style=cIsUtility>You are immune to fall damage</style>.\r\n " +
-        $"•<style=cIsHealing>Block</style> incoming damage once. The attacker that triggered this has <style=cIsDamage>on hit effects</style> applied to them (this is treated as if they were hit by a <style=cIsDamage>{TwistedRegretsLostBarrierDummyDamage * 100}%</style> base damage attack with a proc coefficient of <style=cIsDamage>1</style>). Recharges every <style=cIsHealing>{TwistedRegretsLostBarrierCooldown}s</style> (<style=cIsHealing>{TwistedRegretsLostBarrierCooldown / 2}s</style> if disabled by no attacker).\r\n" +
-        $"•Hits apply <style=cIsUtility>Cripple</style> and <style=cIsDamage>Collapse</style>, and fire a number of <style=cIsDamage>homing missiles</style> equal to the <style=cIsDamage>number of debuffs</style> on the target, with <style=cIsDamage>{TwistedRegretsLostOrbDamage * 100}%</style> base damage and <style=cIsDamage>0</style> proc coefficient each.";
+        $"•Skill hits apply <style=cIsUtility>Cripple</style> and fire <style=cIsDamage>{TwistedRegretsLostOrbCountBase} (+{TwistedRegretsLostOrbCountScaling} per {TwistedRegretsLostOrbCountIncreaseThreshold * 100}% base damage) (scaling with proc coefficient) homing missiles</style> with <style=cIsDamage>{TwistedRegretsLostOrbDamage * 100}%</style> base damage and <style=cIsDamage>0</style> proc coefficient each. " +
+        $"These <style=cIsDamage>missiles</style> have a <style=cIsDamage>{TwistedRegretsLostOrbCollapseChance}%</style> chance to apply <style=cIsDamage>Collapse</style>.";
 
     public override string ItemLore => "How many years had it been now? Perhaps decades, centuries, eons? Since he had an equal stand beside him and reach where he couldn't? He had long since forgotten.\r\n\r\n" +
-        "<style=cMono>RE?GR?E?T?\r\n\r\n</style>" +
         "For the most part, remembering those times was frustrating. He remembered the disagreements. He remembered their fights. He remembered how his brother just wouldn't respect his wishes, and see what he saw. A single moment of justice, a single moment of betrayal. Divided, never to rejoin.\r\n\r\n" +
-        "<style=cMono>REG?RE???T\r\n\r\n</style>" +
-        "But even he, godlike and ancient, felt nostalgia. Sometimes, instead of the bitter, painful past, he would remember joy. How the three of them would frolick in the meadow. How they all laughed from the bottom of their hearts. How the two of them created wonders. Nothing was impossible for them.\r\n\r\n" +
-        "<style=cMono>R?EGR??ET?\r\n\r\n</style>" +
-        "At these times, his heart would clench and something would well up, from deep within. At these times, he wondered if things could have been different. If they could get it right next time.\r\n\r\n" +
-        "<style=cMono>??REGRET??</style>";
+        "But even he, godlike and ancient, felt nostalgia. Sometimes, instead of the bitter, painful past, he would remember joy. How the three of them would frolick in the meadow. How they all laughed from the bottom of their hearts, and how they created wonders. Nothing was impossible for them.\r\n\r\n" +
+        "At these times, his heart would clench and something would well up, from deep within. At these times, he wondered if things could have been different. If they could get it right next time.\r\n\r\n";
 
     public override ItemTierDef ItemTierDef => VoidTierPrototype.instance.ItemTierDef;
 
@@ -184,12 +183,14 @@ public class TwistedRegrets : Item<TwistedRegrets>
     {
         CoreOfCorruptionVoidCorruptionChanceInit = config.ActiveBind("Item: " + ItemName, "Void enhancement chance with one " + CoreOfCorruption.instance.ItemName, 5f, "The % chance any spawned enemy also has Void powers with one " + CoreOfCorruption.instance.ItemName + ". Stacks are counted across the players on the team.");
         CoreOfCorruptionVoidCorruptionChanceStack = config.ActiveBind("Item: " + ItemName, "Void enhancement chance per stack of " + CoreOfCorruption.instance.ItemName + " after one", 5f, "The % chance any spawned enemy also has Void powers per stack of " + CoreOfCorruption.instance.ItemName + " after one. Stacks are counted across the players on the team.");
-        TwistedRegretsNerfInit = config.ActiveBind("Item: " + ItemName, "Enemy stat nerf with one " + ItemName, 0.15f, "How much should ALL stats on enemies (refer to Irradiant Pearl on the wiki) be reduced with one " + ItemName + "? This scales exponentially (0.15 = 15%, refer to Alien Head on the wiki).");
-        TwistedRegretsNerfStack = config.ActiveBind("Item: " + ItemName, "Enemy stat nerf per stack after one " + ItemName, 0.15f, "How much should ALL stats on enemies (refer to Irradiant Pearl on the wiki) be reduced per stack of " + ItemName + " after one? This scales exponentially (0.15 = 15%, refer to Alien Head on the wiki).");
+        TwistedRegretsNerfInit = config.ActiveBind("Item: " + ItemName, "Enemy stat nerf with one " + ItemName, 0.1f, "How much should ALL stats on enemies (refer to Irradiant Pearl on the wiki) be reduced with one " + ItemName + "? This scales exponentially (0.1 = 10%, refer to Alien Head on the wiki).");
+        TwistedRegretsNerfStack = config.ActiveBind("Item: " + ItemName, "Enemy stat nerf per stack after one " + ItemName, 0.1f, "How much should ALL stats on enemies (refer to Irradiant Pearl on the wiki) be reduced per stack of " + ItemName + " after one? This scales exponentially (0.1 = 10%, refer to Alien Head on the wiki).");
         TwistedRegretsLostHealthAndShieldBoost = config.ActiveBind("Item: " + ItemName, "Health and shield boost for Lost Elites after the shield - health split", 0.5f, "Lost Elites split their combined health pool equally into shields and health, and boost both of the resulting pools. What should this boost be? (0.5 = 50%)");
         TwistedRegretsLostMovement = config.ActiveBind("Item: " + ItemName, "Movement speed for Lost Elites", 0.2f, "How much should movement speed be increased for Lost Elites? (0.2 = 20%)");
-        TwistedRegretsLostBarrierDummyDamage = config.ActiveBind("Item: " + ItemName, "Damage value to be used for block proc calculation", 4f, "On-hit effects are applied to the attacker that breaks the barrier of a Lost Elite. What should the damage value to be used for the calculations of this proc be? (4 = 400% base damage)");
-        TwistedRegretsLostBarrierCooldown = config.ActiveBind("Item: " + ItemName, "Block cooldown for Lost Elites", 12f, "The ability to block the next incoming hit has a cooldown of this many seconds. If the barrier didn't activate from an attack from an enemy, this cooldown is halved.");
-        TwistedRegretsLostOrbDamage = config.ActiveBind("Item: " + ItemName, "Damage of the missiles launched on hit for Lost Elites", 0.1f, "What % of base damage should the missiles launched on hit from Lost Elites do? (0.1 = 10%)");
+        TwistedRegretsLostOrbDamage = config.ActiveBind("Item: " + ItemName, "Damage of the missiles launched on hit for Lost Elites", 0.2f, "What % of base damage should the missiles launched on hit from " + Lost.instance.EliteName + " Elites do? (0.2 = 10%)");
+        TwistedRegretsLostOrbCollapseChance = config.ActiveBind("Item: " + ItemName, "Chance to apply Collapse on missile hit", 10f, "Upon hitting an enemy, there is a this percent chance that the missiles launched on hit from " + Lost.instance.EliteName + " Elites apply Collapse.");
+        TwistedRegretsLostOrbCountBase = config.ActiveBind("Item: " + ItemName, "Number of missiles fired at base", 1, "At 1 proc coefficient, a hit will fire at least this many missiles, not counting damage scaling.");
+        TwistedRegretsLostOrbCountScaling = config.ActiveBind("Item: " + ItemName, "Number to increase missile count by at threshold", 1, "Every threshold reached will increase missile count by this number.");
+        TwistedRegretsLostOrbCountIncreaseThreshold = config.ActiveBind("Item: " + ItemName, "Percentage damage threshold to increase missile count", 2f, "Every this percent base damage beyond the threshold will increase missile count (2 = 200%). I recommend referring to the detailed description in-game to make better sense of missile count scaling.");
     }
 }

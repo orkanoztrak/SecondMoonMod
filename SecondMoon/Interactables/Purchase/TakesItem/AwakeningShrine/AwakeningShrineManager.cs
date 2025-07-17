@@ -35,7 +35,11 @@ public class AwakeningShrineManager : NetworkBehaviour
 
     private WeightedSelection<DirectorCard> availableBossesOnStage = new WeightedSelection<DirectorCard>();
 
-    public void Awake()
+    /*public void Awake()
+    {
+    }*/
+
+    public void OnEnable()
     {
         bossDirector = GetComponent<CombatDirector>();
         bossGroup = GetComponent<BossGroup>();
@@ -53,10 +57,6 @@ public class AwakeningShrineManager : NetworkBehaviour
                 availableBossesOnStage.AddChoice(choice);
             }
         }
-    }
-
-    public void OnEnable()
-    {
         instancesList.Add(this);
     }
 
@@ -161,14 +161,11 @@ public class AwakeningShrineManager : NetworkBehaviour
         return null;
     }
 
-    public static void DropItem(AwakeningShrineManager manager, Vector3 pivot, Vector3 velocity)
+    public void DropPrototypeReward(Vector3 pivot, Vector3 velocity)
     {
-        if (manager)
+        if (dormantToAwaken != PickupIndex.none)
         {
-            if (manager.dormantToAwaken != PickupIndex.none)
-            {
-                PickupDropletController.CreatePickupDroplet(manager.dormantToAwaken, pivot, velocity);
-            }
+            PickupDropletController.CreatePickupDroplet(dormantToAwaken, pivot, velocity);
         }
     }
 }

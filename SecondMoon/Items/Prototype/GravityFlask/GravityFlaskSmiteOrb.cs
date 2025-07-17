@@ -33,21 +33,22 @@ public class GravityFlaskSmiteOrb : GenericDamageOrb, IOrbFixedUpdateBehavior
         }, transmit: true);
         if ((bool)attacker)
         {
-            BlastAttack blastAttack = new BlastAttack();
-            blastAttack.attacker = attacker;
-            blastAttack.baseDamage = damageValue;
-            blastAttack.baseForce = 0f;
-            blastAttack.bonusForce = Vector3.down * 1500f;
-            blastAttack.crit = isCrit;
-            blastAttack.damageColorIndex = DamageColorIndex.Item;
-            blastAttack.falloffModel = BlastAttack.FalloffModel.None;
-            blastAttack.inflictor = null;
-            blastAttack.position = lastKnownTargetPosition;
-            blastAttack.procChainMask = procChainMask;
-            blastAttack.procCoefficient = 0;
-            blastAttack.radius = 3f;
-            blastAttack.teamIndex = TeamComponent.GetObjectTeam(attacker);
-            blastAttack.Fire();
+            new BlastAttack
+            {
+                attacker = attacker,
+                baseDamage = damageValue,
+                baseForce = 0f,
+                bonusForce = Vector3.down * 1500f,
+                crit = isCrit,
+                damageColorIndex = DamageColorIndex.Item,
+                falloffModel = BlastAttack.FalloffModel.None,
+                inflictor = null,
+                position = lastKnownTargetPosition,
+                procChainMask = procChainMask,
+                procCoefficient = 0,
+                radius = 3f,
+                teamIndex = TeamComponent.GetObjectTeam(attacker)
+            }.Fire();
         }
     }
 

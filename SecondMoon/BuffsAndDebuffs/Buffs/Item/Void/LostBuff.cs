@@ -40,7 +40,7 @@ public class LostBuff : Buff<LostBuff>
         On.RoR2.CharacterBody.OnBuffFinalStackLost += RemoveLostController;
         SkillSprintingFixes();
         IL.RoR2.CharacterBody.RecalculateStats += ModifyStats;
-        On.RoR2.GlobalEventManager.ProcessHitEnemy += AddDebuffsAndLaunchMissiles;
+        On.RoR2.GlobalEventManager.ProcessHitEnemy += LaunchMissiles;
         IL.RoR2.HealthComponent.TakeDamageProcess += SplitOsp;
         IL.RoR2.UI.HealthBar.UpdateBarInfos += SetupBarColors;
         IL.RoR2.HealthComponent.GetHealthBarValues += ChangeOspFractionDisplayCalc;
@@ -381,12 +381,12 @@ public class LostBuff : Buff<LostBuff>
         }
     }
 
-    private void AddDebuffsAndLaunchMissiles(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+    private void LaunchMissiles(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
     {
         CharacterBody attackerBody = null;
         HealthComponent victimComponent = null;
         bool secondHalf = false;
-        if (damageInfo.attacker && damageInfo.procCoefficient > 0 && NetworkServer.active && !damageInfo.rejected)
+        if (damageInfo.attacker && damageInfo.procCoefficient > 0 && NetworkServer.active && !damageInfo.rejected && damageInfo.damageType.IsDamageSourceSkillBased)
         {
             attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
             victimComponent = victim.GetComponent<HealthComponent>();
@@ -398,45 +398,28 @@ public class LostBuff : Buff<LostBuff>
                     var attacker = attackerBody.master;
                     if (attacker)
                     {
-                        damageInfo.procChainMask.AddProc(ProcType.FractureOnHit);
-                        DotController.DotDef dotDef = DotController.GetDotDef(DotController.DotIndex.Fracture);
-                        DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Fracture, dotDef.interval, 1f);
                         victimComponent.body.AddTimedBuff(RoR2Content.Buffs.Cripple, 3f);
                     }
                 }
             }
         }
         orig(self, damageInfo, victim);
-        if (secondHalf)
+        if (secondHalf && attackerBody && victimComponent)
         {
-            var debuffs = 0;
-
-            BuffIndex[] debuffBuffIndices = BuffCatalog.debuffBuffIndices;
-            foreach (BuffIndex buffType in debuffBuffIndices)
+            var ratio = damageInfo.damage / attackerBody.damage;
+            var loopCalc = (float)(Math.Floor(ratio / TwistedRegretsLostOrbCountIncreaseThreshold) + 1) * damageInfo.procCoefficient;
+            if (loopCalc % 1 != 0)
             {
-                if (victimComponent.body.HasBuff(buffType))
-                {
-                    debuffs++;
-                }
+                loopCalc = Util.CheckRoll((loopCalc % 1) * 100, attackerBody.master) ? loopCalc + 1 : loopCalc;
             }
-            DotController dotController = DotController.FindDotController(victim.gameObject);
-            if ((bool)dotController)
-            {
-                for (DotController.DotIndex dotIndex = 0; dotIndex < (DotController.DotIndex)(DotAPI.VanillaDotCount + DotAPI.CustomDotCount); dotIndex++)
-                {
-                    if (dotController.HasDotActive(dotIndex))
-                    {
-                        debuffs++;
-                    }
-                }
-            }
-
-            for (int i = 0; i < debuffs; i++)
+            var loops = (int)loopCalc;
+            Debug.Log("number of missiles: " +  loops);
+            for (int i = 0; i < loops; i++)
             {
                 LostOrb lostOrb = new LostOrb
                 {
                     origin = attackerBody.aimOrigin,
-                    damageValue = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, TwistedRegretsLostOrbDamage) * damageInfo.procCoefficient,
+                    damageValue = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, TwistedRegretsLostOrbDamage),
                     isCrit = damageInfo.crit,
                     attacker = damageInfo.attacker,
                     procChainMask = default,
@@ -451,7 +434,6 @@ public class LostBuff : Buff<LostBuff>
                 {
                     lostOrb.teamIndex = TeamIndex.Neutral;
                 }
-
                 HurtBox mainHurtBox = victimComponent.body.mainHurtBox;
                 if ((bool)mainHurtBox)
                 {
@@ -605,22 +587,6 @@ public class LostBuff : Buff<LostBuff>
                 {
                     body.bodyFlags &= ~CharacterBody.BodyFlags.IgnoreFallDamage;
                 }
-                if (body.HasBuff(LostBarrier.instance.BuffDef))
-                {
-                    body.RemoveBuff(LostBarrier.instance.BuffDef);
-                }
-                if (body.HasBuff(LostBarrierCooldown.instance.BuffDef))
-                {
-                    body.RemoveBuff(LostBarrierCooldown.instance.BuffDef);
-                }
-            }
-        }
-
-        private void FixedUpdate()
-        {
-            if (NetworkServer.active && body && !body.HasBuff(LostBarrier.instance.BuffDef) && !body.HasBuff(LostBarrierCooldown.instance.BuffDef))
-            {
-                body.AddBuff(LostBarrier.instance.BuffDef);
             }
         }
     }

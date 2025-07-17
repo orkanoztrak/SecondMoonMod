@@ -15,10 +15,10 @@ public class HydraOrb : GenericDamageOrb
     public GameObject inflictor;
 
     public OrbVariant orbVariant;
-
     public override void Begin()
     {
-        duration = 0.5f;
+        duration = 0.1f;
+        DamageAPI.AddModdedDamageType(ref damageType, Hydra.HydraOrbLoopPrevention);
         if (orbVariant == OrbVariant.Fire)
         {
             effectPrefab = Hydra.instance.HydraOrbEffectFireVariant;
@@ -27,38 +27,8 @@ public class HydraOrb : GenericDamageOrb
         {
             effectPrefab = Hydra.instance.HydraOrbEffectLightningVariant;
         }
-        Strike();
-    }
-
-    public override void OnArrival()
-    {
-    }
-
-    private void Strike()
-    {
-        if (!target)
+        if (target)
         {
-            return;
-        }
-        HealthComponent healthComponent = target.healthComponent;
-        if ((bool)healthComponent)
-        {
-            DamageInfo damageInfo = new()
-            {
-                damage = damageValue,
-                attacker = attacker,
-                inflictor = inflictor,
-                force = Vector3.zero,
-                crit = isCrit,
-                procChainMask = procChainMask,
-                procCoefficient = procCoefficient,
-                position = target.transform.position,
-                damageColorIndex = damageColorIndex,
-                damageType = damageType
-            };
-            healthComponent.TakeDamage(damageInfo);
-            GlobalEventManager.instance.OnHitEnemy(damageInfo, healthComponent.gameObject);
-            GlobalEventManager.instance.OnHitAll(damageInfo, healthComponent.gameObject);
             if ((bool)target.hurtBoxGroup)
             {
                 target = target.hurtBoxGroup.hurtBoxes[UnityEngine.Random.Range(0, target.hurtBoxGroup.hurtBoxes.Length)];
@@ -66,7 +36,7 @@ public class HydraOrb : GenericDamageOrb
             EffectData effectData = new EffectData
             {
                 origin = origin,
-                genericFloat = 0.1f
+                genericFloat = duration
             };
             effectData.SetHurtBoxReference(target);
             EffectManager.SpawnEffect(effectPrefab, effectData, transmit: true);
