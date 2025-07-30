@@ -17,18 +17,8 @@ public class AwakeningShrineBaseState : BaseState
         manager = outer.gameObject.GetComponent<AwakeningShrineManager>();
     }
 
-    public virtual Interactability GetInteractability(Interactor activator)
-    {
-        return Interactability.Disabled;
-    }
-
     public virtual string GetContextString(Interactor activator)
     {
         return null;
-    }
-
-    public virtual void OnInteractionBegin(Interactor activator)
-    {
-
     }
 }

@@ -3,6 +3,7 @@ using MonoMod.Cil;
 using R2API;
 using RoR2;
 using RoR2.Orbs;
+using RoR2.UI;
 using SecondMoon.Items.ItemTiers.TierPrototype;
 using SecondMoon.Utils;
 using System;
@@ -99,6 +100,97 @@ public class GravityFlask : Item<GravityFlask>
         On.RoR2.HealthComponent.Heal += GravityFlaskIncreaseHeals;
         On.RoR2.GlobalEventManager.ProcessHitEnemy += GravityFlaskSmite;
         On.RoR2.CharacterMaster.GiveMoney += GravityFlaskMoreGold;
+        On.RoR2.UI.ItemIcon.SetItemIndex += Testing;
+        IL.RoR2.UI.ItemIcon.ItemClicked += Testing;
+    }
+
+    private void Testing(ILContext il)
+    {
+        var cursor = new ILCursor(il);
+        if (cursor.TryGotoNext(x => x.MatchLdarg(0),
+            x => x.MatchLdfld(typeof(ItemIcon), nameof(RoR2.UI.ItemIcon.OnItemClicked)),
+            x => x.MatchDup()))
+        {
+            ILLabel target = cursor.MarkLabel();
+            if (cursor.TryGotoPrev(x => x.MatchLdarg(0),
+                x => x.MatchCallOrCallvirt<InspectPanelController>("Show"),
+                x => x.MatchLdloc(0)))
+            {
+                cursor.MoveBeforeLabels();
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldloc_0);
+                cursor.EmitDelegate<Func<ItemIcon, ItemDef, bool>>((icon, itemDef) =>
+                {
+                    if (icon)
+                    {
+                        var panel = icon.inspectPanel;
+                        if (panel)
+                        {
+                            var inventory = icon.gameObject.GetComponentInParent<ItemInventoryDisplay>();
+                            if (inventory)
+                            {
+                                var master = GeneralUtils.FindMasterByInventory(inventory.inventory);
+                                var bodyObject = master.GetBodyObject();
+                                if (bodyObject)
+                                {
+                                    var tracker = bodyObject.GetComponent<GravityFlaskBehavior>();
+                                    if (tracker)
+                                    {
+                                        var stringToDisplay = ConstructInspectString(tracker);
+                                        InspectInfo info = new InspectInfo
+                                        {
+                                            Visual = itemDef.pickupIconSprite,
+                                            TitleToken = itemDef.nameToken,
+                                            DescriptionToken = itemDef.descriptionToken,
+                                            FlavorToken = itemDef.loreToken,
+                                            TitleColor = ColorCatalog.GetColor(ItemTierCatalog.GetItemTierDef(itemDef.tier)?.colorIndex ?? ColorCatalog.ColorIndex.Tier1Item),
+                                            isDynamicInspectInfo = true,
+                                            dynamicInspectPickupIndex = PickupCatalog.FindPickupIndex(itemDef.itemIndex),
+                                            isConsumedItem = itemDef.isConsumed
+                                        };
+                                        panel.Show(info);
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                });
+                cursor.Emit(Mono.Cecil.Cil.OpCodes.Brtrue, target.Target);
+            }
+
+        }
+    }
+
+    private string ConstructInspectString(GravityFlaskBehavior tracker)
+    {
+        if (tracker)
+        {
+            var finalString = $"<color=#7CFDEA>The following bonuses are applied to you: </color>\r\n";
+            if (GravityFlaskFirstThreshold <= tracker.GravityFlaskDamageTracker)
+            {
+                finalString += $"• Gain <style=cIsDamage>{GravityFlaskAttackSpeedInit * (tracker.GravityFlaskDamageTracker / GravityFlaskFirstThreshold) * 100}%</style> <style=cStack>(+{GravityFlaskAttackSpeedStack * (tracker.GravityFlaskDamageTracker / GravityFlaskFirstThreshold) * 100}% per stack)</style> attack speed.\r\n";
+            }
+            if (GravityFlaskSecondThreshold <= tracker.GravityFlaskDamageTracker)
+            {
+                finalString += $"• Gain <style=cIsDamage>{GravityFlaskDamageInit * (tracker.GravityFlaskDamageTracker / GravityFlaskSecondThreshold) * 100}%</style> <style=cStack>(+{GravityFlaskDamageStack * (tracker.GravityFlaskDamageTracker / GravityFlaskSecondThreshold) * 100}% per stack)</style> base damage.\r\n";
+            }
+            if (GravityFlaskThirdThreshold <= tracker.GravityFlaskDamageTracker)
+            {
+                finalString += $"• Gain <style=cIsDamage>{GravityFlaskCritInit * (tracker.GravityFlaskDamageTracker / GravityFlaskSecondThreshold)}%</style> <style=cStack>(+{GravityFlaskCritStack * (tracker.GravityFlaskDamageTracker / GravityFlaskSecondThreshold)}% per stack)</style> critical hit chance.\r\n";
+            }
+            finalString += $"\r\n\r\n<color=#7CFDEA>You have <style=cIsDamage>{tracker.GravityFlaskDamageTracker} Damage</style> items.</color>\r\n" +
+                $"<color=#7CFDEA>You have <style=cIsHealing>{tracker.GravityFlaskHealingTracker} Healing</style> items.</color>\r\n" +
+                $"<color=#7CFDEA>You have <style=cIsUtility>{tracker.GravityFlaskHealingTracker} Utility</style> items.</color>\r\n";
+            return finalString;
+        }
+        return null;
+    }
+
+    private void Testing(On.RoR2.UI.ItemIcon.orig_SetItemIndex orig, ItemIcon self, ItemIndex newItemIndex, int newItemCount)
+    {
+        throw new NotImplementedException();
     }
 
     private void GravityFlaskMoreGold(On.RoR2.CharacterMaster.orig_GiveMoney orig, CharacterMaster self, uint amount)

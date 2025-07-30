@@ -3,6 +3,9 @@ using EntityStates;
 using R2API;
 using RoR2;
 using RoR2.Hologram;
+using SecondMoon.Equipment.AffixGuardian;
+using SecondMoon.Items.Lunar.IrradiatedMoonstone;
+using SecondMoon.Items.Lunar.Moonstone;
 using SecondMoon.MyEntityStates.Interactables;
 using SecondMoon.MyEntityStates.Items.Prototype;
 using SecondMoon.Utils;
@@ -57,30 +60,80 @@ public class AwakeningShrine : Interactable<AwakeningShrine>
     {
         RoR2Application.onLoad += ConstructInteractable;
         On.RoR2.PickupPickerController.GetInteractability += PickupPickerController_GetInteractability;
-        BossGroup.onBossGroupDefeatedServer += GuardianEliteDropPrototype;
+        BossGroup.onBossGroupDefeatedServer += ReturnToMain;
+        On.RoR2.BossGroup.DropRewards += GuardianEliteDropPrototype;
+        //On.RoR2.BossGroup.UpdateObservations += ChangeSubtitle;
+        On.RoR2.CharacterBody.GetSubtitle += ChangeSubtitle;
     }
 
-    private void GuardianEliteDropPrototype(BossGroup group)
+    private string ChangeSubtitle(On.RoR2.CharacterBody.orig_GetSubtitle orig, CharacterBody self)
+    {
+        if (self.HasBuff(AffixGuardian.instance.EliteBuffDef))
+        {
+            return AffixGuardian.AffixGuardianSubtitle;
+        }
+        return orig(self);
+    }
+
+    private void ChangeSubtitle(On.RoR2.BossGroup.orig_UpdateObservations orig, BossGroup self, ValueType memory)
+    {
+        orig(self,memory);
+        var manager = AwakeningShrineManager.FindForBossGroup(self);
+        if (manager)
+        {
+            self.bestObservedSubtitle = "<sprite name=\"CloudLeft\" tint=1> " + "Watchful Gaze of the Bulwark" + "<sprite name=\"CloudRight\" tint=1>";
+        }
+    }
+
+    private void GuardianEliteDropPrototype(On.RoR2.BossGroup.orig_DropRewards orig, BossGroup self)
+    {
+        var manager = AwakeningShrineManager.FindForBossGroup(self);
+        ExplicitPickupDropTable dropTable = null;
+        if (manager)
+        {
+            dropTable = ScriptableObject.CreateInstance<ExplicitPickupDropTable>();
+            var prototype = PickupCatalog.GetPickupDef(manager.FindCorrespondingPrototypeForDormant());
+            if (prototype != null)
+            {
+                if (prototype.itemIndex != ItemIndex.None)
+                {
+                    dropTable.pickupEntries = [new ExplicitPickupDropTable.PickupDefEntry { pickupDef = ItemCatalog.GetItemDef(prototype.itemIndex), pickupWeight = 1 }];
+                }
+                else if (prototype.equipmentIndex != EquipmentIndex.None)
+                {
+                    dropTable.pickupEntries = [new ExplicitPickupDropTable.PickupDefEntry { pickupDef = EquipmentCatalog.GetEquipmentDef(prototype.equipmentIndex), pickupWeight = 1 }];
+                }
+                dropTable.Regenerate(Run.instance);
+                self.dropTable = dropTable;
+            }
+        }
+        orig(self);
+        UnityEngine.Object.Destroy(dropTable);
+    }
+
+    private void ReturnToMain(BossGroup group)
     {
         var manager = AwakeningShrineManager.FindForBossGroup(group);
         if (manager)
         {
             var esm = manager.gameObject.GetComponent<EntityStateMachine>();
-            if (esm.state is AwakeningShrineBossFight)
+            if (esm.state.GetType() == typeof(AwakeningShrineBossFight))
             {
-                esm.SetNextState(new AwakeningShrineDropReward());
+                manager.DisableBossDirector();
+                esm.SetNextStateToMain();
             }
         }
     }
 
     private Interactability PickupPickerController_GetInteractability(On.RoR2.PickupPickerController.orig_GetInteractability orig, PickupPickerController self, Interactor activator)
     {
-        if (self.name.Contains("AwakeningShrine") && activator)
+        if (self.gameObject.name.Contains("AwakeningShrine") && activator)
         {
             var body = activator.GetComponent<CharacterBody>();
             if (body)
             {
-                if (body.master)
+                var state = self.gameObject.GetComponent<EntityStateMachine>().state.GetType();
+                if (body.master && state == typeof(AwakeningShrineIdle))
                 {
                     var hasDormant = false;
                     foreach (var key in PrototypeEquipmentIndexPairs.Keys)
@@ -104,6 +157,11 @@ public class AwakeningShrine : Interactable<AwakeningShrine>
                     {
                         return Interactability.ConditionsNotMet;
                     }
+                    return Interactability.Available;
+                }
+                else if (state != typeof(AwakeningShrineIdle))
+                {
+                    return Interactability.Disabled;
                 }
             }
         }
@@ -155,11 +213,6 @@ public class AwakeningShrine : Interactable<AwakeningShrine>
         highlightController.strength = 1;
         highlightController.highlightColor = Highlight.HighlightColor.interactive;
 
-        /*var hologramController = InteractableBodyModelPrefab.AddComponent<HologramProjector>();
-        hologramController.hologramPivot = InteractableBodyModelPrefab.transform.Find("HologramPivot");
-        hologramController.displayDistance = 10;
-        hologramController.disableHologramRotation = true;*/
-
         InteractableSpawnCard isc = ScriptableObject.CreateInstance<InteractableSpawnCard>();
         isc.name = "iscAwakeningShrine";
         isc.prefab = InteractableBodyModelPrefab;
@@ -167,7 +220,7 @@ public class AwakeningShrine : Interactable<AwakeningShrine>
         isc.hullSize = HullClassification.Golem;
         isc.nodeGraphType = RoR2.Navigation.MapNodeGroup.GraphType.Ground;
         isc.requiredFlags = RoR2.Navigation.NodeFlags.None;
-        isc.forbiddenFlags = RoR2.Navigation.NodeFlags.NoShrineSpawn | RoR2.Navigation.NodeFlags.NoChestSpawn;
+        isc.forbiddenFlags = RoR2.Navigation.NodeFlags.NoShrineSpawn;
         isc.directorCreditCost = 20;
         isc.occupyPosition = true;
         isc.orientToFloor = true;

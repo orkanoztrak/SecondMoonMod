@@ -37,7 +37,7 @@ public class RadiantHelm : Equipment<RadiantHelm>
 
     public override string EquipmentPickupDesc => "Disappear and teleport forward. Permanently upgraded with large boss monster kills. This equipment's base cooldown cannot be changed except by its own effect.";
 
-    public override string EquipmentFullDescription => $"Disappear and teleport <style=cIsUtility>{RadiantHelmBaseBlinkDistance}m</style> forward, and reduce the <style=cIsUtility>remaining cooldown of skills</style> by <style=cIsUtility>{RadiantHelmActivationCDR}%</style>. <color=#7CFDEA>Large boss monster kills enhance the power of this equipment for the rest of this run:</color>\r\n\r\n" +
+    public override string EquipmentFullDescription => $"Disappear and teleport <style=cIsUtility>{RadiantHelmBaseBlinkDistance}m</style> forward, and reduce the <style=cIsUtility>remaining cooldown of skills</style> by <style=cIsUtility>{RadiantHelmActivationCDR * 100}%</style>. <color=#7CFDEA>Large boss monster kills enhance the power of this equipment for the rest of this run:</color>\r\n\r\n" +
         $"• <color=#7CFDEA>{RadiantHelmFirstUpgradeKillThreshold} kills:</color> Deal <style=cIsDamage>{RadiantHelmBossDmgBoost * 100}%</style> more damage to large monsters and <style=cIsDamage>double</style> your <style=cIsDamage>proc coefficient</style> against them.\r\n" +
         $"• <color=#7CFDEA>{RadiantHelmSecondUpgradeKillThreshold} kills:</color> <style=cIsUtility>Halve</style> the <style=cIsUtility>cooldown</style> of this.\r\n" +
         $"• <color=#7CFDEA>{RadiantHelmThirdUpgradeKillThreshold} kills:</color> Increase <style=cIsUtility>ALL stats</style> by <style=cIsUtility>{RadiantHelmStatBoost * 100}%</style>.\r\n\r\n" +
@@ -296,7 +296,6 @@ public class RadiantHelm : Equipment<RadiantHelm>
                     if (damageReport.attackerMaster.inventory?.currentEquipmentIndex == EquipmentDef.equipmentIndex)
                     {
                         RadiantHelmKillTracker[damageReport.attackerMaster]++;
-                        Debug.Log("You have killed " + RadiantHelmKillTracker[damageReport.attackerMaster] + " large bosses.");
                     }
                 }
             }

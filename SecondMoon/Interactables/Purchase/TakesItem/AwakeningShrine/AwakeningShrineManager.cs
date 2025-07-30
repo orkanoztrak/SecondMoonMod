@@ -1,5 +1,6 @@
 ﻿using R2API;
 using RoR2;
+using SecondMoon.Equipment.AffixGuardian;
 using SecondMoon.MyEntityStates.Interactables;
 using System;
 using System.Collections.Generic;
@@ -29,18 +30,15 @@ public class AwakeningShrineManager : NetworkBehaviour
 
     private Xoroshiro128Plus bossRng;
 
-    private PickupIndex dormantToAwaken;
+    private PickupDef dormantToAwaken;
 
     private WeightedSelection<DirectorCard> availableMonstersOnStage = ClassicStageInfo.instance.monsterSelection;
 
     private WeightedSelection<DirectorCard> availableBossesOnStage = new WeightedSelection<DirectorCard>();
 
-    /*public void Awake()
-    {
-    }*/
-
     public void OnEnable()
     {
+        pickupPickerController = GetComponent<PickupPickerController>();
         bossDirector = GetComponent<CombatDirector>();
         bossGroup = GetComponent<BossGroup>();
         combatSquad = GetComponent<CombatSquad>();
@@ -84,7 +82,7 @@ public class AwakeningShrineManager : NetworkBehaviour
                 {
                     if (body.master.inventory.GetItemCount(pickupDef.itemIndex) > 0)
                     {
-                        dormantToAwaken = pickupDef.pickupIndex;
+                        dormantToAwaken = pickupDef;
                         body.master.inventory.RemoveItem(pickupDef.itemIndex);
                         shrine.GetComponent<EntityStateMachine>()?.SetNextState(new AwakeningShrineWindupBeforeBossSpawn());
                     }
@@ -136,17 +134,23 @@ public class AwakeningShrineManager : NetworkBehaviour
 
     public void SetupBossSpawn(Interactor interactor)
     {
-        bossDirector.monsterCredit = 0;
-        bossDirector.monsterCredit += (int)(600f * Mathf.Pow(Run.instance.compensatedDifficultyCoefficient, 0.5f));
+        bossDirector.enabled = true;
         bossDirector.currentSpawnTarget = interactor.gameObject;
         var currentDirectorCard = availableBossesOnStage.Evaluate(bossRng.nextNormalizedFloat);
+        bossDirector.monsterCredit = currentDirectorCard.cost;
         var bossCard = currentDirectorCard.spawnCard as CharacterSpawnCard;
         bossCard.noElites = true;
         bossMaster = bossCard.prefab.GetComponent<CharacterMaster>();
         bossDirector.OverrideCurrentMonsterCard(currentDirectorCard);
         bossCard.noElites = false;
+        bossDirector.currentActiveEliteDef = AffixGuardian.instance.EliteDef;
         bossDirector.monsterSpawnTimer = 0;
-        bossDirector.enabled = true;
+        combatSquad.memberHistory.Clear();
+        combatSquad.defeatedServer = false;
+        bossGroup.dropTable = null;
+        bossGroup.bestObservedName = "";
+        bossGroup.bestObservedSubtitle = "";
+        bossGroup.bossMemoryCount = 0;
     }
 
     public static AwakeningShrineManager FindForBossGroup(BossGroup bossGroup)
@@ -161,11 +165,25 @@ public class AwakeningShrineManager : NetworkBehaviour
         return null;
     }
 
-    public void DropPrototypeReward(Vector3 pivot, Vector3 velocity)
+    public PickupIndex FindCorrespondingPrototypeForDormant()
     {
-        if (dormantToAwaken != PickupIndex.none)
+        if (dormantToAwaken.pickupIndex != PickupIndex.none)
         {
-            PickupDropletController.CreatePickupDroplet(dormantToAwaken, pivot, velocity);
+            if (AwakeningShrine.PrototypeEquipmentIndexPairs.TryGetValue(dormantToAwaken.itemIndex, out var ei))
+            {
+                return PickupCatalog.equipmentIndexToPickupIndex[(int)ei];
+            }
+            if (AwakeningShrine.PrototypeItemIndexPairs.TryGetValue(dormantToAwaken.itemIndex, out var ii))
+            {
+                return PickupCatalog.itemIndexToPickupIndex[(int)ii];
+            }
         }
+        return PickupIndex.none;
+    }
+
+    public void DisableBossDirector()
+    {
+        bossDirector.monsterCredit = 0;
+        bossDirector.enabled = false;
     }
 }

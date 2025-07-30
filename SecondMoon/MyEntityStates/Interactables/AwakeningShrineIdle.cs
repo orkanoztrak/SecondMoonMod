@@ -3,21 +3,14 @@ using SecondMoon.Items.ItemTiers.TierPrototype;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace SecondMoon.MyEntityStates.Interactables;
 
 public class AwakeningShrineIdle : AwakeningShrineBaseState
 {
-    public override Interactability GetInteractability(Interactor activator)
+    public override void OnEnter()
     {
-        var body = activator.GetComponent<CharacterBody>();
-        if (body)
-        {
-            if (body.master)
-            {
-                return body.master.inventory.HasAtLeastXTotalItemsOfTier(TierPrototype.instance.ItemTierDef.tier, 1) ? Interactability.Available : Interactability.ConditionsNotMet;
-            }
-        }
-        return Interactability.ConditionsNotMet;
+        base.OnEnter();
     }
 }

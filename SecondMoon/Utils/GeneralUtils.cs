@@ -28,6 +28,14 @@ namespace SecondMoon.Utils;
 
 public static class GeneralUtils
 {
+    public static CharacterMaster FindMasterByInventory(Inventory inventory)
+    {
+        foreach (var master in CharacterMaster.instancesList)
+        {
+            if (master.inventory == inventory) return master;
+        }
+        return null;
+    }
     public static GameObject CreateBlankPrefab(string name = "GameObject", bool network = false)
     {
         GameObject gameObject = PrefabAPI.InstantiateClone(new GameObject(name), name, false);

@@ -413,7 +413,6 @@ public class LostBuff : Buff<LostBuff>
                 loopCalc = Util.CheckRoll((loopCalc % 1) * 100, attackerBody.master) ? loopCalc + 1 : loopCalc;
             }
             var loops = (int)loopCalc;
-            Debug.Log("number of missiles: " +  loops);
             for (int i = 0; i < loops; i++)
             {
                 LostOrb lostOrb = new LostOrb
@@ -614,10 +613,6 @@ public class LostBuff : Buff<LostBuff>
             {
                 info.normalizedXMax = info.normalizedXMin;
             }
-            /*if (info.enabled)
-            {
-                Debug.Log("Bar positions:\nMin x: " + info.normalizedXMin + "\nMax x: " + info.normalizedXMax);
-            }*/
             base.UpdateInfo(ref info, healthBarValues);
         }
     }

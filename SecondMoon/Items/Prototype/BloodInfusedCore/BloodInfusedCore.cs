@@ -11,7 +11,6 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
-using static SecondMoon.Items.Prototype.GravityFlask.GravityFlask;
 
 namespace SecondMoon.Items.Prototype.BloodInfusedCore;
 

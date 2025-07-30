@@ -15,6 +15,8 @@ namespace SecondMoon.Equipment.AffixGuardian;
 
 public class AffixGuardian : EliteEquipment<AffixGuardian>
 {
+    public static ConfigOption<string> AffixGuardianSubtitle;
+
     public ConfigOption<float> AffixGuardianDropOnDeathChance;
     public ConfigOption<float> AffixGuardianBarrierGainLowerThreshold;
     public ConfigOption<float> AffixGuardianCDForMaxBarrier;
@@ -72,6 +74,7 @@ public class AffixGuardian : EliteEquipment<AffixGuardian>
 
     private void CreateConfig(ConfigFile config)
     {
+        AffixGuardianSubtitle = config.ActiveBind("Equipment: " + EliteEquipmentName, "Subtitle for boss", "Watchful Gaze of the Bulwark", "This subtitle overrides the regular one the spawned boss has on the boss UI.");
         AffixGuardianDropOnDeathChance = config.ActiveBind("Equipment: " + EliteEquipmentName, "Chance to drop on death", 0.00025f, "How likely is the player to get this item upon killing a " + EliteModifier + " elite? (0.00025 = 0.025%, which is 1/4000, the base odds for an elite aspect drop in vanilla)");
         AffixGuardianBarrierGainLowerThreshold = config.ActiveBind("Equipment: " + EliteEquipmentName, "Minimum cooldown required for barrier gain", 4f, "Skills with cooldown below this many seconds will not grant barrier upon being activated.");
         AffixGuardianCDForMaxBarrier = config.ActiveBind("Equipment: " + EliteEquipmentName, "Cooldown required for gaining max barrier", 40f, "Using a skill with at least this much cooldown will grant a 100% barrier. Barrier gain for lower cooldowns is directly proportional.");
@@ -117,14 +120,11 @@ public class AffixGuardian : EliteEquipment<AffixGuardian>
                         stop = true;
                     }
                 }
-                Debug.Log("Current health fraction: " + combinedHealthAndShield);
-                Debug.Log("Current health chunk (from the right): " + i);
                 if (1 - combinedHealthAndShield >= guardianController.damageChunkTracker * instance.AffixGuardianHurtTriggerThreshold 
                     && body.healthComponent.alive 
                     && !guardianController.triggerTheNova 
                     && guardianController.lastTriggeredAtChunk != i)
                 {
-                    Debug.Log("Trigger the nova");
                     guardianController.lastTriggeredAtChunk = i;
                     guardianController.triggerTheNova = true;
                 }
@@ -277,12 +277,7 @@ public class AffixGuardian : EliteEquipment<AffixGuardian>
                 stopwatch += Time.fixedDeltaTime;
                 if (effectTransform.gameObject.activeSelf)
                 {
-                    if (novaRadiusCurve == null)
-                    {
-                        Debug.Log("lmao");
-                    }
                     float num = radius * novaRadiusCurve.Evaluate(stopwatch / duration);
-                    Debug.Log("num: " + num);
                     effectTransform.localScale = new Vector3(num, num, num);
                 }
                 if (barrierPulse.isFinished)
@@ -349,7 +344,6 @@ public class AffixGuardian : EliteEquipment<AffixGuardian>
                         ApplyBarrier(healthComponent);
                     }
                 }
-                Debug.Log("hurtBoxes count: " + hurtBoxesList.Count + "\nt: " + t);
                 hurtBoxesList.Clear();
             }
 

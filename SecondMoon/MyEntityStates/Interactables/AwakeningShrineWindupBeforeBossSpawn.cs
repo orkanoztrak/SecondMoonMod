@@ -16,7 +16,8 @@ public class AwakeningShrineWindupBeforeBossSpawn : AwakeningShrineBaseState
     public override void OnEnter()
     {
         base.OnEnter();
-        shaker = outer.gameObject.transform.Find("BossSpawnFX").gameObject.GetComponent<ShakeEmitter>();
+        shaker = outer.gameObject.transform.Find("ShakeEmitter").gameObject.GetComponent<ShakeEmitter>();
+        shaker.stopwatch = 0f;
         duration = shaker.duration;
         shaker.gameObject.SetActive(true);
     }
