@@ -21,7 +21,7 @@ public class SilverRevolver : Item<SilverRevolver>
 
     public override string ItemLangTokenName => "SILVER_REVOLVER";
 
-    public override string ItemPickupDesc => "You always critically strike against Elite monsters, and critical strikes lower cooldowns.";
+    public override string ItemPickupDesc => "You always critically strike against elites. Critical strikes lower cooldowns.";
 
     public override string ItemFullDesc => $"Gain <style=cIsDamage>{SilverRevolverInitialCritChance}% critical chance</style>. " +
         $"You always <style=cIsDamage>critically strike</style> against elites. " +

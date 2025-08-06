@@ -24,7 +24,7 @@ public class NarrowMagnifier : Item<NarrowMagnifier>
 
     public override string ItemLangTokenName => "NARROW_MAGNIFIER";
 
-    public override string ItemPickupDesc => "Gain increased damage per critical chance (up to 100%) and deal increased damage against enemies at a certain distance... <color=#FF7F7F>BUT deal reduced damage to enemies not at that distance and disable critical hits.</color>\n";
+    public override string ItemPickupDesc => "Gain increased damage based on critical chance and deal increased damage against enemies at a certain distance... <color=#FF7F7F>BUT deal reduced damage to enemies not at that distance and disable critical hits.</color>\n";
 
     public override string ItemFullDesc => $"For every <style=cIsDamage>1% critical chance (up to 100%)</style>, increase <style=cIsDamage>base damage</style> by <style=cIsDamage>{1 * NarrowMagnifierCCDmgConversion}% (+{0.01 * NarrowMagnifierCCDmgConversion}% per 1% critical damage increase)</style>. " +
         $"Against enemies between <style=cIsDamage>{NarrowMagnifierMinRadius}m</style> and <style=cIsDamage>{NarrowMagnifierMaxRadius}m</style> away, " +

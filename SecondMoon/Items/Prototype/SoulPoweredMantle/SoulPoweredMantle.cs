@@ -26,7 +26,7 @@ public class SoulPoweredMantle : Item<SoulPoweredMantle>
 
     public override string ItemLangTokenName => "SOUL_POWERED_MANTLE";
 
-    public override string ItemPickupDesc => "Using a skill makes you invisible, scaling with cooldown. You are very lucky while invisible.";
+    public override string ItemPickupDesc => "Using a skill makes you invisible. You are very lucky while invisible.";
 
     public override string ItemFullDesc => $"Using a <style=cIsUtility>skill</style> grants you <style=cIsUtility>invisibility</style> and <style=cIsUtility>40% movement speed</style> for <style=cIsUtility>{SoulPoweredMantleInvisPercent * 10}%</style> of its cooldown. " +
         $"<color=#7CFDEA>While invisible, gain {SoulPoweredMantleLuckInit} <style=cStack>(+{SoulPoweredMantleLuckStack} per stack)</style> luck</color>.";
@@ -52,7 +52,7 @@ public class SoulPoweredMantle : Item<SoulPoweredMantle>
 
     public override void Hooks()
     {
-        On.RoR2.CharacterBody.OnInventoryChanged += OnInventoryChanged;
+        On.RoR2.CharacterBody.OnInventoryChanged += SoulPoweredMantleAddBehavior;
         On.RoR2.GenericSkill.OnExecute += SoulPoweredMantleInvisibility;
     }
 
@@ -74,7 +74,7 @@ public class SoulPoweredMantle : Item<SoulPoweredMantle>
         }
     }
 
-    private void OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
+    private void SoulPoweredMantleAddBehavior(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
     {
         if (NetworkServer.active)
         {

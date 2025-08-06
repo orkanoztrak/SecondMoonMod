@@ -26,7 +26,7 @@ public class UniversalKey : Item<UniversalKey>
 
     public override string ItemLangTokenName => "UNIVERSAL_KEY";
 
-    public override string ItemPickupDesc => "The cost of the first interactable in a stage is fully refunded and it\'s used twice!";
+    public override string ItemPickupDesc => "The cost of the first interactable in a stage is refunded and it\'s used twice!";
 
     public override string ItemFullDesc => $"The cost of the first <style=cIsUtility>{UniversalKeyInteractableCountInit}</style> <style=cStack>(+{UniversalKeyInteractableCountStack} per stack)</style> <style=cIsUtility>interactables</style> in a stage " +
         $"are fully refunded and trigger twice. Not limited to chests!";
@@ -53,6 +53,33 @@ public class UniversalKey : Item<UniversalKey>
         On.RoR2.ShopTerminalBehavior.DropPickup += UniversalKeyDuplicateDropFromDelayedShop;
         On.RoR2.BarrelInteraction.OnInteractionBegin += UniversalKeyDuplicateRewardFromBarrels;
         On.RoR2.OptionChestBehavior.ItemDrop += UniversalKeyDuplicateRewardsFromPotential;
+        On.RoR2.ChestBehavior.ItemDrop += UniversalKeyDuplicateRewardsFromChest;
+    }
+
+    private void UniversalKeyDuplicateRewardsFromChest(On.RoR2.ChestBehavior.orig_ItemDrop orig, ChestBehavior self)
+    {
+        orig(self);
+        var interactable = self.gameObject;
+        CharacterMaster masterCache = null;
+        (int, GameObject, bool) tupleCache = (0, null, false);
+        var check = false;
+        foreach (var pcmc in PlayerCharacterMasterController.instances)
+        {
+            UniversalKeyPurchaseCounters.TryGetValue(pcmc.master, out var tuple);
+            if (tuple.Item2 == interactable && tuple.Item3)
+            {
+                tupleCache = tuple;
+                masterCache = pcmc.master;
+                check = true;
+                break;
+            }
+        }
+        if (check)
+        {
+            self.Roll();
+            orig(self);
+            UniversalKeyPurchaseCounters[masterCache] = (tupleCache.Item1, tupleCache.Item2, false);
+        }
     }
 
     private void UniversalKeyDuplicateRewardsFromPotential(On.RoR2.OptionChestBehavior.orig_ItemDrop orig, OptionChestBehavior self)
@@ -209,14 +236,14 @@ public class UniversalKey : Item<UniversalKey>
                 OptionChestBehavior isPotential = interactableType.GetComponent<OptionChestBehavior>();
                 float cachedFailure = 0f;
                 float cachedFailureWeight = 0f;
+                int cachedDropCount = 0;
                 if (stackCount > 0)
                 {
-                    if (isChest)
+                    if (isChest && self.saleStarCompatible)
                     {
                         if (!interactableType.name.Contains("Fan"))
                         {
                             activated = true;
-                            isChest.dropCount *= 2;
                         }
                     }
                     if (isAdaptiveChest)

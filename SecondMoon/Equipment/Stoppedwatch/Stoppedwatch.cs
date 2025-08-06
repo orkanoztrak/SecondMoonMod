@@ -19,7 +19,7 @@ public class Stoppedwatch : Equipment<Stoppedwatch>
 
     public override string EquipmentLangTokenName => "GOD_WATCH";
 
-    public override string EquipmentPickupDesc => "For a brief time, your skills do not go on cooldown and you are invincible.";
+    public override string EquipmentPickupDesc => StoppedwatchDuration == 1? $"Remove skill cooldowns and become invincible for {StoppedwatchDuration} second." : $"Remove skill cooldowns and become invincible for {StoppedwatchDuration} seconds.";
 
     public override string EquipmentFullDescription => $"For <style=cIsUtility>{StoppedwatchDuration}s</style>, skills do not go on cooldown upon being used and you take no damage.";
 

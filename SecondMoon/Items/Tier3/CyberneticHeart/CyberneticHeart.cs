@@ -19,7 +19,7 @@ public class CyberneticHeart : Item<CyberneticHeart>
 
     public override string ItemLangTokenName => "CYBERNETIC_HEART";
 
-    public override string ItemPickupDesc => "Gain a recharging shield. Your healing restores shields as well.";
+    public override string ItemPickupDesc => "Gain a recharging shield. Healing restores shields.";
 
     public override string ItemFullDesc => $"Gain a shield equal to <style=cIsHealing>{CyberneticHeartShieldInit * 100}%</style> <style=cStack>(+{CyberneticHeartShieldStack * 100}% per stack)</style> of your maximum health. " +
         $"Your <style=cIsHealing>healing</style> restores an equal amount of <style=cIsHealing>shields</style>.";

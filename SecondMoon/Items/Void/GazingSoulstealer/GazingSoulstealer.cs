@@ -94,10 +94,10 @@ public class GazingSoulstealer : Item<GazingSoulstealer>
                     var stackCount = GetCount(slot.characterBody);
                     if (stackCount > 0)
                     {
-                        slot.characterBody.skillLocator.primary.rechargeStopwatch += slot.characterBody.skillLocator.primary.cooldownRemaining;
-                        slot.characterBody.skillLocator.secondary.rechargeStopwatch += slot.characterBody.skillLocator.secondary.cooldownRemaining;
-                        slot.characterBody.skillLocator.utility.rechargeStopwatch += slot.characterBody.skillLocator.utility.cooldownRemaining;
-                        slot.characterBody.skillLocator.special.rechargeStopwatch += slot.characterBody.skillLocator.special.cooldownRemaining;
+                        if (slot.characterBody.skillLocator)
+                        {
+                            slot.characterBody.skillLocator.ResetSkills();
+                        }
                     }
                 }
             }

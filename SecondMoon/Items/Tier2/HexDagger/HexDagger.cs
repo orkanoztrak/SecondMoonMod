@@ -21,7 +21,7 @@ public class HexDagger : Item<HexDagger>
 
     public override string ItemLangTokenName => "HEX_DAGGER";
 
-    public override string ItemPickupDesc => "Your status effects can critically strike.";
+    public override string ItemPickupDesc => "Your damage over time effects can critically strike.";
 
     public override string ItemFullDesc => $"Gain <style=cIsDamage>{HexDaggerInitialCritChance}% critical chance</style>. " +
         $"Each tick of a <style=cIsDamage>damage over time effect</style> can now <style=cIsDamage>critically strike. </style>" +

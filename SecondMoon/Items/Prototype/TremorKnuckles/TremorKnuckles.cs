@@ -22,7 +22,7 @@ public class TremorKnuckles : Item<TremorKnuckles>
 
     public override string ItemLangTokenName => "TREMOR_KNUCKLES";
 
-    public override string ItemPickupDesc => "Continued Primary skill use boosts damage and applies bombs on hit, until you use a non-Primary combat skill.";
+    public override string ItemPickupDesc => "Continued Primary skill use boosts damage and applies bombs on hit, until you initiate combat with a non-Primary skill.";
 
     public override string ItemFullDesc => $"Using your <style=cIsUtility>Primary skill</style> <style=cIsDamage>{TremorKnucklesRequiredPrimaryUses}</style> times grants a stack of <color=#7CFDEA>Tremors</color>, which stacks up to <style=cIsDamage>{TremorKnucklesMaxCharges}</style> times. " +
         $"All stacks of <color=#7CFDEA>Tremors</color> are removed upon using a <style=cIsUtility>non-Primary combat skill</style>. " +

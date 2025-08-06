@@ -28,7 +28,7 @@ public class BlissfulVisage : Item<BlissfulVisage>
 
     public override string ItemLangTokenName => "GHOSTONKILLVOID";
 
-    public override string ItemPickupDesc => $"Periodically summon a <style=cIsVoid>corrupted</style> ghost of yourself - kills reduce this timer. <style=cIsVoid>Corrupts all Happiest Masks</style>.";
+    public override string ItemPickupDesc => $"Periodically summon a <style=cIsVoid>corrupted</style> ghost of yourself - kills reduce its cooldown. <style=cIsVoid>Corrupts all Happiest Masks</style>.";
 
     public override string ItemFullDesc => $"Every <style=cIsUtility>{BlissfulVisageGhostCooldown}s</style>, summon a <style=cIsVoid>corrupted</style> ghost of yourself that inherits your items. Kills reduce this timer by <style=cIsDamage>{BlissfulVisageReduceTimerOnKillInit}s</style> <style=cStack>(+{BlissfulVisageReduceTimerOnKillStack}s per stack)</style>. Lasts <style=cIsDamage>{BlissfulVisageSuicideTimer}s</style>. <style=cIsVoid>Corrupts all Happiest Masks</style>.";
 

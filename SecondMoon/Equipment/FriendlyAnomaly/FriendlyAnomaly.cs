@@ -20,7 +20,7 @@ public class FriendlyAnomaly : Equipment<FriendlyAnomaly>
 
     public override string EquipmentLangTokenName => "FRIENDLY_ANOMALY";
 
-    public override string EquipmentPickupDesc => "Kill target enemy and gain its elite powers (if any) for the rest of the stage - large monsters are immune.";
+    public override string EquipmentPickupDesc => "Execute an elite monster and gain its power. Large monsters are immune.";
 
     public override string EquipmentFullDescription => $"<style=cIsDamage>Execute</style> any enemy that isn't a large monster. If it was elite, gain its <style=cIsDamage>power</style> for the rest of the stage.";
 
@@ -40,7 +40,7 @@ public class FriendlyAnomaly : Equipment<FriendlyAnomaly>
         {
             var targetComponent = slot.GetComponent<TargetingControllerComponent>();
             if (targetComponent)
-            { 
+            {
                 if (targetComponent.TargetObject)
                 {
                     var chosenHurtbox = targetComponent.TargetFinder.GetResults().First();
@@ -49,17 +49,14 @@ public class FriendlyAnomaly : Equipment<FriendlyAnomaly>
                         var targetBody = chosenHurtbox.healthComponent.body;
                         if (targetBody)
                         {
-                            if (!targetBody.isChampion)
+                            if (!targetBody.isChampion && targetBody.isElite)
                             {
-                                if (targetBody.isElite)
+                                for (int k = 0; k < BuffCatalog.eliteBuffIndices.Length; k++)
                                 {
-                                    for (int k = 0; k < BuffCatalog.eliteBuffIndices.Length; k++)
+                                    BuffIndex buffIndex = BuffCatalog.eliteBuffIndices[k];
+                                    if (targetBody.HasBuff(buffIndex))
                                     {
-                                        BuffIndex buffIndex = BuffCatalog.eliteBuffIndices[k];
-                                        if (targetBody.HasBuff(buffIndex))
-                                        {
-                                            slot.characterBody.AddBuff(buffIndex);
-                                        }
+                                        slot.characterBody.AddBuff(buffIndex);
                                     }
                                 }
                                 Vector3 vector = chosenHurtbox.transform ? chosenHurtbox.transform.position : Vector3.zero;
@@ -110,10 +107,25 @@ public class FriendlyAnomaly : Equipment<FriendlyAnomaly>
 
     public override void Hooks()
     {
-        On.RoR2.EquipmentSlot.Update += FilterOutBosses;
+        On.RoR2.EquipmentSlot.Update += FilterOutBossesAndNonElites;
+        On.RoR2.CharacterBody.OnEquipmentLost += RemoveTargetingIfExists;
     }
 
-    private void FilterOutBosses(On.RoR2.EquipmentSlot.orig_Update orig, EquipmentSlot self)
+    private void RemoveTargetingIfExists(On.RoR2.CharacterBody.orig_OnEquipmentLost orig, CharacterBody self, EquipmentDef equipmentDef)
+    {
+        if (equipmentDef == EquipmentDef && self)
+        {
+            var targetingComponent = self.GetComponent<TargetingControllerComponent>();
+            if (targetingComponent)
+            {
+                targetingComponent.Invalidate();
+                targetingComponent.Indicator.active = false;
+            }
+        }
+        orig(self, equipmentDef);
+    }
+
+    private void FilterOutBossesAndNonElites(On.RoR2.EquipmentSlot.orig_Update orig, EquipmentSlot self)
     {
         orig(self);
         if (self.equipmentIndex == EquipmentDef.equipmentIndex)
@@ -125,7 +137,7 @@ public class FriendlyAnomaly : Equipment<FriendlyAnomaly>
                 {
                     if (bullseyeSearch.candidatesEnumerable.Any())
                     {
-                        bullseyeSearch.candidatesEnumerable = bullseyeSearch.candidatesEnumerable.Where(x => (x.hurtBox != null) && !x.hurtBox.healthComponent.body.isChampion).ToList();
+                        bullseyeSearch.candidatesEnumerable = bullseyeSearch.candidatesEnumerable.Where(x => (x.hurtBox != null) && !x.hurtBox.healthComponent.body.isChampion && x.hurtBox.healthComponent.body.isElite).ToList();
                     }
                 };
             }
@@ -144,6 +156,6 @@ public class FriendlyAnomaly : Equipment<FriendlyAnomaly>
 
     private void CreateConfig(ConfigFile config)
     {
-        Cooldown = config.ActiveBind("Equipment: " + EquipmentName, "Cooldown", 90f, "How many seconds will this equipment's cooldown be?");
+        Cooldown = config.ActiveBind("Equipment: " + EquipmentName, "Cooldown", 75f, "How many seconds will this equipment's cooldown be?");
     }
 }

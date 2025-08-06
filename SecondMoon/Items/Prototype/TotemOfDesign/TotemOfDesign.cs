@@ -1,50 +1,32 @@
 ﻿using BepInEx.Configuration;
-using MonoMod.Cil;
 using R2API;
 using RoR2;
-using SecondMoon.BuffsAndDebuffs.Buffs.Item.Prototype;
-using SecondMoon.BuffsAndDebuffs.Debuffs.PureDebuffs.Item.Prototype;
 using SecondMoon.Items.ItemTiers.TierPrototype;
-using SecondMoon.Items.Prototype.GravityFlask;
 using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
+using System.Collections.ObjectModel;
+using System.Data;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
+using static RoR2.PulseController;
 
 namespace SecondMoon.Items.Prototype.TotemOfDesign;
 
 public class TotemOfDesign : Item<TotemOfDesign>
 {
-    public static ConfigOption<float> TotemOfDesignRegenIncreaseInit;
-    public static ConfigOption<float> TotemOfDesignRegenIncreaseStack;
-    public static ConfigOption<float> TotemOfDesignAttackSpeedIncreaseInit;
-    public static ConfigOption<float> TotemOfDesignAttackSpeedIncreaseStack;
-    public static ConfigOption<float> TotemOfDesignDamageIncreaseInit;
-    public static ConfigOption<float> TotemOfDesignDamageIncreaseStack;
-
-    public static ConfigOption<float> TotemOfDesignMovementDecreaseInit;
-    public static ConfigOption<float> TotemOfDesignMovementDecreaseStack;
-    public static ConfigOption<float> TotemOfDesignCooldownIncreaseInit;
-    public static ConfigOption<float> TotemOfDesignCooldownIncreaseStack;
-    public static ConfigOption<float> TotemOfDesignDamageDecreaseInit;
-    public static ConfigOption<float> TotemOfDesignDamageDecreaseStack;
+    public static ConfigOption<float> TotemOfDesignSkillFailChanceInit;
+    public static ConfigOption<float> TotemOfDesignSkillFailChanceStack;
+    public static ConfigOption<float> TotemOfDesignFailBlastRadius;
+    public static ConfigOption<float> TotemOfDesignFailBlastHealthScaling;
     public override string ItemName => "Totem of Design";
 
     public override string ItemLangTokenName => "TOTEM_OF_DESIGN";
 
-    public override string ItemPickupDesc => "Buffs on you increase health regeneration, attack speed and damage. Debuffs on enemies decrease movement speed, cooldown reduction and damage.";
+    public override string ItemPickupDesc => "Enemy skills have a chance to critically fail. Your skills have a chance to not go on cooldown.";
 
-    public override string ItemFullDesc => $"Gain <color=#7CFDEA>1</color> <style=cStack>(+1 per stack)</style> stacks of the <color=#7CFDEA>Flawless Design</color> buff, which grants the following:\r\n" +
-        $"• Increase <style=cIsHealing>health regeneration</style> by <style=cIsHealing>{TotemOfDesignRegenIncreaseInit * 100}%</style> <color=#7CFDEA>(+{TotemOfDesignRegenIncreaseStack * 100}% per buff)</color>.\r\n" +
-        $"• Increase <style=cIsDamage>attack speed</style> by <style=cIsDamage>{TotemOfDesignAttackSpeedIncreaseInit * 100}%</style> <color=#7CFDEA>(+{TotemOfDesignAttackSpeedIncreaseStack * 100}% per buff)</color>.\r\n" +
-        $"• Increase <style=cIsDamage>damage</style> by <style=cIsDamage>{TotemOfDesignDamageIncreaseInit * 100}%</style> <color=#7CFDEA>(+{TotemOfDesignDamageIncreaseStack * 100}% per buff)</color>.\r\n\r\n" +
-        $"Hitting enemies permanently applies the <color=#7CFDEA>Flawed Design</color> debuff to them (stacks up to <color=#7CFDEA>1</color> <style=cStack>(+1 per stack)</style>) which grants the following:\r\n" +
-        $"• Decrease <style=cIsUtility>movement speed</style> by <style=cIsUtility>{TotemOfDesignMovementDecreaseInit * 100}%</style> <color=#7CFDEA>(+{TotemOfDesignMovementDecreaseStack * 100}% per debuff)</color>.\r\n" +
-        $"• Increase <style=cIsUtility>cooldowns</style> by <style=cIsUtility>{TotemOfDesignCooldownIncreaseInit * 100}%</style> <color=#7CFDEA>(+{TotemOfDesignCooldownIncreaseStack * 100}% per debuff)</color>.\r\n" +
-        $"• Decrease <style=cIsDamage>damage</style> by <style=cIsDamage>{TotemOfDesignDamageDecreaseInit * 100}%</style> <color=#7CFDEA>(+{TotemOfDesignDamageDecreaseStack * 100}% per debuff)</color>.";
+    public override string ItemFullDesc => $"";
 
     public override string ItemLore => $"Have I ever told you why I love Design?\r\n\r\n" +
         $"Unlike the other compounds, Design does not have its own form. It is the creator's own skills and vision that give it form. In this regard, Design is the most abstract compound that also tells the most about the contraption and its maker.\r\n\r\n" +
@@ -60,6 +42,10 @@ public class TotemOfDesign : Item<TotemOfDesign>
 
     public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Healing, ItemTag.Utility];
 
+    private static int TotemOfDesignPlayersStackTracker = 0;
+    private static int TotemOfDesignMonstersStackTracker = 0;
+
+
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
         DisplayRules = new ItemDisplayRuleDict(null);
@@ -68,144 +54,96 @@ public class TotemOfDesign : Item<TotemOfDesign>
 
     public override void Hooks()
     {
-        On.RoR2.GlobalEventManager.ProcessHitEnemy += TotemOfDesignApplyDebuff;
-        On.RoR2.CharacterBody.OnInventoryChanged += TotemOfDesignApplyBuff;
-        IL.RoR2.CharacterBody.RecalculateStats += TotemOfDesignStatModifications;
-        On.RoR2.GenericSkill.CalculateFinalRechargeInterval += TotemOfDesignIncreaseCooldownCeiling;
+        On.RoR2.CharacterBody.OnInventoryChanged += TotemOfDesignUpdateTracker;
+        On.RoR2.GenericSkill.OnExecute += TotemOfDesignCauseSkillFailure;
     }
 
-    private float TotemOfDesignIncreaseCooldownCeiling(On.RoR2.GenericSkill.orig_CalculateFinalRechargeInterval orig, GenericSkill self)
+    private void TotemOfDesignCauseSkillFailure(On.RoR2.GenericSkill.orig_OnExecute orig, GenericSkill self)
     {
-        if (self.cooldownScale > 1f)
+        if (self.characterBody && self.skillDef)
         {
-            return Mathf.Min(self.baseRechargeInterval * self.cooldownScale, Mathf.Max(0.5f, self.baseRechargeInterval * self.cooldownScale - self.flatCooldownReduction));
-        }
-        else
-        {
-            return orig(self);
-        }
-    }
-
-    private void TotemOfDesignStatModifications(ILContext il)
-    {
-        var cursor = new ILCursor(il);
-        if (cursor.TryGotoNext(x => x.MatchLdarg(0),
-            x => x.MatchLdarg(0),
-            x => x.MatchCallOrCallvirt<CharacterBody>("get_maxShield"),
-            x => x.MatchLdarg(0),
-            x => x.MatchCallOrCallvirt<CharacterBody>("get_cursePenalty")))
-        {
-            cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
-            cursor.EmitDelegate<Action<CharacterBody>>((body) =>
+            var stackCount = 0;
+            TeamIndex enemyTeam = TeamIndex.None;
+            if (self.characterBody.teamComponent)
             {
-                if (body)
+                switch (self.characterBody.teamComponent.teamIndex)
                 {
-                    int buffs = 0;
-                    int debuffs = 0;
-                    int flawless = body.GetBuffCount(FlawlessDesign.instance.BuffDef);
-                    int flawed = body.GetBuffCount(FlawedDesign.instance.BuffDef);
-                    if (flawless > 0 || flawed > 0)
+                    case TeamIndex.Player:
+                        enemyTeam = TeamIndex.Monster;
+                        stackCount = TotemOfDesignMonstersStackTracker;
+                        break;
+
+                    case TeamIndex.Monster:
+                        enemyTeam = TeamIndex.Player;
+                        stackCount = TotemOfDesignPlayersStackTracker;
+                        break;
+                }
+                if (stackCount > 0)
+                {
+                    var roll = GeneralUtils.HyperbolicScaling(TotemOfDesignSkillFailChanceInit + (stackCount - 1) * TotemOfDesignSkillFailChanceStack);
+                    if (Util.CheckRoll(roll * 100))
                     {
-                        BuffIndex[] debuffBuffIndices = BuffCatalog.debuffBuffIndices;
-                        foreach (BuffIndex buffType in debuffBuffIndices)
+                        var state = self.characterBody.GetComponent<SetStateOnHurt>();
+                        if (state)
                         {
-                            if (body.HasBuff(buffType))
-                            {
-                                debuffs++;
-                            }
+                            state.SetStun(2f);
                         }
-                        DotController dotController = DotController.FindDotController(body.gameObject);
-                        if ((bool)dotController)
+                        CreatePulseAttack(self.characterBody, enemyTeam);
+                        self.rechargeStopwatch = 0f;
+                        self.stock -= self.skillDef.stockToConsume;
+                        if (self.skillDef.cancelSprintingOnActivation)
                         {
-                            for (DotController.DotIndex dotIndex = 0; dotIndex < (DotController.DotIndex)(DotAPI.VanillaDotCount + DotAPI.CustomDotCount); dotIndex++)
-                            {
-                                if (dotController.HasDotActive(dotIndex))
-                                {
-                                    debuffs++;
-                                }
-                            }
+                            self.characterBody.isSprinting = false;
                         }
-                        buffs = body.activeBuffsListCount - debuffs;
-                        if (flawless > 0 && buffs > 0)
-                        {
-                            body.regen += Math.Abs(body.regen * (TotemOfDesignRegenIncreaseInit + ((flawless - 1) * TotemOfDesignRegenIncreaseStack)) * buffs);
-                            body.attackSpeed *= 1 + ((TotemOfDesignAttackSpeedIncreaseInit + ((flawless - 1) * TotemOfDesignAttackSpeedIncreaseStack)) * buffs);
-                            body.damage *= 1 + ((TotemOfDesignDamageIncreaseInit + ((flawless - 1) * TotemOfDesignDamageIncreaseStack)) * buffs);
-                        }
-                        if (flawed > 0 && debuffs > 0)
-                        {
-                            var decrease = (float)((1 - TotemOfDesignDamageDecreaseInit) * Math.Pow(1 - TotemOfDesignDamageDecreaseStack, debuffs - 1));
-                            decrease = (float)(decrease * Math.Pow(decrease, flawed - 1));
-                            if (body.skillLocator)
-                            {
-                                if (body.skillLocator.primaryBonusStockSkill)
-                                {
-                                    body.skillLocator.primaryBonusStockSkill.cooldownScale *= 1 + ((TotemOfDesignCooldownIncreaseInit + ((flawed - 1) * TotemOfDesignCooldownIncreaseStack)) * debuffs);
-                                }
-                                if (body.skillLocator.secondaryBonusStockSkill)
-                                {
-                                    body.skillLocator.secondaryBonusStockSkill.cooldownScale *= 1 + ((TotemOfDesignCooldownIncreaseInit + ((flawed - 1) * TotemOfDesignCooldownIncreaseStack)) * debuffs);
-                                }
-                                if (body.skillLocator.utilityBonusStockSkill)
-                                {
-                                    body.skillLocator.utilityBonusStockSkill.cooldownScale *= 1 + ((TotemOfDesignCooldownIncreaseInit + ((flawed - 1) * TotemOfDesignCooldownIncreaseStack)) * debuffs);
-                                }
-                                if (body.skillLocator.specialBonusStockSkill)
-                                {
-                                    body.skillLocator.specialBonusStockSkill.cooldownScale *= 1 + ((TotemOfDesignCooldownIncreaseInit + ((flawed - 1) * TotemOfDesignCooldownIncreaseStack)) * debuffs);
-                                }
-                            }
-                            body.moveSpeed *= decrease;
-                            body.damage *= decrease;
-                        }
+                        return;
                     }
                 }
-            });
-        }
-    }
-
-    private void TotemOfDesignApplyBuff(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
-    {
-        var stackCount = GetCount(self);
-        if (stackCount > 0 && self.GetBuffCount(FlawlessDesign.instance.BuffDef.buffIndex) < stackCount)
-        {
-            while (self.GetBuffCount(FlawlessDesign.instance.BuffDef.buffIndex) < stackCount)
-            {
-                self.AddBuff(FlawlessDesign.instance.BuffDef);
-            }
-        }
-        else if (stackCount <= 0 && self.GetBuffCount(FlawlessDesign.instance.BuffDef.buffIndex) > stackCount)
-        {
-            while (self.GetBuffCount(FlawlessDesign.instance.BuffDef.buffIndex) > stackCount)
-            {
-                self.RemoveBuff(FlawlessDesign.instance.BuffDef);
             }
         }
         orig(self);
+        static void CreatePulseAttack(CharacterBody characterBody, TeamIndex teamIndex)
+        {
+            Debug.Log("called");
+            EffectManager.SpawnEffect(LegacyResourcesAPI.Load<GameObject>("Prefabs/Effects/OmniEffect/OmniExplosionVFXQuick"), new EffectData
+            {
+                origin = characterBody.transform.position,
+                scale = TotemOfDesignFailBlastRadius,
+            }, true);
+            new BlastAttack
+            {
+                procChainMask = default,
+                procCoefficient = 0,
+                attacker = null,
+                inflictor = null,
+                teamIndex = teamIndex,
+                baseDamage = characterBody.healthComponent.fullCombinedHealth * TotemOfDesignFailBlastHealthScaling,
+                baseForce = 100f,
+                falloffModel = BlastAttack.FalloffModel.Linear,
+                crit = false,
+                radius = TotemOfDesignFailBlastRadius,
+                position = characterBody.transform.position,
+                damageColorIndex = DamageColorIndex.Item,
+            }.Fire();
+        }
     }
 
-    private void TotemOfDesignApplyDebuff(On.RoR2.GlobalEventManager.orig_ProcessHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+
+    private void TotemOfDesignUpdateTracker(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
     {
-        if (damageInfo.procCoefficient > 0 && NetworkServer.active && !damageInfo.rejected)
+        int num = 0;
+        ReadOnlyCollection<CharacterMaster> readOnlyInstancesList = CharacterMaster.readOnlyInstancesList;
+        for (int i = 0; i < readOnlyInstancesList.Count; i++)
         {
-            if (damageInfo.attacker)
+            CharacterMaster characterMaster = readOnlyInstancesList[i];
+            if (characterMaster.teamIndex == TeamIndex.Player && characterMaster.hasBody && characterMaster.playerCharacterMasterController)
             {
-                var attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
-                var victimBody = victim.GetComponent<CharacterBody>();
-                if (attackerBody && victimBody)
-                {
-                    var stackCount = GetCount(attackerBody);
-                    if (stackCount > 0 && victimBody.GetBuffCount(FlawedDesign.instance.BuffDef.buffIndex) < stackCount)
-                    {
-                        while (victimBody.GetBuffCount(FlawedDesign.instance.BuffDef.buffIndex) < stackCount)
-                        {
-                            victimBody.AddBuff(FlawedDesign.instance.BuffDef);
-                        }
-                    }
-                }
+                num += characterMaster.inventory.GetItemCount(ItemDef);
             }
         }
-        orig(self, damageInfo, victim);
+        TotemOfDesignPlayersStackTracker = num;
+        TotemOfDesignMonstersStackTracker = Util.GetItemCountForTeam(TeamIndex.Monster, ItemDef.itemIndex, requiresAlive: true, requiresConnected: false);
+        orig(self);
+
     }
 
     public override void Init(ConfigFile config)
@@ -214,7 +152,6 @@ public class TotemOfDesign : Item<TotemOfDesign>
         if (IsEnabled)
         {
             CreateConfig(config);
-            OrbAPI.AddOrb(typeof(GravityFlaskSmiteOrb));
             CreateLang();
             CreateItem();
             Hooks();
@@ -223,18 +160,9 @@ public class TotemOfDesign : Item<TotemOfDesign>
 
     private void CreateConfig(ConfigFile config)
     {
-        TotemOfDesignRegenIncreaseInit = config.ActiveBind("Item: " + ItemName, "Health regeneration per buff with one " + ItemName, 0.15f, "How much should health regeneration be increased by per buff with one " + ItemName + "? (0.15 = 15%)");
-        TotemOfDesignRegenIncreaseStack = config.ActiveBind("Item: " + ItemName, "Health regeneration per buff per stack after one " + ItemName, 0.15f, "How much should health regeneration be increased by per buff per stack of " + ItemName + " after one? (0.15 = 15%)");
-        TotemOfDesignAttackSpeedIncreaseInit = config.ActiveBind("Item: " + ItemName, "Attack speed per buff with one " + ItemName, 0.15f, "How much should attack speed be increased by per buff with one " + ItemName + "? (0.15 = 15%)");
-        TotemOfDesignAttackSpeedIncreaseStack = config.ActiveBind("Item: " + ItemName, "Attack speed per buff per stack after one " + ItemName, 0.15f, "How much should attack speed be increased by per buff per stack of " + ItemName + " after one? (0.15 = 15%)");
-        TotemOfDesignDamageIncreaseInit = config.ActiveBind("Item: " + ItemName, "Damage per buff with one " + ItemName, 0.15f, "How much should damage be increased by per buff with one " + ItemName + "? (0.15 = 15%)");
-        TotemOfDesignDamageIncreaseStack = config.ActiveBind("Item: " + ItemName, "Damage per buff per stack after one " + ItemName, 0.15f, "How much should damage be increased by per buff per stack of " + ItemName + " after one? (0.15 = 15%)");
-
-        TotemOfDesignMovementDecreaseInit = config.ActiveBind("Item: " + ItemName, "Movement speed decrease per debuff with one " + ItemName, 0.15f, "How much should movement speed be decreased by per debuff with one " + ItemName + "? (0.15 = 15%)");
-        TotemOfDesignMovementDecreaseStack = config.ActiveBind("Item: " + ItemName, "Movement speed decrease per debuff per stack after one " + ItemName, 0.15f, "How much should movement speed be decreased by per debuff per stack of " + ItemName + " after one? (0.15 = 15%)");
-        TotemOfDesignCooldownIncreaseInit = config.ActiveBind("Item: " + ItemName, "Cooldown increase per debuff with one " + ItemName, 0.15f, "How much should cooldowns be increased by with one " + ItemName + "? (0.15 = 15%).");
-        TotemOfDesignCooldownIncreaseStack = config.ActiveBind("Item: " + ItemName, "Cooldown increase per debuff per stack after one " + ItemName, 0.15f, "How much should cooldowns be increased by per debuff per stack of " + ItemName + " after one? (0.15 = 15%).");
-        TotemOfDesignDamageDecreaseInit = config.ActiveBind("Item: " + ItemName, "Damage decrease per debuff with one " + ItemName, 0.15f, "How much should damage be decreased by per debuff with one " + ItemName + "? (0.15 = 15%)");
-        TotemOfDesignDamageDecreaseStack = config.ActiveBind("Item: " + ItemName, "Damage decrease per debuff per stack after one " + ItemName, 0.15f, "How much should damage be decreased by per debuff per stack of " + ItemName + " after one? (0.15 = 15%)");
+        TotemOfDesignSkillFailChanceInit = config.ActiveBind("Item: " + ItemName, "Skill fail chance with one " + ItemName, 100f, "What % of skills should fail with one " + ItemName + " on the opposing team? This scales hyperbolically (0.1 = 10%, refer to Tougher Times on the wiki).");
+        TotemOfDesignSkillFailChanceStack = config.ActiveBind("Item: " + ItemName, "Skill fail chance per stack of " + ItemName + " after one", 100f, "What % of skills should fail per stack of " + ItemName + " after one on the opposing team? This scales hyperbolically (0.1 = 10%, refer to Tougher Times on the wiki).");
+        TotemOfDesignFailBlastRadius = config.ActiveBind("Item: " + ItemName, "Failed skill blast radius", 15f, "If a skill fails, the resulting AOE will have a raidus of this many meters.");
+        TotemOfDesignFailBlastHealthScaling = config.ActiveBind("Item: " + ItemName, "Failed skill blast health percent", 0.1f, "What % of the skill user's health pool should be dealt as damage to enemies in an area? (0.1 = 10%)");
     }
 }

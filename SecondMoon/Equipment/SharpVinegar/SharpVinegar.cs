@@ -23,7 +23,7 @@ public class SharpVinegar : Equipment<SharpVinegar>
 
     public override string EquipmentLangTokenName => "SHARP_VINEGAR";
 
-    public override string EquipmentPickupDesc => "Gain increased damage, also attack speed based on critical chance... <color=#FF7F7F>BUT disable critical strikes during this and deal no damage afterwards.</color>\n";
+    public override string EquipmentPickupDesc => "Increase damage, additionally increase attack speed based on critical chance... <color=#FF7F7F>BUT disable critical strikes while active and deal no damage afterwards.</color>\n";
 
     public override string EquipmentFullDescription => $"For <style=cIsUtility>{SharpVinegarBuffDuration}s</style>, increase <style=cIsDamage>base damage</style> by <style=cIsDamage>{SharpVinegarBonusDmgActive * 100}%</style>, <style=cIsUtility>movement speed</style> by <style=cIsUtility>{SharpVinegarBonusMSActive * 100}%</style> " +
         $"and for every <style=cIsDamage>1% critical chance (up to 100%)</style>, increase <style=cIsDamage>attack speed</style> by <style=cIsDamage>{1 * SharpVinegarCCASConversion}% (+{0.01 * SharpVinegarCCASConversion}% per 1% critical damage increase)</style>. " +

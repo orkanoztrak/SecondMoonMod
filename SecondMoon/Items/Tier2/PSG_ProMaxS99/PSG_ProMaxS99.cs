@@ -22,11 +22,11 @@ public class PSG_ProMaxS99 : Item<PSG_ProMaxS99>
     public static ConfigOption<float> PSGShieldRechargeRateInit;
     public static ConfigOption<float> PSGShieldRechargeRateStack;
 
-    public override string ItemName => "P.S.G.+ Pro Max S99";
+    public override string ItemName => "P.S.G.Plus Pro Max S99";
 
     public override string ItemLangTokenName => "PSG_WITH_AN_EXTRA_CAMERA";
 
-    public override string ItemPickupDesc => "Gain a recharging shield and increase your shield recharge rate. Get out of danger faster.";
+    public override string ItemPickupDesc => "Gain a recharging shield and increase your shield recharge rate. Get out of danger sooner.";
 
     public override string ItemFullDesc => $"Gain a shield equal to <style=cIsHealing>{PSGShieldInit * 100}%</style> <style=cStack>(+{PSGShieldStack * 100}% per stack)</style> of your maximum health. " +
         $"Your shields recharge <style=cIsHealing>{PSGShieldRechargeRateInit * 100}%</style> <style=cStack>(+{PSGShieldRechargeRateStack * 100}% per stack)</style> faster. " +

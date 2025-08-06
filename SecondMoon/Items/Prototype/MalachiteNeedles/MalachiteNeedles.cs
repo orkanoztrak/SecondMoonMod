@@ -20,7 +20,7 @@ public class MalachiteNeedles : Item<MalachiteNeedles>
 
     public override string ItemLangTokenName => "MALACHITE_NEEDLES";
 
-    public override string ItemPickupDesc => $"Corrode enemies on hit. Damage over time effects deal damage based on their total when applied.";
+    public override string ItemPickupDesc => $"Corrode enemies on hit. Damage over time effects deal extra damage based on their total when applied.";
 
     public override string ItemFullDesc => $"Hits <color=#8aa626>corrode</color> enemies for <style=cIsDamage>{MalachiteNeedlesCorrosionDmgInit * 100}%</style> <style=cStack>(+{MalachiteNeedlesCorrosionDmgStack * 100}% per stack)</style> TOTAL damage. " +
         $"<color=#7CFDEA>Damage over time effects, in addition to their normal effects, deal damage equal to {MalachiteNeedlesDOTBurstConversion * 100}% of their total when applied</color>.";

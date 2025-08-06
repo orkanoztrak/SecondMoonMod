@@ -21,7 +21,7 @@ public class QuicksilverVest : Item<QuicksilverVest>
 
     public override string ItemLangTokenName => "QUICKSILVER_VEST";
 
-    public override string ItemPickupDesc => "Increase your maximum health. Increasing health increases speed.";
+    public override string ItemPickupDesc => "Increase your maximum health. Increase speed based on total health pool.";
 
     public override string ItemFullDesc => $"Gain <style=cIsHealing>{QuicksilverVestHealthInit * 100}%</style> <style=cStack>(+{QuicksilverVestHealthStack * 100}% per stack)</style> <style=cIsHealing>maximum health</style>" +
         $" and increase <style=cIsUtility>movement speed</style> by <style=cIsHealing>{QuicksilverVestConversionRate * 100}%</style> of the increase percentage to your <style=cIsHealing>health bar</style>, excluding barrier.";

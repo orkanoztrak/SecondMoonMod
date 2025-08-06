@@ -48,7 +48,7 @@ public class IrradiatedMoonstone : Item<IrradiatedMoonstone>
 
     public override string ItemLangTokenName => "SHINYPEARL_LUNAR";
 
-    public override string ItemPickupDesc => $"You are faster (in almost all aspects)... <color=#FF7F7F>BUT your enemies also benefit from this item.</color>\n";
+    public override string ItemPickupDesc => $"Become speed itself. <color=#FF7F7F>Your enemies also benefit from this item.</color>\n";
 
     public override string ItemFullDesc => $"Gain the following boosts:\r\n\r\n" +
         $"• Gain <style=cIsUtility>{IrradiatedMoonstoneCooldownReductionInit * 100}% <style=cStack>(+{IrradiatedMoonstoneCooldownReductionStack * 100}% per stack)</style> cooldown reduction</style> <color=#FF7F7F>(enemies also benefit).</color>\r\n" +

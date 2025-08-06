@@ -21,9 +21,9 @@ public class Hydra : Item<Hydra>
 
     public override string ItemLangTokenName => "HYDRA";
 
-    public override string ItemPickupDesc => "Your skills launch additional hits with reduced damage.";
+    public override string ItemPickupDesc => "Your skills launch elemental orbs with reduced damage.";
 
-    public override string ItemFullDesc => $"Your skills hit <color=#7CFDEA>{HydraAdditionalHitCountInit} (+{HydraAdditionalHitCountStack} per stack) extra times</color>. These hits deal <style=cIsDamage>{HydraAdditionalHitDamage * 100}%</style> TOTAL damage, with <style=cIsDamage>{HydraAdditionalHitProcCoefficientMult * 100}%</style> of the original hit's proc coefficient.";
+    public override string ItemFullDesc => $"Your skills launch <color=#7CFDEA>{HydraAdditionalHitCountInit} (+{HydraAdditionalHitCountStack} per stack) elemental orbs</color>. These hits deal <style=cIsDamage>{HydraAdditionalHitDamage * 100}%</style> TOTAL damage, with <style=cIsDamage>{HydraAdditionalHitProcCoefficientMult * 100}%</style> of the skill's proc coefficient.";
 
     public override string ItemLore => "When Mithrix went away, his brother hurried to the well. Without regard for his own safety, he stuck his hand into it. Thorp! Out he pulled a worm, but it, along with his hand, was brutally deformed. Still, he wouldn't cry.\r\n\r\n" +
         "Even though his hand healed after, the unfortunate creature was left unable to grow, forcibly conjoined by the gravitational force and mangled. Alone it would surely die, but he was not going to let that happen. You see, he loved worms.";

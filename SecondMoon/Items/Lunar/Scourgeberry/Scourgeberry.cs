@@ -2,14 +2,9 @@
 using MonoMod.Cil;
 using R2API;
 using RoR2;
-using SecondMoon.BuffsAndDebuffs.Buffs.Item.Prototype;
 using SecondMoon.BuffsAndDebuffs.Debuffs.Dots.Item.Lunar;
-using SecondMoon.BuffsAndDebuffs.Debuffs.Dots.Item.Prototype;
-using SecondMoon.BuffsAndDebuffs.Debuffs.PureDebuffs.Item.Prototype;
 using SecondMoon.Utils;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
@@ -26,7 +21,7 @@ public class Scourgeberry : Item<Scourgeberry>
 
     public override string ItemLangTokenName => "SCOURGEBERRY";
 
-    public override string ItemPickupDesc => "Turn your hits with proc coefficient into a damage over time effect that is stronger.";
+    public override string ItemPickupDesc => "Turn your hits into a stronger damage over time effect.";
 
     public override string ItemFullDesc => $"<color=#FF7F7F>Hits with proc coefficient deal <style=cIsDamage>0</style> damage. </color>" +
         $"Hits apply <color=#0000FF>Lunar Scourge</color> for <style=cIsDamage>{ScourgeberryLunarScourgeDmgInit * 100}%</style> <style=cStack>(+{ScourgeberryLunarScourgeDmgStack * 100}% per stack)</style> of the TOTAL damage they would deal over <style=cIsDamage>{ScourgeberryLunarScourgeDuration}s</style> <style=cStack>(2× per stack)</style>.";

@@ -23,7 +23,6 @@ public class FlailOfMass : Item<FlailOfMass>
     public static ConfigOption<float> FlailOfMassProcCoefficient;
     public static ConfigOption<float> FlailOfMassMomentumBuildRate;
     public static ConfigOption<float> FlailOfMassMomentumDecayRate;
-    public static ConfigOption<float> FlailOfMassHealthAndShieldIncreaseBoost;
 
     public static List<BuffIndex> FlailOfMassSlowsAndRoots = new List<BuffIndex>();
     public static string[] FlailOfMassSlowAndRootNames = ["bdEntangle", "bdNullified", "bdNullifyStack", "bdLunarSecondaryRoot", "bdSlow50", "bdSlow60", "bdSlow80", "bdClayGoo", "bdSlow30", "bdJailerSlow", "bdJailerTether"];
@@ -31,11 +30,10 @@ public class FlailOfMass : Item<FlailOfMass>
 
     public override string ItemLangTokenName => "FLAIL_OF_MASS";
 
-    public override string ItemPickupDesc => "Become immune to stuns and slows, and increase gains to health and shields, excluding by leveling. Consistent sprinting builds up a massive attack.";
+    public override string ItemPickupDesc => "Become immune to stuns and slows. Consistent sprinting charges a massive attack.";
 
     public override string ItemFullDesc => $"<color=#7CFDEA>Become immune to stuns and slows.</color> " +
-        $"All increases to <style=cIsHealing>health and shields</style> are increased by <style=cIsHealing>{FlailOfMassHealthAndShieldIncreaseBoost * 100}%</style>. " +
-        $"While sprinting, gain a <color=#7CFDEA>{Momentum.instance.Name}</color> buff every <style=cIsUtility>{FlailOfMassMomentumBuildRate}s</style> (gain rate increases with <style=cIsUtility>movement speed</style> and <style=cIsHealing>bonus health and shields</style>). Lose a stack of this buff every <style=cIsUtility>{FlailOfMassMomentumDecayRate}s</style> while not sprinting. " +
+        $"While sprinting, gain a <color=#7CFDEA>{Momentum.instance.Name}</color> buff every <style=cIsUtility>{FlailOfMassMomentumBuildRate}s</style> (gain rate increases with <style=cIsUtility>movement speed</style>). Lose a stack of this buff every <style=cIsUtility>{FlailOfMassMomentumDecayRate}s</style> while not sprinting. " +
         $"At <color=#7CFDEA>{FlailOfMassMomentumLimit}</color> stacks, <color=#7CFDEA>{Momentum.instance.Name}</color> stops decaying and using your <style=cIsUtility>Primary skill</style> consumes all <color=#7CFDEA>{Momentum.instance.Name}</color> stacks " +
         $"to fire an explosive homing projectile that deals <style=cIsDamage>{FlailOfMassDamageMultiplierInit * 100}%</style> <style=cStack>(+{FlailOfMassDamageMultiplierStack * 100}% per stack)</style> damage in a <style=cIsDamage>{FlailOfMassRadius}m</style> radius with a proc coefficient of <style=cIsDamage>{FlailOfMassProcCoefficient}</style>.";
 
@@ -61,7 +59,7 @@ public class FlailOfMass : Item<FlailOfMass>
         RoR2Application.onLoad += FlailOfMassRegisterDebuffsToIgnore;
         On.RoR2.CharacterBody.AddBuff_BuffIndex += FlailOfMassIgnoreSlowingDebuffs;
         On.RoR2.CharacterBody.AddTimedBuff_BuffDef_float += FlailOfMassIgnoreSlowingDebuffs;
-        IL.RoR2.CharacterBody.RecalculateStats += FlailOfMassIgnoreSlowsAndBoostHealthAndShieldGains;
+        IL.RoR2.CharacterBody.RecalculateStats += FlailOfMassIgnoreSlows;
         On.RoR2.CharacterBody.OnInventoryChanged += FlailOfMassAddIgnoreStunBehavior;
     }
 
@@ -130,7 +128,7 @@ public class FlailOfMass : Item<FlailOfMass>
         orig(self);
     }
 
-    private void FlailOfMassIgnoreSlowsAndBoostHealthAndShieldGains(ILContext il)
+    private void FlailOfMassIgnoreSlows(ILContext il)
     {
         int movementTrackerIndex = 86;
         int speedTrackerIndex = 87;
@@ -169,30 +167,6 @@ public class FlailOfMass : Item<FlailOfMass>
                     });
                     cursor.Emit(Mono.Cecil.Cil.OpCodes.Stloc, movementTrackerIndex);
                     cursor.Emit(Mono.Cecil.Cil.OpCodes.Br, target2.Target);
-                    if (cursor.TryGotoNext(x => x.MatchLdarg(0),
-                        x => x.MatchLdcR4(0),
-                        x => x.MatchLdarg(0),
-                        x => x.MatchCallOrCallvirt<CharacterBody>("get_oneShotProtectionFraction"),
-                        x => x.MatchLdcR4(1),
-                        x => x.MatchLdcR4(1),
-                        x => x.MatchLdarg(0),
-                        x => x.MatchCallOrCallvirt<CharacterBody>("get_cursePenalty")))
-                    {
-                        cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
-                        cursor.EmitDelegate<Action<CharacterBody>>((body) =>
-                        {
-                            if (body)
-                            {
-                                if (GetCount(body) > 0)
-                                {
-                                    var unchangedHealth = body.baseMaxHealth + body.levelMaxHealth * (body.level - 1);
-                                    var unchangedShield = body.baseMaxShield + body.levelMaxShield * (body.level - 1);
-                                    body.maxHealth += (body.maxHealth - unchangedHealth) *  FlailOfMassHealthAndShieldIncreaseBoost;
-                                    body.maxShield += (body.maxShield - unchangedShield) * FlailOfMassHealthAndShieldIncreaseBoost;
-                                }
-                            }
-                        });
-                    }
                 }
             }
         }
@@ -212,14 +186,13 @@ public class FlailOfMass : Item<FlailOfMass>
 
     private void CreateConfig(ConfigFile config)
     {
-        FlailOfMassMomentumLimit = config.ActiveBind("Item: " + ItemName, "Momentum stacks necessary to access the attack", 150, "At this number of Momentum stacks, they will not decay until the attack is fired.");
+        FlailOfMassMomentumLimit = config.ActiveBind("Item: " + ItemName, "Momentum stacks necessary to access the attack", 120, "At this number of Momentum stacks, they will not decay until the attack is fired.");
         FlailOfMassRadius = config.ActiveBind("Item: " + ItemName, "Attack explosion radius", 25f, "The explosion of the attack will have a radius of this many meters.");
         FlailOfMassDamageMultiplierInit = config.ActiveBind("Item: " + ItemName, "Damage multiplier of the attack with one " + ItemName, 500f, "What % of base damage should the attack do with one " + ItemName + "? (500 = 50000%)");
         FlailOfMassDamageMultiplierStack = config.ActiveBind("Item: " + ItemName, "Damage multiplier of the attack per stack after one " + ItemName, 500f, "What % of base damage should be added to the attack per stack of " + ItemName + " after one? (500 = 50000%)");
         FlailOfMassProcCoefficient = config.ActiveBind("Item: " + ItemName, "Attack proc coefficient", 1f, "The proc coefficient of the attack and the explosion it makes.");
         FlailOfMassMomentumBuildRate = config.ActiveBind("Item: " + ItemName, "Momentum build rate", 1f, "Momentum is added every (10.15/(totalSpeed * buildRate)) seconds while sprinting, where buildRate is this config value.");
         FlailOfMassMomentumDecayRate = config.ActiveBind("Item: " + ItemName, "Momentum build rate", 1f, "Momentum is removed every 1/decayRate seconds while not sprinting, where decayRate is this config value.");
-        FlailOfMassHealthAndShieldIncreaseBoost = config.ActiveBind("Item: " + ItemName, "Increase to health and shield gains", 0.5f, "How much should EXTRA health and shields be increased by? Health or shields must be increased by some source to see this in effect (0.5 = 50%).");
     }
 
     public class FlailOfMassIgnoreStunBehavior : CharacterBody.ItemBehavior

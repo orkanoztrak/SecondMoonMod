@@ -32,9 +32,9 @@ public class OfferingBowl : Item<OfferingBowl>
 
     public override string ItemLangTokenName => "OFFERING_BOWL";
 
-    public override string ItemPickupDesc => $"Break this at the end of the Teleporter event to get a free legendary and boss item... <color=#FF7F7F>BUT take more and deal less damage while you carry it.</color>\n";
+    public override string ItemPickupDesc => $"Break this at the end of the Teleporter event to get 1 legendary and 1 boss item... <color=#FF7F7F>BUT take more and deal less damage while you carry it.</color>\n";
 
-    public override string ItemFullDesc => $"After completing the Teleporter event, lose all stacks of this item and get <style=cIsUtility>1</style> <style=cStack>(+1 per stack)</style> random <style=cIsHealth>legendary</style> and <style=cIsTierBoss>boss</style> items in return. " +
+    public override string ItemFullDesc => $"After completing the Teleporter event, lose all stacks of this item and get <style=cIsUtility>1</style> <style=cStack>(+1 per stack)</style> random <style=cIsHealth>legendary</style> and <style=cIsTierBoss>boss</style> item(s) in return. " +
         $"<color=#FF7F7F>Set damage dealt to <style=cIsDamage>{OfferingBowlOutgoingDamageReductionInit}×</style> <style=cStack>({OfferingBowlOutgoingDamageReductionStack}× per stack)</style></color> " +
         $"<color=#FF7F7F>and damage received to <style=cIsDamage>{OfferingBowlIncomingDamageIncreaseInit}×</style> <style=cStack>({OfferingBowlIncomingDamageIncreaseStack}× per stack)</style>.</color> " +
         $"Cannot appear outside the Bazaar Between Time.";

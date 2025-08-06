@@ -25,7 +25,7 @@ public class EssenceChanneler : Equipment<EssenceChanneler>
 
     public override string EquipmentLangTokenName => "ESSENCE_CHANNELER";
 
-    public override string EquipmentPickupDesc => $"Briefly gain an increase to all stats. Cycle between the powers of a random classic elite with each use.";
+    public override string EquipmentPickupDesc => EssenceChannelerDuration == 1 ? $"Increase ALL stats for {EssenceChannelerDuration} second. Cycle between the powers of a random classic elite with each use." : $"Increase ALL stats for {EssenceChannelerDuration} seconds. Cycle between the powers of a random classic elite with each use.";
 
     public override string EquipmentFullDescription => $"For <style=cIsUtility>{EssenceChannelerDuration}s</style>, gain <style=cIsUtility>{ChannelingBoost * 100}%</style> to <style=cIsUtility>ALL stats</style>." +
         $"Gain a random classic <style=cIsDamage>elite power</style> upon using this that changes with each use.";

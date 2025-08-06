@@ -85,76 +85,6 @@ public class GravityFlask : Item<GravityFlask>
 
     public override ItemTag[] Category => [ItemTag.Damage, ItemTag.Healing, ItemTag.Utility];
 
-    private string ConstructInspectString(GravityFlaskBehavior tracker)
-    {
-        if (tracker)
-        {
-            var finalString = $"<color=#7CFDEA>The following bonuses are applied to you: </color>\r\n";
-            if (GravityFlaskFirstThreshold <= tracker.GravityFlaskDamageTracker)
-            {
-                finalString += $"• Gain <style=cIsDamage>{GravityFlaskAttackSpeedInit * (tracker.GravityFlaskDamageTracker / GravityFlaskFirstThreshold) * 100}%</style> <style=cStack>(+{GravityFlaskAttackSpeedStack * (tracker.GravityFlaskDamageTracker / GravityFlaskFirstThreshold) * 100}% per stack)</style> attack speed." +
-                    $" <color=#7CFDEA>Pick up {GravityFlaskFirstThreshold - (tracker.GravityFlaskDamageTracker % GravityFlaskFirstThreshold)} more Damage item(s) to upgrade!</color>\r\n";
-            }
-            if (GravityFlaskSecondThreshold <= tracker.GravityFlaskDamageTracker)
-            {
-                finalString += $"• Gain <style=cIsDamage>{GravityFlaskDamageInit * (tracker.GravityFlaskDamageTracker / GravityFlaskSecondThreshold) * 100}%</style> <style=cStack>(+{GravityFlaskDamageStack * (tracker.GravityFlaskDamageTracker / GravityFlaskSecondThreshold) * 100}% per stack)</style> base damage." +
-                    $" <color=#7CFDEA>Pick up {GravityFlaskSecondThreshold - (tracker.GravityFlaskDamageTracker % GravityFlaskSecondThreshold)} more Damage item(s) to upgrade!</color>\r\n";
-            }
-            if (GravityFlaskThirdThreshold <= tracker.GravityFlaskDamageTracker)
-            {
-                finalString += $"• Gain <style=cIsDamage>{GravityFlaskCritInit * (tracker.GravityFlaskDamageTracker / GravityFlaskThirdThreshold)}%</style> <style=cStack>(+{GravityFlaskCritStack * (tracker.GravityFlaskDamageTracker / GravityFlaskThirdThreshold)}% per stack)</style> critical hit chance." +
-                    $" <color=#7CFDEA>Pick up {GravityFlaskThirdThreshold - (tracker.GravityFlaskDamageTracker % GravityFlaskThirdThreshold)} more Damage item(s) to upgrade!</color>\r\n";
-            }
-            if (GravityFlaskFinalThreshold <= tracker.GravityFlaskDamageTracker)
-            {
-                finalString += $"• Hits smite enemies for <style=cIsDamage>{GravityFlaskProcDamageInit * 100}%</style> <style=cStack>(+{GravityFlaskProcDamageStack * 100}% per stack)</style> TOTAL damage, with a proc coefficient of <style=cIsDamage>{GravityFlaskProcCoefficient}</style>.";
-            }
-            finalString += $"\r\n";
-            if (GravityFlaskFirstThreshold <= tracker.GravityFlaskHealingTracker)
-            {
-                finalString += $"• Gain <style=cIsHealing>{GravityFlaskHealthInit * (tracker.GravityFlaskHealingTracker / GravityFlaskFirstThreshold) * 100}%</style> <style=cStack>(+{GravityFlaskHealthStack * (tracker.GravityFlaskHealingTracker / GravityFlaskFirstThreshold) * 100}% per stack)</style> maximum health." +
-                   $" <color=#7CFDEA>Pick up {GravityFlaskFirstThreshold - (tracker.GravityFlaskHealingTracker % GravityFlaskFirstThreshold)} more Healing item(s) to upgrade!</color>\r\n";
-            }
-            if (GravityFlaskSecondThreshold <= tracker.GravityFlaskHealingTracker)
-            {
-                finalString += $"• Heal from <style=cIsDamage>incoming damage</style> for <style=cIsHealing>{GravityFlaskHealInit * (tracker.GravityFlaskHealingTracker / GravityFlaskSecondThreshold)}</style> <style=cStack>(+{GravityFlaskHealStack * (tracker.GravityFlaskHealingTracker / GravityFlaskSecondThreshold)} per stack)</style>." +
-                    $" <color=#7CFDEA>Pick up {GravityFlaskSecondThreshold - (tracker.GravityFlaskHealingTracker % GravityFlaskSecondThreshold)} more Healing item(s) to upgrade!</color>\r\n";
-            }
-            if (GravityFlaskThirdThreshold <= tracker.GravityFlaskHealingTracker)
-            {
-                finalString += $"• <style=cIsHealing>Heal +{GravityFlaskHealBoostInit * (tracker.GravityFlaskHealingTracker / GravityFlaskThirdThreshold) * 100}%</style> <style=cStack>(+{GravityFlaskHealBoostStack * (tracker.GravityFlaskHealingTracker / GravityFlaskThirdThreshold) * 100}% per stack)</style> more." +
-                    $" <color=#7CFDEA>Pick up {GravityFlaskThirdThreshold - (tracker.GravityFlaskHealingTracker % GravityFlaskThirdThreshold)} more Healing item(s) to upgrade!</color>\r\n";
-            }
-            if (GravityFlaskFinalThreshold <= tracker.GravityFlaskHealingTracker)
-            {
-                finalString += $"• <style=cIsDamage>Any damage you take</style> is reduced by <style=cIsDamage>{GravityFlaskDamageReductionInit * 100}%</style> <style=cStack>(+{GravityFlaskDamageReductionStack * 100}% per stack)</style>.";
-            }
-            finalString += $"\r\n";
-            if (GravityFlaskFirstThreshold <= tracker.GravityFlaskUtilityTracker)
-            {
-                finalString += $"• Gain <style=cIsUtility>{GravityFlaskMovementInit * (tracker.GravityFlaskUtilityTracker / GravityFlaskFirstThreshold) * 100}%</style> <style=cStack>(+{GravityFlaskMovementStack * (tracker.GravityFlaskUtilityTracker / GravityFlaskFirstThreshold) * 100}% per stack)</style> movement speed." +
-                    $" <color=#7CFDEA>Pick up {GravityFlaskFirstThreshold - (tracker.GravityFlaskUtilityTracker % GravityFlaskFirstThreshold)} more Utility item(s) to upgrade!</color>\r\n";
-            }
-            if (GravityFlaskSecondThreshold <= tracker.GravityFlaskUtilityTracker)
-            {
-                finalString += $"• Gain <style=cIsUtility>{GravityFlaskGoldInit * (tracker.GravityFlaskUtilityTracker / GravityFlaskSecondThreshold) * 100}%</style> <style=cStack>(+{GravityFlaskGoldStack * (tracker.GravityFlaskUtilityTracker / GravityFlaskSecondThreshold) * 100}% per stack)</style> more gold." +
-                    $" <color=#7CFDEA>Pick up {GravityFlaskSecondThreshold - (tracker.GravityFlaskUtilityTracker % GravityFlaskSecondThreshold)} more Utility item(s) to upgrade!</color>\r\n";
-            }
-            if (GravityFlaskThirdThreshold <= tracker.GravityFlaskUtilityTracker)
-            {
-                finalString += $"• <style=cIsUtility>Reduce skill cooldowns</style> by <style=cIsUtility>{GravityFlaskCooldownReductionInit * (tracker.GravityFlaskUtilityTracker / GravityFlaskThirdThreshold) * 100}%</style> <style=cStack>(+{GravityFlaskCooldownReductionStack * (tracker.GravityFlaskUtilityTracker / GravityFlaskThirdThreshold) * 100}% per stack)</style>." +
-                    $" <color=#7CFDEA>Pick up {GravityFlaskThirdThreshold - (tracker.GravityFlaskUtilityTracker % GravityFlaskThirdThreshold)} more Utility item(s) to upgrade!</color>\r\n";
-            }
-            if (GravityFlaskFinalThreshold <= tracker.GravityFlaskUtilityTracker)
-            {
-                finalString += $"• Increase <color=#7CFDEA>upgradeable item bonuses</color> granted by this by <color=#7CFDEA>{GravityFlaskBonusBoostInit * 100}%</color> <style=cStack>(+{GravityFlaskBonusBoostStack * 100}% per stack)</style>.";
-            }
-            return finalString;
-        }
-        return "";
-    }
-
-
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
         DisplayRules = new ItemDisplayRuleDict(null);
@@ -206,7 +136,7 @@ public class GravityFlask : Item<GravityFlask>
                                     var tracker = bodyObject.GetComponent<GravityFlaskBehavior>();
                                     if (tracker)
                                     {
-                                        var stringToDisplay = ConstructInspectString(tracker);
+                                        var stringToDisplay = ConstructInspectString(tracker, inventory.inventory);
                                         InspectInfo info = new InspectInfo
                                         {
                                             Visual = itemDef.pickupIconSprite,
@@ -229,14 +159,6 @@ public class GravityFlask : Item<GravityFlask>
                 });
                 cursor.Emit(Mono.Cecil.Cil.OpCodes.Brtrue, target.Target);
             }
-            else
-            {
-                Debug.Log("show not found");
-            }
-        }
-        else
-        {
-            Debug.Log("trygotonext RoR2.UI.ItemIcon.OnItemClicked not found");
         }
         Debug.Log(il.ToString());
     }
@@ -344,6 +266,89 @@ public class GravityFlask : Item<GravityFlask>
         }
         orig(self, damageInfo, victim);
     }
+
+    private string ConstructInspectString(GravityFlaskBehavior tracker, Inventory inventory)
+    {
+        if (tracker && inventory)
+        {
+            var stackCount = inventory.GetItemCount(ItemDef);
+            if (stackCount > 0)
+            {
+                var finalString = $"<color=#7CFDEA>The following bonuses are applied to you: </color>\r\n";
+                if (GravityFlaskFirstThreshold <= tracker.GravityFlaskDamageTracker)
+                {
+                    finalString += $"• Gain <style=cIsDamage>{(GravityFlaskAttackSpeedInit + (stackCount - 1) * GravityFlaskAttackSpeedStack) * (tracker.GravityFlaskDamageTracker / GravityFlaskFirstThreshold) * 100}%</style> attack speed." +
+                        $" <color=#7CFDEA>{GravityFlaskFirstThreshold - (tracker.GravityFlaskDamageTracker % GravityFlaskFirstThreshold)} more Damage item(s) to upgrade!</color>\r\n";
+                }
+                if (GravityFlaskSecondThreshold <= tracker.GravityFlaskDamageTracker)
+                {
+                    finalString += $"• Gain <style=cIsDamage>{(GravityFlaskDamageInit + (stackCount - 1) * GravityFlaskDamageStack) * (tracker.GravityFlaskDamageTracker / GravityFlaskSecondThreshold) * 100}%</style> base damage." +
+                        $" <color=#7CFDEA>{GravityFlaskSecondThreshold - (tracker.GravityFlaskDamageTracker % GravityFlaskSecondThreshold)} more Damage item(s) to upgrade!</color>\r\n";
+                }
+                if (GravityFlaskThirdThreshold <= tracker.GravityFlaskDamageTracker)
+                {
+                    finalString += $"• Gain <style=cIsDamage>{(GravityFlaskCritInit + (stackCount - 1) * GravityFlaskCritStack) * (tracker.GravityFlaskDamageTracker / GravityFlaskThirdThreshold)}%</style> critical hit chance." +
+                        $" <color=#7CFDEA>{GravityFlaskThirdThreshold - (tracker.GravityFlaskDamageTracker % GravityFlaskThirdThreshold)} more Damage item(s) to upgrade!</color>\r\n";
+                }
+                if (GravityFlaskFinalThreshold <= tracker.GravityFlaskDamageTracker)
+                {
+                    finalString += $"• Hits smite enemies for <style=cIsDamage>{(GravityFlaskProcDamageInit + (stackCount - 1) * GravityFlaskProcDamageStack) * 100}%</style> TOTAL damage.\r\n";
+                }
+                if (GravityFlaskFirstThreshold <= tracker.GravityFlaskHealingTracker)
+                {
+                    finalString += $"• Gain <style=cIsHealing>{(GravityFlaskHealthInit + (stackCount - 1) * GravityFlaskHealthStack) * (tracker.GravityFlaskHealingTracker / GravityFlaskFirstThreshold) * 100}%</style> maximum health." +
+                       $" <color=#7CFDEA>{GravityFlaskFirstThreshold - (tracker.GravityFlaskHealingTracker % GravityFlaskFirstThreshold)} more Healing item(s) to upgrade!</color>\r\n";
+                }
+                if (GravityFlaskSecondThreshold <= tracker.GravityFlaskHealingTracker)
+                {
+                    finalString += $"• Heal from <style=cIsDamage>incoming damage</style> for <style=cIsHealing>{(GravityFlaskHealInit + (stackCount - 1) * GravityFlaskHealStack) * (tracker.GravityFlaskHealingTracker / GravityFlaskSecondThreshold)}</style>." +
+                        $" <color=#7CFDEA>{GravityFlaskSecondThreshold - (tracker.GravityFlaskHealingTracker % GravityFlaskSecondThreshold)} more Healing item(s) to upgrade!</color>\r\n";
+                }
+                if (GravityFlaskThirdThreshold <= tracker.GravityFlaskHealingTracker)
+                {
+                    finalString += $"• <style=cIsHealing>Heal +{(GravityFlaskHealBoostInit + (stackCount - 1) * GravityFlaskHealBoostStack) * (tracker.GravityFlaskHealingTracker / GravityFlaskThirdThreshold) * 100}%</style> more." +
+                        $" <color=#7CFDEA>{GravityFlaskThirdThreshold - (tracker.GravityFlaskHealingTracker % GravityFlaskThirdThreshold)} more Healing item(s) to upgrade!</color>\r\n";
+                }
+                if (GravityFlaskFinalThreshold <= tracker.GravityFlaskHealingTracker)
+                {
+                    finalString += $"• <style=cIsDamage>Damage taken</style> is reduced by <style=cIsDamage>{(GravityFlaskDamageReductionInit + (stackCount - 1) * GravityFlaskDamageReductionStack) * 100}%</style>.\r\n";
+                }
+                if (GravityFlaskFirstThreshold <= tracker.GravityFlaskUtilityTracker)
+                {
+                    finalString += $"• Gain <style=cIsUtility>{(GravityFlaskMovementInit + (stackCount - 1) * GravityFlaskMovementStack) * (tracker.GravityFlaskUtilityTracker / GravityFlaskFirstThreshold) * 100}%</style> movement speed." +
+                        $" <color=#7CFDEA>{GravityFlaskFirstThreshold - (tracker.GravityFlaskUtilityTracker % GravityFlaskFirstThreshold)} more Utility item(s) to upgrade!</color>\r\n";
+                }
+                if (GravityFlaskSecondThreshold <= tracker.GravityFlaskUtilityTracker)
+                {
+                    finalString += $"• Gain <style=cIsUtility>{(GravityFlaskGoldInit + (stackCount - 1) * GravityFlaskGoldStack) * (tracker.GravityFlaskUtilityTracker / GravityFlaskSecondThreshold) * 100}%</style> more gold." +
+                        $" <color=#7CFDEA>{GravityFlaskSecondThreshold - (tracker.GravityFlaskUtilityTracker % GravityFlaskSecondThreshold)} more Utility item(s) to upgrade!</color>\r\n";
+                }
+                if (GravityFlaskThirdThreshold <= tracker.GravityFlaskUtilityTracker)
+                {
+                    float initCDR = (float)Math.Pow(1 - (GravityFlaskCooldownReductionInit), tracker.GravityFlaskUtilityTracker / GravityFlaskThirdThreshold);
+                    if (initCDR < 0)
+                    {
+                        initCDR = 0;
+                    }
+                    float stackCDR = (float)Math.Pow(1 - (GravityFlaskCooldownReductionStack), tracker.GravityFlaskUtilityTracker / GravityFlaskThirdThreshold);
+                    if (stackCDR < 0)
+                    {
+                        stackCDR = 0;
+                    }
+                    float decrease = (float)(1 - (initCDR * Math.Pow(stackCDR, stackCount - 1)));
+                    finalString += $"• <style=cIsUtility>Reduce skill cooldowns</style> by <style=cIsUtility>{decrease * 100}%</style>." +
+                        $" <color=#7CFDEA>{GravityFlaskThirdThreshold - (tracker.GravityFlaskUtilityTracker % GravityFlaskThirdThreshold)} more Utility item(s) to upgrade!</color>\r\n";
+                }
+                if (GravityFlaskFinalThreshold <= tracker.GravityFlaskUtilityTracker)
+                {
+                    finalString += $"• Increase <color=#7CFDEA>upgradeable item bonuses</color> granted by this by <color=#7CFDEA>{(GravityFlaskBonusBoostInit + (stackCount - 1) * GravityFlaskBonusBoostStack) * 100}%</color>.";
+                }
+                return finalString;
+            }
+        }
+        return "";
+    }
+
 
     private float GravityFlaskIncreaseHeals(On.RoR2.HealthComponent.orig_Heal orig, HealthComponent self, float amount, ProcChainMask procChainMask, bool nonRegen)
     {

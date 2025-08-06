@@ -60,8 +60,8 @@ public class TwistedRegrets : Item<TwistedRegrets>
 
     public override ItemTierDef ItemTierToCorrupt => TierPrototype.instance.ItemTierDef;
 
-    public static int TwistedRegretsPlayersStackTracker = 0;
-    public static int TwistedRegretsMonsterStackTracker = 0;
+    private static int TwistedRegretsPlayersStackTracker = 0;
+    private static int TwistedRegretsMonsterStackTracker = 0;
 
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
@@ -153,8 +153,7 @@ public class TwistedRegrets : Item<TwistedRegrets>
         }
         int num = 0;
         ReadOnlyCollection<CharacterMaster> readOnlyInstancesList = CharacterMaster.readOnlyInstancesList;
-        int i = 0;
-        for (int count = readOnlyInstancesList.Count; i < count; i++)
+        for (int i = 0; i < readOnlyInstancesList.Count; i++)
         {
             CharacterMaster characterMaster = readOnlyInstancesList[i];
             if (characterMaster.teamIndex == TeamIndex.Player && characterMaster.hasBody && characterMaster.playerCharacterMasterController)

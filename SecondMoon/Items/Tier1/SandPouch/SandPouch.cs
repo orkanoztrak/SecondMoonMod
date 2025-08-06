@@ -10,23 +10,23 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace SecondMoon.Items.Tier1.PocketSand;
+namespace SecondMoon.Items.Tier1.SandPouch;
 
-public class PocketSand : Item<PocketSand>
+public class SandPouch : Item<SandPouch>
 {
-    public static ConfigOption<float> PocketSandHealthThreshold;
-    public static ConfigOption<float> PocketSandReduction;
-    public static ConfigOption<float> PocketSandTimerInit;
-    public static ConfigOption<float> PocketSandTimerStack;
+    public static ConfigOption<float> SandPouchHealthThreshold;
+    public static ConfigOption<float> SandPouchReduction;
+    public static ConfigOption<float> SandPouchTimerInit;
+    public static ConfigOption<float> SandPouchTimerStack;
 
-    public override string ItemName => "Pocket Sand";
+    public override string ItemName => "Sand Pouch";
 
-    public override string ItemLangTokenName => "POCKET_SAND";
+    public override string ItemLangTokenName => "SAND_POUCH";
 
-    public override string ItemPickupDesc => $"Slow down enemies above {PocketSandHealthThreshold * 100}% health and reduce their attack speed.";
+    public override string ItemPickupDesc => $"On hit, slow down enemies above {SandPouchHealthThreshold * 100}% health and reduce their attack speed.";
 
-    public override string ItemFullDesc => $"Enemies above <style=cIsUtility>{PocketSandHealthThreshold * 100}% health</style> have their <style=cIsUtility>movement speed</style> and <style=cIsDamage>attack speed</style> " +
-        $"reduced by <style=cIsUtility>{PocketSandReduction * 100}</style> for <style=cIsUtility>{PocketSandTimerInit}s</style> <style=cStack>(+{PocketSandTimerStack}s per stack)</style>.";
+    public override string ItemFullDesc => $"Hitting enemies above <style=cIsUtility>{SandPouchHealthThreshold * 100}% health</style> have their <style=cIsUtility>movement speed</style> and <style=cIsDamage>attack speed</style> " +
+        $"reduced by <style=cIsUtility>{SandPouchReduction * 100}</style> for <style=cIsUtility>{SandPouchTimerInit}s</style> <style=cStack>(+{SandPouchTimerStack}s per stack)</style>.";
 
     public override string ItemLore => "<style=cMono>Welcome to DataScraper (v3.1.53 – beta branch)\r\n$ Scraping memory... done.\r\n$ Resolving... done.\r\n$ Combing for relevant data... done.\r\nComplete!\r\nOutputting local audio transcriptions...\r\n\r\n</style>" +
         "Hey, ma!\r\n\r\n" +
@@ -51,10 +51,10 @@ public class PocketSand : Item<PocketSand>
 
     public override void Hooks()
     {
-        IL.RoR2.HealthComponent.TakeDamageProcess += ThrowPocketSand;
+        IL.RoR2.HealthComponent.TakeDamageProcess += ThrowSandPouch;
     }
 
-    private void ThrowPocketSand(ILContext il)
+    private void ThrowSandPouch(ILContext il)
     {
         var combinedHealthIndex = 4;
         var characterMasterIndex = 1;
@@ -70,13 +70,13 @@ public class PocketSand : Item<PocketSand>
             cursor.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
             cursor.EmitDelegate<Action<float, CharacterMaster, DamageInfo, HealthComponent>>((combinedHealth, attacker, damageInfo, healthComponent) =>
             {
-                if (combinedHealth >= healthComponent.fullCombinedHealth * PocketSandHealthThreshold)
+                if (combinedHealth >= healthComponent.fullCombinedHealth * SandPouchHealthThreshold)
                 {
                     var stackCount = GetCount(attacker);
                     if (stackCount > 0)
                     {
                         var victim = healthComponent.GetComponent<CharacterBody>();
-                        victim.AddTimedBuffAuthority(PocketSandDebuff.instance.BuffDef.buffIndex, PocketSandTimerInit + ((stackCount - 1) * PocketSandTimerStack));
+                        victim.AddTimedBuffAuthority(SandPouchDebuff.instance.BuffDef.buffIndex, SandPouchTimerInit + ((stackCount - 1) * SandPouchTimerStack));
                     }
                 }
             });
@@ -97,9 +97,9 @@ public class PocketSand : Item<PocketSand>
 
     private void CreateConfig(ConfigFile config)
     {
-        PocketSandHealthThreshold = config.ActiveBind("Item: " + ItemName, "Health threshold for debuff", 0.9f, "Above what % of target health should hits apply the debuff? (0.9f = 90%)");
-        PocketSandReduction = config.ActiveBind("Item: " + ItemName, "Amount of movement and attack speed reduction", 0.45f, "By what % should target attack and movement speeds be reduced from the debuff? (0.45 = 45%)");
-        PocketSandTimerInit = config.ActiveBind("Item: " + ItemName, "Debuff timer with one " + ItemName, 3f, "How many seconds should the debuff last with one " + ItemName + "?");
-        PocketSandTimerStack = config.ActiveBind("Item: " + ItemName, "Debuff timer per stack after one " + ItemName, 2f, "How many seconds should the debuff be extended by per stack of " + ItemName + " after one?");
+        SandPouchHealthThreshold = config.ActiveBind("Item: " + ItemName, "Health threshold for debuff", 0.9f, "Above what % of target health should hits apply the debuff? (0.9f = 90%)");
+        SandPouchReduction = config.ActiveBind("Item: " + ItemName, "Amount of movement and attack speed reduction", 0.45f, "By what % should target attack and movement speeds be reduced from the debuff? (0.45 = 45%)");
+        SandPouchTimerInit = config.ActiveBind("Item: " + ItemName, "Debuff timer with one " + ItemName, 3f, "How many seconds should the debuff last with one " + ItemName + "?");
+        SandPouchTimerStack = config.ActiveBind("Item: " + ItemName, "Debuff timer per stack after one " + ItemName, 2f, "How many seconds should the debuff be extended by per stack of " + ItemName + " after one?");
     }
 }

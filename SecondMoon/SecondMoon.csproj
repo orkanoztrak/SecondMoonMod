@@ -96,6 +96,7 @@
     <Folder Include="BuffsAndDebuffs\Buffs\Survivor\" />
     <Folder Include="BuffsAndDebuffs\Debuffs\Dots\Item\Tier3\" />
     <Folder Include="BuffsAndDebuffs\Debuffs\Dots\Survivor\" />
+    <Folder Include="BuffsAndDebuffs\Debuffs\PureDebuffs\Item\Prototype\" />
     <Folder Include="BuffsAndDebuffs\Debuffs\PureDebuffs\Survivor\" />
     <Folder Include="Events\" />
     <Folder Include="Interactables\NonPurchase\" />

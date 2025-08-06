@@ -27,9 +27,9 @@ public class BladeOfPetrichor : Equipment<BladeOfPetrichor>
 
     public override string EquipmentLangTokenName => "BLADE_OF_PETRICHOR";
 
-    public override string EquipmentPickupDesc => "Passively deal more damage to healthier enemies. Activate to instead gain a fixed damage bonus and summon executing swords periodically.";
+    public override string EquipmentPickupDesc => "Deal more damage to healthier enemies. Activate to instead gain a fixed damage bonus and summon executing swords periodically.";
 
-    public override string EquipmentFullDescription => $"Passively deal <style=cIsDamage>{BladeOfPetrichorBonusDmgPerRemainingHealth}%</style> more damage to enemies per <style=cIsHealing>1%</style> health they have. " +
+    public override string EquipmentFullDescription => $"Deal <style=cIsDamage>{BladeOfPetrichorBonusDmgPerRemainingHealth}%</style> more damage to enemies per <style=cIsHealing>1%</style> health they have. " +
         $"Activate to instead increase damage dealt by <style=cIsDamage>{BladeOfPetrichorBonusDmgActive * 100}%</style> against all enemies " +
         $"and to <color=#7CFDEA>call down swords to strike enemies</color> within <color=#7CFDEA>{BladeOfPetrichorSwordSearchRadiusActive}m</color> every <color=#7CFDEA>{BladeOfPetrichorSwordFrequencyActive}s</color> for <style=cIsDamage>{BladeOfPetrichorSwordDmgActive * 100}%</style> damage " +
         $"- these swords <color=#7CFDEA>execute</color> enemies below <color=#7CFDEA>{BladeOfPetrichorSwordExecutionThresholdActive * 100}%</color> health. Lasts <style=cIsUtility>{BladeOfPetrichorDuration}s</style>.";

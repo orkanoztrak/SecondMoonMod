@@ -410,7 +410,7 @@ public class LostBuff : Buff<LostBuff>
             var loopCalc = (float)(Math.Floor(ratio / TwistedRegretsLostOrbCountIncreaseThreshold) + 1) * damageInfo.procCoefficient;
             if (loopCalc % 1 != 0)
             {
-                loopCalc = Util.CheckRoll((loopCalc % 1) * 100, attackerBody.master) ? loopCalc + 1 : loopCalc;
+                loopCalc = Util.CheckRoll(loopCalc % 1 * 100, attackerBody.master) ? loopCalc + 1 : loopCalc;
             }
             var loops = (int)loopCalc;
             for (int i = 0; i < loops; i++)

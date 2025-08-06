@@ -28,7 +28,7 @@ public class Thunderbolt : Item<Thunderbolt>
 
     public override string ItemLangTokenName => "THUNDERBOLT";
 
-    public override string ItemPickupDesc => "Increase attack speed. Your attack speed increases also translate to movement speed, cooldown reduction and projectile speed.";
+    public override string ItemPickupDesc => "Increase attack speed. Increasing attack speed also translates to movement speed, cooldown reduction and projectile speed.";
 
     public override string ItemFullDesc => $"Increases <style=cIsDamage>attack speed</style> by <style=cIsDamage>{ThunderboltASInit * 100}%</style> <style=cStack>(+{ThunderboltASStack * 100}% per stack)</style>. " +
         $"<color=#7CFDEA>Your attack speed increase percentage also translates into the following:</color>\r\n\r\n" +
@@ -104,39 +104,6 @@ public class Thunderbolt : Item<Thunderbolt>
                     {
                         projectileSimple.desiredForwardSpeed *= 1 + increase;
                     }
-                }
-            }
-        }
-    }
-
-    private void ThunderboltAttackSpeedAndTranslate(On.RoR2.CharacterBody.orig_RecalculateStats orig, CharacterBody self)
-    {
-        orig(self);
-        var stackCount = GetCount(self);
-        if (stackCount > 0)
-        {
-            self.attackSpeed *= 1 + (ThunderboltASInit + (stackCount - 1) * ThunderboltASStack);
-            var unchanged = self.baseAttackSpeed + self.levelAttackSpeed * (self.level - 1);
-            float increase = self.attackSpeed / unchanged - 1;
-            self.moveSpeed *= 1 + increase * ThunderboltASToMS;
-            float cdr = (1 - 1 / (1 + (increase * 0.5f))) * ThunderboltASToCD * ThunderboltCDMultiplier;
-            if (self.skillLocator)
-            {
-                if (self.skillLocator.primaryBonusStockSkill)
-                {
-                    self.skillLocator.primaryBonusStockSkill.cooldownScale *= 1 - cdr;
-                }
-                if (self.skillLocator.secondaryBonusStockSkill)
-                {
-                    self.skillLocator.secondaryBonusStockSkill.cooldownScale *= 1 - cdr;
-                }
-                if (self.skillLocator.utilityBonusStockSkill)
-                {
-                    self.skillLocator.utilityBonusStockSkill.cooldownScale *= 1 - cdr;
-                }
-                if (self.skillLocator.specialBonusStockSkill)
-                {
-                    self.skillLocator.specialBonusStockSkill.cooldownScale *= 1 - cdr;
                 }
             }
         }

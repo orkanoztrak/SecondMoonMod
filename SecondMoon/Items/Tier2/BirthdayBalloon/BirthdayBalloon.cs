@@ -26,7 +26,7 @@ public class BirthdayBalloon : Item<BirthdayBalloon>
 
     public override string ItemLangTokenName => "BIRTHDAY_BALLOON";
 
-    public override string ItemPickupDesc => "Hold 'Jump' while falling to reduce gravity and periodically heal.";
+    public override string ItemPickupDesc => "Hold 'Jump' while falling to fall slower and periodically heal.";
 
     public override string ItemFullDesc => $"Hold 'Jump' while falling to reduce gravity and <style=cIsHealing>heal</style> for <style=cIsHealing>{BirthdayBalloonHealInit}</style> <style=cStack>(+{BirthdayBalloonHealStack} per stack)</style> per {BirthdayBalloonHealInterval}s.";
 
