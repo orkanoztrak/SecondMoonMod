@@ -24,9 +24,9 @@ public class TotemOfDesign : Item<TotemOfDesign>
 
     public override string ItemLangTokenName => "TOTEM_OF_DESIGN";
 
-    public override string ItemPickupDesc => "Enemy skills have a chance to critically fail. Your skills have a chance to not go on cooldown.";
+    public override string ItemPickupDesc => "Enemy skills have a chance to fail. Your skills have a chance to not go on cooldown.";
 
-    public override string ItemFullDesc => $"";
+    public override string ItemFullDesc => $"Enemy skills have a <color=#7CFDEA>{TotemOfDesignSkillFailChanceInit * 100}% <style=cStack>(+{TotemOfDesignSkillFailChanceStack * 100}% per stack)</style> chance to fail</color>, going on cooldown and dealing <style=cIsDamage>{TotemOfDesignFailBlastHealthScaling * 100}% of maximum health as damage</style> to their allies in a <style=cIsDamage>{TotemOfDesignFailBlastRadius}m</style> radius.\r\n\r\nYour skills have a <color=#7CFDEA>20% <style=cStack>(+20% per stack)</style> chance to not go on cooldown.</color>";
 
     public override string ItemLore => $"Have I ever told you why I love Design?\r\n\r\n" +
         $"Unlike the other compounds, Design does not have its own form. It is the creator's own skills and vision that give it form. In this regard, Design is the most abstract compound that also tells the most about the contraption and its maker.\r\n\r\n" +
@@ -60,7 +60,7 @@ public class TotemOfDesign : Item<TotemOfDesign>
 
     private void TotemOfDesignCauseSkillFailure(On.RoR2.GenericSkill.orig_OnExecute orig, GenericSkill self)
     {
-        if (self.characterBody && self.skillDef)
+        if (self.characterBody && self.skillDef && self.finalRechargeInterval > 0.5f)
         {
             var stackCount = 0;
             TeamIndex enemyTeam = TeamIndex.None;
@@ -160,8 +160,8 @@ public class TotemOfDesign : Item<TotemOfDesign>
 
     private void CreateConfig(ConfigFile config)
     {
-        TotemOfDesignSkillFailChanceInit = config.ActiveBind("Item: " + ItemName, "Skill fail chance with one " + ItemName, 100f, "What % of skills should fail with one " + ItemName + " on the opposing team? This scales hyperbolically (0.1 = 10%, refer to Tougher Times on the wiki).");
-        TotemOfDesignSkillFailChanceStack = config.ActiveBind("Item: " + ItemName, "Skill fail chance per stack of " + ItemName + " after one", 100f, "What % of skills should fail per stack of " + ItemName + " after one on the opposing team? This scales hyperbolically (0.1 = 10%, refer to Tougher Times on the wiki).");
+        TotemOfDesignSkillFailChanceInit = config.ActiveBind("Item: " + ItemName, "Skill fail chance with one " + ItemName, 0.1f, "What % of skills should fail with one " + ItemName + " on the opposing team? This scales hyperbolically (0.1 = 10%, refer to Tougher Times on the wiki).");
+        TotemOfDesignSkillFailChanceStack = config.ActiveBind("Item: " + ItemName, "Skill fail chance per stack of " + ItemName + " after one", 0.1f, "What % of skills should fail per stack of " + ItemName + " after one on the opposing team? This scales hyperbolically (0.1 = 10%, refer to Tougher Times on the wiki).");
         TotemOfDesignFailBlastRadius = config.ActiveBind("Item: " + ItemName, "Failed skill blast radius", 15f, "If a skill fails, the resulting AOE will have a raidus of this many meters.");
         TotemOfDesignFailBlastHealthScaling = config.ActiveBind("Item: " + ItemName, "Failed skill blast health percent", 0.1f, "What % of the skill user's health pool should be dealt as damage to enemies in an area? (0.1 = 10%)");
     }
