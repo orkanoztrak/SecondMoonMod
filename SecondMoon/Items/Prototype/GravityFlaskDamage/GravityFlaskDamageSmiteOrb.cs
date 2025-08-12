@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace SecondMoon.Items.Prototype.GravityFlask;
+namespace SecondMoon.Items.Prototype.GravityFlaskDamage;
 
-public class GravityFlaskSmiteOrb : GenericDamageOrb, IOrbFixedUpdateBehavior
+public class GravityFlaskDamageSmiteOrb : GenericDamageOrb, IOrbFixedUpdateBehavior
 {
     private Vector3 lastKnownTargetPosition;
     public override void Begin()

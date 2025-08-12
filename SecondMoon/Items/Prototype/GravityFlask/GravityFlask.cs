@@ -5,6 +5,7 @@ using RoR2;
 using RoR2.Orbs;
 using RoR2.UI;
 using SecondMoon.Items.ItemTiers.TierPrototype;
+using SecondMoon.Items.Prototype.GravityFlaskDamage;
 using SecondMoon.Utils;
 using System;
 using System.Collections.Generic;
@@ -225,7 +226,7 @@ public class GravityFlask : Item<GravityFlask>
                         if (tracker.GravityFlaskDamageTracker >= GravityFlaskFinalThreshold && Util.CheckRoll(100 * damageInfo.procCoefficient, attacker))
                         { 
                             var smiteDamage = GravityFlaskProcDamageInit + ((stackCount - 1) * GravityFlaskProcDamageStack);
-                            var smiteOrb = new GravityFlaskSmiteOrb
+                            var smiteOrb = new GravityFlaskDamageSmiteOrb
                             {
                                 attacker = attackerBody.gameObject,
                                 damageColorIndex = DamageColorIndex.Item,
@@ -454,7 +455,7 @@ public class GravityFlask : Item<GravityFlask>
         if (IsEnabled)
         {
             CreateConfig(config);
-            OrbAPI.AddOrb(typeof(GravityFlaskSmiteOrb));
+            OrbAPI.AddOrb(typeof(GravityFlaskDamageSmiteOrb));
             CreateLang();
             CreateItem();
             Hooks();
