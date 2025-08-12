@@ -21,7 +21,7 @@ public class KnitClover : Item<KnitClover>
 
     public override string ItemLangTokenName => "KNIT_CLOVER";
 
-    public override string ItemPickupDesc => "Your non-critical hits have a chance to have a higher proc coefficient.";
+    public override string ItemPickupDesc => "Your non-critical hits have a chance to be lucky.";
 
     public override string ItemFullDesc => $"<style=cIsDamage>{KnitCloverProcChanceInit}%</style> <style=cStack>(+{KnitCloverProcChanceStack}% per stack)</style> chance for <style=cIsDamage>non-critical hits</style> " + 
         $"to have their <style=cIsUtility>proc coefficient</style> increased by <style=cIsUtility>{KnitCloverProcCoefficientBoost * 100f}%</style>. " + 

@@ -20,6 +20,10 @@ public class TotemOfDesign : Item<TotemOfDesign>
     public static ConfigOption<float> TotemOfDesignSkillFailChanceStack;
     public static ConfigOption<float> TotemOfDesignFailBlastRadius;
     public static ConfigOption<float> TotemOfDesignFailBlastHealthScaling;
+
+    public static ConfigOption<float> TotemOfDesignSelfSkillNoCooldownChanceInit;
+    public static ConfigOption<float> TotemOfDesignSelfSkillNoCooldownChanceStack;
+
     public override string ItemName => "Totem of Design";
 
     public override string ItemLangTokenName => "TOTEM_OF_DESIGN";
@@ -55,10 +59,10 @@ public class TotemOfDesign : Item<TotemOfDesign>
     public override void Hooks()
     {
         On.RoR2.CharacterBody.OnInventoryChanged += TotemOfDesignUpdateTracker;
-        On.RoR2.GenericSkill.OnExecute += TotemOfDesignCauseSkillFailure;
+        On.RoR2.GenericSkill.OnExecute += TotemOfDesignSkillBehaviors;
     }
 
-    private void TotemOfDesignCauseSkillFailure(On.RoR2.GenericSkill.orig_OnExecute orig, GenericSkill self)
+    private void TotemOfDesignSkillBehaviors(On.RoR2.GenericSkill.orig_OnExecute orig, GenericSkill self)
     {
         if (self.characterBody && self.skillDef && self.finalRechargeInterval > 0.5f)
         {
@@ -80,8 +84,7 @@ public class TotemOfDesign : Item<TotemOfDesign>
                 }
                 if (stackCount > 0)
                 {
-                    var roll = GeneralUtils.HyperbolicScaling(TotemOfDesignSkillFailChanceInit + (stackCount - 1) * TotemOfDesignSkillFailChanceStack);
-                    if (Util.CheckRoll(roll * 100))
+                    if (Util.CheckRoll(GeneralUtils.HyperbolicScaling(TotemOfDesignSkillFailChanceInit + (stackCount - 1) * TotemOfDesignSkillFailChanceStack) * 100))
                     {
                         var state = self.characterBody.GetComponent<SetStateOnHurt>();
                         if (state)
@@ -99,8 +102,24 @@ public class TotemOfDesign : Item<TotemOfDesign>
                     }
                 }
             }
+            orig(self);
+            var inventory = self.characterBody.inventory;
+            if (inventory)
+            {
+                var stackCount2 = inventory.GetItemCount(ItemDef);
+                if (stackCount2 > 0)
+                {
+                    if (Util.CheckRoll(GeneralUtils.HyperbolicScaling(TotemOfDesignSelfSkillNoCooldownChanceInit + (stackCount2 - 1) * TotemOfDesignSelfSkillNoCooldownChanceStack) * 100))
+                    {
+                        self.RestockSteplike();
+                    }
+                }
+            }
         }
-        orig(self);
+        else
+        {
+            orig(self);
+        }
         static void CreatePulseAttack(CharacterBody characterBody, TeamIndex teamIndex)
         {
             Debug.Log("called");
@@ -164,5 +183,7 @@ public class TotemOfDesign : Item<TotemOfDesign>
         TotemOfDesignSkillFailChanceStack = config.ActiveBind("Item: " + ItemName, "Skill fail chance per stack of " + ItemName + " after one", 0.1f, "What % of skills should fail per stack of " + ItemName + " after one on the opposing team? This scales hyperbolically (0.1 = 10%, refer to Tougher Times on the wiki).");
         TotemOfDesignFailBlastRadius = config.ActiveBind("Item: " + ItemName, "Failed skill blast radius", 15f, "If a skill fails, the resulting AOE will have a raidus of this many meters.");
         TotemOfDesignFailBlastHealthScaling = config.ActiveBind("Item: " + ItemName, "Failed skill blast health percent", 0.1f, "What % of the skill user's health pool should be dealt as damage to enemies in an area? (0.1 = 10%)");
+        TotemOfDesignSelfSkillNoCooldownChanceInit = config.ActiveBind("Item: " + ItemName, "Skill no cooldown chance with one " + ItemName, 0.2f, "What % of skills should not go on cooldown upon use with one " + ItemName + "? This scales hyperbolically (0.2 = 20%, refer to Tougher Times on the wiki).");
+        TotemOfDesignSelfSkillNoCooldownChanceStack = config.ActiveBind("Item: " + ItemName, "Skill no cooldown chance per stack of " + ItemName + " after one", 0.2f, "What % of skills should not go on cooldown upon use per stack of " + ItemName + " after one? This scales hyperbolically (0.2 = 20%, refer to Tougher Times on the wiki).");
     }
 }

@@ -32,7 +32,19 @@ public class NarrowMagnifier : Item<NarrowMagnifier>
         $"<color=#FF7F7F> Against enemies outside this range, reduce <style=cIsDamage>damage dealt</style> by <style=cIsDamage>{NarrowMagnifierDamageReductionInit * 100}%</style> <style=cStack>(+{NarrowMagnifierDamageReductionStack * 100}% per stack)</style>. " +
         $"You cannot critically strike.</color>";
 
-    public override string ItemLore => "Test";
+    public override string ItemLore => "\"Mommy, mommy!\"\r\n\r\n" +
+        "\"What is it, darling?\"\r\n\r\n" +
+        "\"Look at this toy I found! Things look bigger when I look through it, but sometimes they look weird!\"﻿\r\n\r\n" +
+        "\"Oh honey, you took this from daddy's lab didn't you? We've talked about this before, haven't we?\"\r\n\r\n" +
+        "\"Sorry... I got curious...\"﻿\r\n\r\n" +
+        "\"Well, since we have it here, at least let me show you how it works. See, this isn't a toy, it's a tool to see things more clearly. That's why things look bigger through it.\"﻿\r\n\r\n" +
+        "\"Ooh!\"﻿\r\n\r\n" +
+        "\"But that doesn't mean it can't be fun or interesting! See, when it's sunny and you take a piece of paper, like this...\"﻿\r\n\r\n" +
+        "\"Eep! It's burning! But it's cool! How did you know it would do that?\"﻿\r\n\r\n" +
+        "\"Hehe, mommy was young once too, you know. My friends and I would do this often. Now be a good girl and put it back where you found it, won't you?\"\r\n\r\n" +
+        "\"Yes!\"\r\n\r\n" +
+        "\"And no snacks until tomorrow.\"\r\n\r\n" +
+        "\"Waah, not fair!!\"";
 
     public override ItemTierDef ItemTierDef => Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/LunarTierDef.asset").WaitForCompletion();
 

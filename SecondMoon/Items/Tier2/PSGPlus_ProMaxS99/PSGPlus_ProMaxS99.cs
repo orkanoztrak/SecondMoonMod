@@ -11,9 +11,9 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 
-namespace SecondMoon.Items.Tier2.PSG_ProMaxS99;
+namespace SecondMoon.Items.Tier2.PSGPlus_ProMaxS99;
 
-public class PSG_ProMaxS99 : Item<PSG_ProMaxS99>
+public class PSGPlus_ProMaxS99 : Item<PSGPlus_ProMaxS99>
 {
     public static ConfigOption<float> PSGShieldInit;
     public static ConfigOption<float> PSGShieldStack;
